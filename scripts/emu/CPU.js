@@ -10,7 +10,7 @@ define(["underscore"], function(_) {
     const E = "E";
     const H = "H";
     const L = "L";
-    const F = "L";
+    const F = "F";
     const PC = "PC";
     const SP = "SP";
     const M = "M";
@@ -30,7 +30,8 @@ define(["underscore"], function(_) {
         };
     };
 
-    CPU.prototype.increaseCycles = function(m, t) {
+    CPU.prototype._increaseCycles = function(m) {
+        var t = m*4;
         this._reg.M = m;
         this._reg.T = t;
         this._clock.M += m;
@@ -38,7 +39,7 @@ define(["underscore"], function(_) {
     };
 
     CPU.prototype.NOP = function() {
-        this.increaseCycles(1, 4);
+        this._increaseCycles(1);
     };
 
     CPU.prototype.ADD = function(reg1, reg2) {
@@ -53,10 +54,23 @@ define(["underscore"], function(_) {
             this._reg.F |= 0x10;
         }
         this._reg.A &= 255;
-        this._reg.M = 1;
-        this._reg.T = 4;
+
+        this._increaseCycles(1);
+    };
+
+    CPU.prototype.CP = function(reg1, reg2) {
+        var r1 = this._reg[reg1];
+        r1 -= reg2;
+        this._reg.F |= 0x40;
+        if(!(r1 & 255)) this._reg.F |= 0x80;
+        if(r1 < 0) this._reg.F |= 0x10;
+
+        this._increaseCycles(1);
+    };
+
+    CPU.prototype.PUSH = function(reg) {
+
     };
 
     return CPU;
 });
-
