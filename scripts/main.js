@@ -9,6 +9,7 @@ requirejs.config({
     }
 });
 
-requirejs(function() {
+requirejs(["emu/CPU"],
+    function(CPU) {
 
-});
+    });
