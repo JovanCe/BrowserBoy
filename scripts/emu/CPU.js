@@ -3,20 +3,20 @@
  */
 
 define(["underscore"], function(_) {
-    const A = "A";
-    const B = "B";
-    const C = "C";
-    const D = "D";
-    const E = "E";
-    const H = "H";
-    const L = "L";
-    const F = "F";
-    const PC = "PC";
-    const SP = "SP";
-    const M = "M";
-    const T = "T";
-
     var CPU = function() {
+        this.A = "A";
+        this.B = "B";
+        this.C = "C";
+        this.D = "D";
+        this.E = "E";
+        this.H = "H";
+        this.L = "L";
+        this.F = "F";
+        this.PC = "PC";
+        this.SP = "SP";
+        this.M = "M";
+        this.T = "T";
+
         // registers
         this._reg = {
             A:0, B:0, C:0, D:0, E:0, H:0, L:0, F:0,    // 8-bit registers
