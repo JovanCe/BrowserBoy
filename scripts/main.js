@@ -2,14 +2,15 @@
  * Created by JovanCe on 11/8/15.
  */
 
-requirejs.config({
+require.config({
     baseUrl: "scripts",
     paths: {
-        emu: "emu"
+        CPU: "emu/CPU",
+        MemoryManager: "emu/MemoryManager",
+        lodash: "lib/lodash"
     }
 });
 
-requirejs(["emu/CPU"],
+require(["CPU"],
     function(CPU) {
-
     });

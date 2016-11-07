@@ -2,7 +2,7 @@
  * Created by JovanCe on 11/8/15.
  */
 
-define(["underscore"], function(_) {
+define(["lodash", "MemoryManager"], function(_, MemoryManager) {
     var CPU = function() {
         this.A = "A";
         this.B = "B";
@@ -62,8 +62,12 @@ define(["underscore"], function(_) {
         var r1 = this._reg[reg1];
         r1 -= reg2;
         this._reg.F |= 0x40;
-        if(!(r1 & 255)) this._reg.F |= 0x80;
-        if(r1 < 0) this._reg.F |= 0x10;
+        if(!(r1 & 255)) {
+            this._reg.F |= 0x80;
+        }
+        if(r1 < 0) {
+            this._reg.F |= 0x10;
+        }
 
         this._increaseCycles(1);
     };

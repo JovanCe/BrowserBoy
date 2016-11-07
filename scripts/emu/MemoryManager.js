@@ -3,7 +3,7 @@
  */
 
 
-define(["underscore", "CPU"], function(_, CPU) {
+define(["lodash"], function(_) {
     function MemoryManager() {
     }
 
