@@ -114,5 +114,5 @@ define(["lodash", "MemoryManager"], function(_, MM) {
         _step(4);
     };
 
-    return CPU;
+    return new CPU();
 });
