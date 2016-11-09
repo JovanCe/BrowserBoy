@@ -11,6 +11,10 @@ require.config({
     }
 });
 
-require(["CPU"],
-    function(CPU) {
+require(["CPU", "MemoryManager"],
+    function(CPU, MM) {
+        CPU.reset();
+        MM.reset();
+        MM.embedBios();
+        CPU.dispatch();
     });
