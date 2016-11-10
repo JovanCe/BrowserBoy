@@ -53,12 +53,20 @@ define(["lodash", "MemoryManager"], function(_, MM) {
         this._stop = false;
     };
 
+    CPU.prototype.dispatch = function() {
+      //  while(true) {
+            var op = MM.readByte(this._reg.PC++);
+            this._reg.PC &= 65536;
+
+      //  }
+    };
+
     CPU.prototype.NOP = function() {
         _step(1);
     };
 
     CPU.prototype.HALT = function() {
-        _halt = true;
+        this._halt = true;
         _step(1);
     };
 
