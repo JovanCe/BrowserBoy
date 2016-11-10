@@ -39,10 +39,8 @@ body h1 {
 
 #screen {
     display: block;
-    height: 160px;
-    width: 144px;
     margin: 0 auto;
-    margin-top: 77px;
+    margin-top: 82px;
     border: 2px solid black;
 }
 
