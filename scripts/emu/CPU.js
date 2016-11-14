@@ -2,7 +2,7 @@
  * Created by JovanCe on 11/8/15.
  */
 
-define(["lodash", "MemoryManager"], function(_, MM) {
+define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
     var CPU = function() {
         this.A = "A";
         this.B = "B";
@@ -41,6 +41,7 @@ define(["lodash", "MemoryManager"], function(_, MM) {
         this._reg.T = t;
         this._clock.M += m;
         this._clock.T += t;
+        GPU._clock.T += t;
     };
 
     CPU.prototype.reset = function() {
