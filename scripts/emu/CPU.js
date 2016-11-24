@@ -113,20 +113,27 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._step(1);
     };
 
-    CPU.prototype.LD = function(reg) {
-        // get the required address from the current instruction
-        var address = MM.readWord(this._reg.PC);
-        // increase PC by a word
-        this._reg.PC += 2;
-        // read concrete byte
-        this._reg[reg] = MM.readByte(address);
-        this._step(4);
-    };
-
     CPU.prototype.LDr = function(src, dest) {
         this._reg[dest] = this._reg[src];
         this._step(1);
     };
+
+    CPU.prototype.LDn = function(reg) {
+        this._reg[reg] = MM.readByte(this._reg.PC++);
+        this._step(2);
+    };
+
+    CPU.prototype.LDn16 = function(reg1, reg2) {
+        this._reg[reg1] = MM.readByte(this._reg.PC++);
+        this._reg[reg2] = MM.readByte(this._reg.PC++);
+        this._step(3);
+    };
+
+    CPU.prototype.LDr16n16 = function(reg) {
+        this._reg[reg] = MM.readWord(this._reg.PC);
+        this._reg.PC+=2;
+        this._step(3);
+    }
 
 
     CPU.prototype.initInstructions = function() {
@@ -180,7 +187,22 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
             LDrrLD: this.LDr.curry(L, D).bind(_this),
             LDrrLE: this.LDr.curry(L, E).bind(_this),
             LDrrLH: this.LDr.curry(L, H).bind(_this),
-            LDrrLL: this.LDr.curry(L, L).bind(_this)
+            LDrrLL: this.LDr.curry(L, L).bind(_this),
+
+            LDnA: this.LDn.curry(A).bind(_this),
+            LDnB: this.LDn.curry(B).bind(_this),
+            LDnC: this.LDn.curry(C).bind(_this),
+            LDnD: this.LDn.curry(D).bind(_this),
+            LDnE: this.LDn.curry(E).bind(_this),
+            LDnH: this.LDn.curry(H).bind(_this),
+            LDnL: this.LDn.curry(L).bind(_this),
+
+            LDnnBC: this.LDn16.curry(B, C).bind(_this),
+            LDnnDE: this.LDn16.curry(D, E).bind(_this),
+            LDnnHL: this.LDn16.curry(H, L).bind(_this),
+            LDnnSP: this.LDr16n16.curry(SP).bind(_this)
+
+
         }
     };
 
