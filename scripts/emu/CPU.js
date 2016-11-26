@@ -35,8 +35,10 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this.initInstructions();
     };
 
-    CPU.prototype._step = function(m) {
-        var t = m*4;
+    CPU.prototype._step = function(m, t) {
+        if(t == undefined || t == null) {
+            t=m*4;
+        }
         this._reg.M = m;
         this._reg.T = t;
         this._clock.M += m;
