@@ -120,12 +120,12 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._step(1);
     };
 
-    CPU.prototype.LDn = function(reg) {
+    CPU.prototype.LDrn = function(reg) {
         this._reg[reg] = MM.readByte(this._reg.PC++);
         this._step(2);
     };
 
-    CPU.prototype.LDn16 = function(reg1, reg2) {
+    CPU.prototype.LDrn16 = function(reg1, reg2) {
         this._reg[reg1] = MM.readByte(this._reg.PC++);
         this._reg[reg2] = MM.readByte(this._reg.PC++);
         this._step(3);
@@ -137,11 +137,74 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._step(3);
     };
 
-    CPU.prototype.LDrm = function(src1, src2, dest) {
-        this._reg[dest] = MM.readByte(this._reg[src1] << 8 + this._reg[src2])
+    CPU.prototype.LDrmm = function(src1, src2, dest, offset) {
+        if(!offset) {
+            offset = 0;
+        }
+        this._reg[dest] = MM.readByte(this._reg[src1] << 8 + this._reg[src2] + offset);
         this._step(1,8);
     };
 
+    CPU.prototype.LDmmr = function(src, dest1, dest2, offset) {
+        if(!offset) {
+            offset = 0;
+        }
+        MM.writeByte(this._reg[dest1] << 8 + this._reg[dest2] + offset, this._reg[src]);
+        this._step(1,8);
+    };
+
+    CPU.prototype.LDmn = function(dest1, dest2) {
+        MM.writeByte(this._reg[dest1] << 8 + this._reg[dest2], MM.readByte(this._reg.PC++));
+        this._step(2, 12);
+    };
+
+    CPU.prototype.LDa16r = function(reg) {
+        MM.writeByte(MM.readWord(this._reg[PC]), this._reg[reg]);
+        this._reg.PC += 2;
+        this._step(3, 16);
+    };
+
+    CPU.prototype.LDa16r16 = function(reg) {
+        MM.writeByte(MM.readWord(this._reg[PC]), this._reg[reg]);
+        this._reg.PC += 2;
+        this._step(3, 20);
+    };
+
+    CPU.prototype.LDra16 = function(reg) {
+        this._reg[reg] = MM.readByte(MM.readWord(this._reg[PC]));
+        this._reg.PC += 2;
+        this._step(3, 16);
+    };
+
+    CPU.prototype.LDar = function(reg) {
+        MM.writeByte(0xFF00 + MM.readByte(this._reg.PC++), this._reg[reg]);
+        this._step(2, 12);
+    };
+
+    CPU.prototype.LDra = function(reg) {
+        this._reg[reg] = MM.readByte(0xFF00 + MM.readByte(this._reg.PC++));
+        this._step(2, 12);
+    };
+
+    CPU.prototype.LDmr = function(src, destAddr) {
+        MM.writeByte(0xFF00 + this._reg[destAddr], this._reg[src]);
+        this._step(2, 8);
+    };
+
+    CPU.prototype.LDrm = function(srcAddr, dest) {
+        this._reg[dest] = MM.readByte(0xFF00 + this._reg[srcAddr]);
+        this._step(2, 8);
+    };
+
+    CPU.prototype.LDr16rr = function(src1, src2, dest) {
+        this._reg[dest] = this._reg[src1] << 8 + this._reg[src2];
+        this._step(1, 8);
+    };
+
+    CPU.prototype.LDr16rr = function(src1, src2, dest) {
+        this._reg[dest] = this._reg[src1] << 8 + this._reg[src2];
+        this._step(1, 8);
+    };
 
     CPU.prototype.initInstructions = function() {
         var _this = this;
@@ -196,26 +259,61 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
             LDrrLH: this.LDr.curry(L, H).bind(_this),
             LDrrLL: this.LDr.curry(L, L).bind(_this),
 
-            LDnA: this.LDn.curry(A).bind(_this),
-            LDnB: this.LDn.curry(B).bind(_this),
-            LDnC: this.LDn.curry(C).bind(_this),
-            LDnD: this.LDn.curry(D).bind(_this),
-            LDnE: this.LDn.curry(E).bind(_this),
-            LDnH: this.LDn.curry(H).bind(_this),
-            LDnL: this.LDn.curry(L).bind(_this),
+            LDnA: this.LDrn.curry(A).bind(_this),
+            LDnB: this.LDrn.curry(B).bind(_this),
+            LDnC: this.LDrn.curry(C).bind(_this),
+            LDnD: this.LDrn.curry(D).bind(_this),
+            LDnE: this.LDrn.curry(E).bind(_this),
+            LDnH: this.LDrn.curry(H).bind(_this),
+            LDnL: this.LDrn.curry(L).bind(_this),
 
-            LDnnBC: this.LDn16.curry(B, C).bind(_this),
-            LDnnDE: this.LDn16.curry(D, E).bind(_this),
-            LDnnHL: this.LDn16.curry(H, L).bind(_this),
+            LDnnBC: this.LDrn16.curry(B, C).bind(_this),
+            LDnnDE: this.LDrn16.curry(D, E).bind(_this),
+            LDnnHL: this.LDrn16.curry(H, L).bind(_this),
             LDnnSP: this.LDr16n16.curry(SP).bind(_this),
 
-            LDrmAHL: this.LDrm.curry(H, L, A).bind(_this),
-            LDrmBHL: this.LDrm.curry(H, L, B).bind(_this),
-            LDrmCHL: this.LDrm.curry(H, L, C).bind(_this),
-            LDrmDHL: this.LDrm.curry(H, L, D).bind(_this),
-            LDrmEHL: this.LDrm.curry(H, L, E).bind(_this),
-            LDrmHHL: this.LDrm.curry(H, L, H).bind(_this),
-            LDrmLHL: this.LDrm.curry(H, L, L).bind(_this)
+            LDrmAHL: this.LDrmm.curry(H, L, A).bind(_this),
+            LDrmAHLplus: this.LDrmm.curry(H, L, A, 1).bind(_this),
+            LDrmAHLminus: this.LDrmm.curry(H, L, A, -1).bind(_this),
+            LDrmBHL: this.LDrmm.curry(H, L, B).bind(_this),
+            LDrmCHL: this.LDrmm.curry(H, L, C).bind(_this),
+            LDrmDHL: this.LDrmm.curry(H, L, D).bind(_this),
+            LDrmEHL: this.LDrmm.curry(H, L, E).bind(_this),
+            LDrmHHL: this.LDrmm.curry(H, L, H).bind(_this),
+            LDrmLHL: this.LDrmm.curry(H, L, L).bind(_this),
+            LDrmABC: this.LDrmm.curry(B, C, A).bind(_this),
+            LDrmADE: this.LDrmm.curry(D, E, A).bind(_this),
+
+            LDmrHLA: this.LDmmr.curry(A, H, L).bind(_this),
+            LDmrHLplusA: this.LDmmr.curry(A, H, L, 1).bind(_this),
+            LDmrHLminusA: this.LDmmr.curry(A, H, L, -1).bind(_this),
+            LDmrHLB: this.LDmmr.curry(B, H, L).bind(_this),
+            LDmrHLC: this.LDmmr.curry(C, H, L).bind(_this),
+            LDmrHLD: this.LDmmr.curry(D, H, L).bind(_this),
+            LDmrHLE: this.LDmmr.curry(E, H, L).bind(_this),
+            LDmrHLH: this.LDmmr.curry(H, H, L).bind(_this),
+            LDmrHLL: this.LDmmr.curry(L, H, L).bind(_this),
+            LDmrBCA: this.LDmmr.curry(A, B, C).bind(_this),
+            LDmrDEA: this.LDmmr.curry(A, D, E).bind(_this),
+
+            LDmnHL: this.LDmn.curry(H, L).bind(_this),
+
+            LDarSP: this.LDa16r16.curry(SP).bind(_this),
+
+            LDaarA: this.LDa16r.curry(A).bind(_this),
+
+            LDraaA: this.LDra16.curry(A).bind(_this),
+
+            LDarA: this.LDar.curry(A).bind(_this),
+
+            LDraA: this.LDra.curry(A).bind(_this),
+
+            LDmrCA: this.LDmr.curry(A, C).bind(_this),
+
+            LDrmAC: this.LDrm.curry(C, A).bind(_this)
+
+
+
 
         }
     };
