@@ -36,7 +36,7 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
     };
 
     CPU.prototype._step = function(m, t) {
-        if(t == undefined || t == null) {
+        if(!t) {
             t=m*4;
         }
         this._reg.M = m;
