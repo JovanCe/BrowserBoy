@@ -135,7 +135,12 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._reg[reg] = MM.readWord(this._reg.PC);
         this._reg.PC+=2;
         this._step(3);
-    }
+    };
+
+    CPU.prototype.LDrm = function(src1, src2, dest) {
+        this._reg[dest] = MM.readByte(this._reg[src1] << 8 + this._reg[src2])
+        this._step(1,8);
+    };
 
 
     CPU.prototype.initInstructions = function() {
@@ -202,8 +207,15 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
             LDnnBC: this.LDn16.curry(B, C).bind(_this),
             LDnnDE: this.LDn16.curry(D, E).bind(_this),
             LDnnHL: this.LDn16.curry(H, L).bind(_this),
-            LDnnSP: this.LDr16n16.curry(SP).bind(_this)
+            LDnnSP: this.LDr16n16.curry(SP).bind(_this),
 
+            LDrmAHL: this.LDrm.curry(H, L, A).bind(_this),
+            LDrmBHL: this.LDrm.curry(H, L, B).bind(_this),
+            LDrmCHL: this.LDrm.curry(H, L, C).bind(_this),
+            LDrmDHL: this.LDrm.curry(H, L, D).bind(_this),
+            LDrmEHL: this.LDrm.curry(H, L, E).bind(_this),
+            LDrmHHL: this.LDrm.curry(H, L, H).bind(_this),
+            LDrmLHL: this.LDrm.curry(H, L, L).bind(_this)
 
         }
     };
