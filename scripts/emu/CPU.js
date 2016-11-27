@@ -110,11 +110,11 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._reg.F = 0;
 
         if(!(this._reg[reg1] & 255)) {
-            this._reg.F |= 0x80;
+            this._setZeroFlag();
         }
 
         if(this._reg[reg1] > 255) {
-            this._reg.F |= 0x10;
+            this._setCarryFlag();
         }
         this._reg[reg1] &= 255;
 
@@ -126,10 +126,10 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         r1 -= reg2;
         this._reg.F |= 0x40;
         if(!(r1 & 255)) {
-            this._reg.F |= 0x80;
+            this._setZeroFlag();
         }
         if(r1 < 0) {
-            this._reg.F |= 0x10;
+            this._setCarryFlag();
         }
 
         this._step(1);
@@ -373,8 +373,6 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
             LDrmAC: this.LDrm.curry(C, A).bind(_this),
 
             LDHLSPn: this.LDrrr16n(SP, H, L).bind(_this)
-
-
 
         }
     };
