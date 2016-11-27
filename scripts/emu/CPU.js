@@ -90,12 +90,12 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
     };
 
     CPU.prototype.dispatch = function() {
-      //  while(true) {
+      while(!(this._halt || this._stop)) {
             var instruction = MM.readByte(this._reg.PC++);
             this._reg.PC &= 65536;
             this._insMap[instruction]();
 
-      //  }
+      }
     };
 
     CPU.prototype.NOP = function() {
