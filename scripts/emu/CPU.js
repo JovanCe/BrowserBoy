@@ -30,7 +30,7 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         };
 
         this._halt = false;
-        this._stop = false;
+        this._stop = true;
 
         this._initInstructions();
         this._mapInstructions();
@@ -54,7 +54,7 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._clock.M = 0;
         this._clock.T = 0;
         this._halt = false;
-        this._stop = false;
+        this._stop = true;
     };
 
     CPU.prototype._resetZeroFlag = function() {
