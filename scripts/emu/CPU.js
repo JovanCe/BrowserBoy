@@ -238,6 +238,34 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._step(1, 8);
     };
 
+    CPU.prototype.LDrrr16n = function(src, dest1, dest2) {
+        var offset = MM.readByte(this._reg.PC++);
+        // the offset is signed, need to convert it from 2-complement representation
+        if (offset > 127) {
+            offset = -((~offset + 1) & 255);
+        }
+        var value = this._reg[src] + offset;
+        this._reg.dest1 = (value >> 8) & 255;
+        this._reg.dest2 = value & 255;
+
+        // set flags
+        this._reg.F = 0;
+        if(offset > 0xFFFF) {
+            this._setCarryFlag();
+        }
+        else {
+            this._resetCarryFlag();
+        }
+        if((this._reg.SP & 0xF)  + (offset & 0xF) > 0xF) {
+            this._setHalfCarryFlag();
+        }
+        else {
+            this._resetHalfCarryFlag();
+        }
+
+        this._step(2, 12);
+    };
+
     CPU.prototype.initInstructions = function() {
         var _this = this;
         this._ins = {
@@ -342,8 +370,9 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
 
             LDmrCA: this.LDmr.curry(A, C).bind(_this),
 
-            LDrmAC: this.LDrm.curry(C, A).bind(_this)
+            LDrmAC: this.LDrm.curry(C, A).bind(_this),
 
+            LDHLSPn: this.LDrrr16n(SP, H, L).bind(_this)
 
 
 
