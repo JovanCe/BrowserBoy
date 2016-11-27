@@ -56,6 +56,38 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._stop = false;
     };
 
+    CPU.prototype._resetZeroFlag = function() {
+        this._reg.F &= 0x70;
+    };
+
+    CPU.prototype._resetSubstractFlag = function() {
+        this._reg.F &= 0xB0;
+    };
+
+    CPU.prototype._resetHalfCarryFlag = function() {
+        this._reg.F &= 0xD0;
+    };
+
+    CPU.prototype._resetCarryFlag = function() {
+        this._reg.F &= 0xE0;
+    };
+
+    CPU.prototype._setZeroFlag = function() {
+        this._reg.F |= 0x80;
+    };
+
+    CPU.prototype._setSubstractFlag = function() {
+        this._reg.F |= 0x40;
+    };
+
+    CPU.prototype._setHalfCarryFlag = function() {
+        this._reg.F |= 0x20;
+    };
+
+    CPU.prototype._setCarryFlag = function() {
+        this._reg.F |= 0x10;
+    };
+
     CPU.prototype.dispatch = function() {
       //  while(true) {
             var op = MM.readByte(this._reg.PC++);
