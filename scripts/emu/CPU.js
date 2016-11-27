@@ -32,7 +32,8 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._halt = false;
         this._stop = false;
 
-        this.initInstructions();
+        this._initInstructions();
+        this._mapInstructions();
     };
 
     CPU.prototype._step = function(m, t) {
@@ -90,8 +91,9 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
 
     CPU.prototype.dispatch = function() {
       //  while(true) {
-            var op = MM.readByte(this._reg.PC++);
+            var instruction = MM.readByte(this._reg.PC++);
             this._reg.PC &= 65536;
+            this._insMap[instruction]();
 
       //  }
     };
@@ -266,7 +268,7 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._step(2, 12);
     };
 
-    CPU.prototype.initInstructions = function() {
+    CPU.prototype._initInstructions = function() {
         var _this = this;
         this._ins = {
             LDrrAA: this.LDr.curry(A, A).bind(_this),
@@ -375,6 +377,11 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
             LDHLSPn: this.LDrrr16n.curry(SP, H, L).bind(_this)
 
         }
+    };
+
+    CPU.prototype._mapInstructions = function() {
+        // position of the instructions corresponds to its memory address
+        this._insMap = {}
     };
 
     return new CPU();
