@@ -10,7 +10,7 @@ requirejs.config({
 tests = [
     "tests/cpu"
 ];
-requirejs(function(){
+requirejs(["jquery"],function($){
     mocha.setup('bdd');
     requirejs(tests, function(){
         mocha.run();
