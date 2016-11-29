@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../styles/mocha.css">
+    <script src="../scripts/util.js"></script>
+    <script src="../scripts/test/lib/mocha.js"></script>
+    <script src="../scripts/test/lib/chai.js"></script>
+    <script src="../scripts/require.js" type="text/javascript"></script>
+    <script src="../scripts/require-config.js" type="text/javascript"></script>
+    <script>
+        requirejs.config({
+            baseUrl: "../scripts"
+
+        });
+        requirejs(["test/test-runner"]);
+    </script>
+</head>
+<body>
+    <div id="mocha"></div>
+</body>
+</html>
