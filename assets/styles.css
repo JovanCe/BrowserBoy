@@ -1,10 +1,10 @@
 @font-face {
     font-family: gameBoy;
-    src: url("../gb.ttf");
+    src: url("gb.ttf");
 }
 body {
     text-align: center;
-    background-image: url("../img/bck.gif");
+    background-image: url("img/bck.gif");
     background-repeat: repeat;
 }
 
@@ -49,7 +49,7 @@ body h1 {
     margin: 0 auto;
     padding: 1px;
     margin-top: 50px;
-    background-image: url("../img/gb.jpg");
+    background-image: url("img/gb.jpg");
     background-size: 100%;
     width:350px;
     height:573px;
