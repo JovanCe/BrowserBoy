@@ -175,7 +175,7 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         if(!offset) {
             offset = 0;
         }
-        this._reg[dest] = MM.readByte(this._reg[src1] << 8 + this._reg[src2] + offset);
+        this._reg[dest] = MM.readByte((this._reg[src1] << 8) + this._reg[src2] + offset);
         this._step(1,8);
     };
 
@@ -183,12 +183,12 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         if(!offset) {
             offset = 0;
         }
-        MM.writeByte(this._reg[dest1] << 8 + this._reg[dest2] + offset, this._reg[src]);
+        MM.writeByte((this._reg[dest1] << 8) + this._reg[dest2] + offset, this._reg[src]);
         this._step(1,8);
     };
 
     CPU.prototype.LDmn = function(dest1, dest2) {
-        MM.writeByte(this._reg[dest1] << 8 + this._reg[dest2], MM.readByte(this._reg.PC++));
+        MM.writeByte((this._reg[dest1] << 8) + this._reg[dest2], MM.readByte(this._reg.PC++));
         this._step(2, 12);
     };
 
@@ -231,12 +231,12 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
     };
 
     CPU.prototype.LDr16rr = function(src1, src2, dest) {
-        this._reg[dest] = this._reg[src1] << 8 + this._reg[src2];
+        this._reg[dest] = (this._reg[src1] << 8) + this._reg[src2];
         this._step(1, 8);
     };
 
     CPU.prototype.LDr16rr = function(src1, src2, dest) {
-        this._reg[dest] = this._reg[src1] << 8 + this._reg[src2];
+        this._reg[dest] = (this._reg[src1] << 8) + this._reg[src2];
         this._step(1, 8);
     };
 
