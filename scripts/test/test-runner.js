@@ -10,10 +10,9 @@ requirejs.config({
 tests = [
     "tests/cpu"
 ];
-requirejs(tests, function(){
+requirejs(function(){
     mocha.setup('bdd');
-    requirejs(['testCPU'], function(module){
-        console.log("module: ", module);
+    requirejs(tests, function(){
         mocha.run();
     });
 });
