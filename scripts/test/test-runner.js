@@ -3,6 +3,7 @@
  */
 
 requirejs.config({
+    urlArgs: "now="+Date.now(),
     paths: {
         tests: "test"
     }
