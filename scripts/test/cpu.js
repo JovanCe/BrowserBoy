@@ -144,7 +144,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDrmm", function(){
-            it("should load a value from the address provided by first two registers and into the third one," +
+            it("should load the value from the address provided by first two registers into the third one," +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function(){
                 MM.writeByte(258, 1);
                 CPU._reg.H=1;
@@ -153,6 +153,45 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.A).to.equal(1);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
+            });
+        });
+        describe("LDmmr", function(){
+            it("should put the value from the first register to the address provided by the second two," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function(){
+                CPU._reg.A = 5;
+                CPU._reg.H=1;
+                CPU._reg.L=2;
+                CPU.LDmmr("A", "H", "L");
+                expect(MM.readByte(258)).to.equal(5);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
+        describe("LDmn", function(){
+            it("should put the immediate byte value into the the address provided by two registers in params," +
+                "and advance the clocks by 2 machine cycle and 12 cpu cycles respectively", function(){
+                CPU._reg.PC = 5;
+                MM.writeByte(CPU._reg.PC, 81);
+                CPU._reg.H=1;
+                CPU._reg.L=2;
+                CPU.LDmn("H", "L");
+                expect(MM.readByte(258)).to.equal(81);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(12);
+            });
+        });
+        describe("LDa16r", function(){
+            it("should put the byte value in the register to the immediate address value, advance the PC by 2" +
+                "and advance the clocks by 3 machine cycle and 16 cpu cycles respectively", function(){
+                CPU._reg.PC = 5;
+                MM.writeByte(CPU._reg.PC, 2);
+                MM.writeByte(CPU._reg.PC+1, 1);
+                CPU._reg.A = 10;
+                CPU.LDa16r("A");
+                expect(MM.readByte(258)).to.equal(10);
+                expect(CPU._reg.PC).to.equal(7);
+                expect(CPU._reg.M).to.equal(3);
+                expect(CPU._reg.T).to.equal(16);
             });
         });
     });
