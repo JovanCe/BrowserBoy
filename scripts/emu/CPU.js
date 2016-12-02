@@ -199,7 +199,7 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
     };
 
     CPU.prototype.LDa16r16 = function(reg) {
-        MM.writeByte(MM.readWord(this._reg[PC]), this._reg[reg]);
+        MM.writeWord(MM.readWord(this._reg[PC]), this._reg[reg]);
         this._reg.PC += 2;
         this._step(3, 20);
     };
