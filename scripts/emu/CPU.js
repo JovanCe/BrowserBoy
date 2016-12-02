@@ -242,12 +242,12 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
             offset = -((~offset + 1) & 255);
         }
         var value = this._reg[src] + offset;
-        this._reg.dest1 = (value >> 8) & 255;
-        this._reg.dest2 = value & 255;
+        this._reg[dest1] = (value >> 8) & 255;
+        this._reg[dest2] = value & 255;
 
         // set flags
         this._reg.F = 0;
-        if(offset > 0xFFFF) {
+        if(value > 0xFFFF) {
             this._setCarryFlag();
         }
         else {
