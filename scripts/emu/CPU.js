@@ -235,11 +235,6 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
         this._step(1, 8);
     };
 
-    CPU.prototype.LDr16rr = function(src1, src2, dest) {
-        this._reg[dest] = (this._reg[src1] << 8) + this._reg[src2];
-        this._step(1, 8);
-    };
-
     CPU.prototype.LDrrr16n = function(src, dest1, dest2) {
         var offset = MM.readByte(this._reg.PC++);
         // the offset is signed, need to convert it from 2-complement representation
@@ -373,6 +368,8 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
             LDmrCA: this.LDmr.curry(A, C).bind(_this),
 
             LDrmAC: this.LDrm.curry(C, A).bind(_this),
+
+            LDSPHL: this.LDr16rr.curry(H, L, SP),
 
             LDHLSPn: this.LDrrr16n.curry(SP, H, L).bind(_this)
 
