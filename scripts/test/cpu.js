@@ -27,7 +27,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     expect(CPU._reg.T).to.equal(3);
                 });
             });
-            it("should advance global clocks", function(){
+            it("should also advance global clocks", function(){
                 CPU._step(1, 3);
                 CPU._step(2, 5);
                 expect(CPU._clock.M).to.equal(3);
