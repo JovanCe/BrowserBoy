@@ -117,7 +117,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDrn16", function(){
-            it("should load an immediate word value into two provided 8 bit registers, advance the PC by 2" +
+            it("should load an immediate word value into two provided 8-bit registers, advance the PC by 2" +
                 "and advance the clock by 3 machine cycles", function(){
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, 1);
@@ -130,7 +130,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDr16n16", function(){
-            it("should load an immediate word value into the provided 16 bit register, advance the PC by 2" +
+            it("should load an immediate word value into the provided 16-bit register, advance the PC by 2" +
                 "and advance the clock by 3 machine cycles", function(){
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, 1);
@@ -195,7 +195,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDa16r16", function(){
-            it("should put the word value in the 16 bit register to the immediate address value, advance the PC by 2" +
+            it("should put the word value in the 16-bit register to the immediate address value, advance the PC by 2" +
                 "and advance the clocks by 3 machine cycle and 20 cpu cycles respectively", function(){
                 CPU._reg.PC = 5;
                 MM.writeByte(CPU._reg.PC, 2);
@@ -268,6 +268,61 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
             });
+        });
+        describe("LDr16rr", function(){
+            it("should load the value from the first two 8-bit registers to the third 16-bit register," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function(){
+                CPU._reg.H = 2;
+                CPU._reg.L = 5;
+                CPU.LDr16rr("H", "L", "SP");
+                expect(CPU._reg.SP).to.equal(517);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
+        describe("LDrrr16n", function(){
+            function execute(regVal, offsetVal) {
+                CPU._reg.SP=regVal;
+                CPU._reg.PC=5;
+                MM.writeByte(CPU._reg.PC, offsetVal);
+                CPU.LDrrr16n("SP", "H", "L");
+            }
+            it("should load the value from the first 16-bit register added with the immediate signed byte offset, " +
+                "into the second two 8-bit registers, set carry and half-carry flags accordingly" +
+                "and advance the clocks by 2 machine cycle and 12 cpu cycles respectively", function(){
+                execute(1000, 2);
+                expect(CPU._reg.H).to.equal(3);
+                expect(CPU._reg.L).to.equal(234);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(12);
+            });
+            describe("when the offset is negative", function() {
+                it("should convert the offset from 2-complement representation", function() {
+                    execute(1000, 254);
+                    expect(CPU._reg.H).to.equal(3);
+                    expect(CPU._reg.L).to.equal(230);
+                });
+            });
+            describe("when there's a low nibble overflow", function() {
+                it("set the half-carry flag", function() {
+                    execute(1000, -2);
+                    expect(CPU._reg.H).to.equal(3);
+                    expect(CPU._reg.L).to.equal(230);
+                    expect((CPU._reg.F & 0x20) >> 5).to.equal(1);
+                    console.log(CPU._reg.F);
+                });
+            });
+            describe("when there's an overflow", function() {
+                it("should set the carry flag", function() {
+                    execute(65535, 2);
+                    console.log(CPU._reg.F);
+
+                    expect(CPU._reg.H).to.equal(0);
+                    expect(CPU._reg.L).to.equal(1);
+                    expect((CPU._reg.F & 0x10) >> 4).to.equal(1);
+                });
+            });
+
         });
 
     });
