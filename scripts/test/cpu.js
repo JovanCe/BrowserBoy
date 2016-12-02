@@ -309,14 +309,11 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     expect(CPU._reg.H).to.equal(3);
                     expect(CPU._reg.L).to.equal(230);
                     expect((CPU._reg.F & 0x20) >> 5).to.equal(1);
-                    console.log(CPU._reg.F);
                 });
             });
             describe("when there's an overflow", function() {
                 it("should set the carry flag", function() {
                     execute(65535, 2);
-                    console.log(CPU._reg.F);
-
                     expect(CPU._reg.H).to.equal(0);
                     expect(CPU._reg.L).to.equal(1);
                     expect((CPU._reg.F & 0x10) >> 4).to.equal(1);
