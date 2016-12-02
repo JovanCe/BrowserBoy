@@ -9,7 +9,8 @@ requirejs.config({
     }
 });
 tests = [
-    "tests/cpu"
+    "tests/cpu",
+    "tests/mm"
 ];
 requirejs(["jquery"],function($){
     mocha.setup('bdd');
