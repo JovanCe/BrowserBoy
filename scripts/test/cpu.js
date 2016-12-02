@@ -194,7 +194,84 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(16);
             });
         });
+        describe("LDa16r16", function(){
+            it("should put the word value in the 16 bit register to the immediate address value, advance the PC by 2" +
+                "and advance the clocks by 3 machine cycle and 20 cpu cycles respectively", function(){
+                CPU._reg.PC = 5;
+                MM.writeByte(CPU._reg.PC, 2);
+                MM.writeByte(CPU._reg.PC+1, 1);
+                CPU._reg.SP = 512;
+                CPU.LDa16r16("SP");
+                expect(MM.readWord(258)).to.equal(512);
+                expect(CPU._reg.PC).to.equal(7);
+                expect(CPU._reg.M).to.equal(3);
+                expect(CPU._reg.T).to.equal(20);
+            });
+        });
+        describe("LDra16", function(){
+            it("should load the value in the immediate address, put it in the provided register, advance the PC by 2" +
+                "and advance the clocks by 3 machine cycle and 16 cpu cycles respectively", function(){
+                CPU._reg.PC = 5;
+                MM.writeByte(CPU._reg.PC, 2);
+                MM.writeByte(CPU._reg.PC+1, 1);
+                MM.writeByte(MM.readWord(CPU._reg.PC), 8);
+                CPU.LDra16("A");
+                expect(CPU._reg.A).to.equal(8);
+                expect(CPU._reg.PC).to.equal(7);
+                expect(CPU._reg.M).to.equal(3);
+                expect(CPU._reg.T).to.equal(16);
+            });
+        });
+        describe("LDar", function(){
+            it("should put the value from the register into the FF00 + immediate offset address, advance the PC by 1" +
+                "and advance the clocks by 2 machine cycle and 12 cpu cycles respectively", function(){
+                CPU._reg.PC = 5;
+                MM.writeByte(CPU._reg.PC, 2);
+                CPU._reg.A = 1;
+                CPU.LDar("A");
+                expect(MM.readByte(0xFF00 + 2)).to.equal(1);
+                expect(CPU._reg.PC).to.equal(6);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(12);
+            });
+        });
+        describe("LDra", function(){
+            it("should load the value from the FF00 + immediate offset address into the provided register," +
+                "and advance the clocks by 2 machine cycle and 12 cpu cycles respectively", function(){
+                CPU._reg.PC = 5;
+                MM.writeByte(CPU._reg.PC, 2);
+                MM.writeByte(0xFF00 + 2, 1);
+                CPU.LDra("A");
+                expect(CPU._reg.A).to.equal(1);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(12);
+            });
+        });
+        describe("LDmr", function(){
+            it("should put the value from the first register into the FF00 + offset provided in the second register address," +
+                "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function(){
+                CPU._reg.C = 5;
+                CPU._reg.A = 1;
+                CPU.LDmr("A", "C");
+                expect(MM.readByte(0xFF00 + 5)).to.equal(1);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
+        describe("LDrm", function(){
+            it("should load the value from the FF00 + offset provided in the second register address into the first register," +
+                "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function(){
+                CPU._reg.C = 5;
+                MM.writeByte(0xFF00 + 5, 13);
+                CPU.LDrm("C", "A");
+                expect(CPU._reg.A).to.equal(13);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
+
     });
+
 
     return {
         name: "CPU tests"
