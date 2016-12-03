@@ -391,9 +391,13 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
 
         }
     };
-    CPU.prototype.NI = function() {};
+    CPU.prototype.NI = function() {
+        console.log("Unimplemented instruction called");
+    };
 
-    CPU.prototype.EMPTY = function() {};
+    CPU.prototype.EMPTY = function() {
+        console.log("Unmapped instruction called");
+    };
 
     CPU.prototype._mapInstructions = function() {
         // position of the instructions corresponds to its memory address
