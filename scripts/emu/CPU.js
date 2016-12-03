@@ -375,10 +375,93 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
 
         }
     };
+    CPU.prototype.NI = function() {};
+
+    CPU.prototype.EMPTY = function() {};
 
     CPU.prototype._mapInstructions = function() {
         // position of the instructions corresponds to its memory address
-        this._insMap = {}
+        this._insMap = [
+            this.NOP, this._ins.LDnnBC, this._ins.LDmrBCA, this.NI,
+            this.NI, this.NI, this._ins.LDnB, this.NI,
+            this._ins.LDarSP, this.NI, this._ins.LDrmABC, this.NI,
+            this.NI, this.NI, this._ins.LDnC, this.NI,
+
+            this.NI, this._ins.LDnnDE, this._ins.LDmrDEA, this.NI,
+            this.NI, this.NI, this._ins.LDnD, this.NI,
+            this.NI, this.NI, this._ins.LDrmADE, this.NI,
+            this.NI, this.NI, this._ins.LDnE, this.NI,
+
+            this.NI, this._ins.LDnnHL, this._ins.LDmrHLplusA, this.NI,
+            this.NI, this.NI, this._ins.LDnH, this.NI,
+            this.NI, this.NI, this._ins.LDrmAHLplus, this.NI,
+            this.NI, this.NI, this._ins.LDnL, this.NI,
+
+            this.NI, this._ins.LDnnSP, this._ins.LDmrHLminusA, this.NI,
+            this.NI, this.NI, this._ins.LDmnHL, this.NI,
+            this.NI, this.NI, this._ins.LDrmAHLminus, this.NI,
+            this.NI, this.NI, this._ins.LDnA, this.NI,
+
+            this._ins.LDrrBB, this._ins.LDrrBC, this._ins.LDrrBD, this._ins.LDrrBE,
+            this._ins.LDrrBH, this._ins.LDrrBL, this._ins.LDrmBHL, this._ins.LDrrBA,
+            this._ins.LDrrCB, this._ins.LDrrCC, this._ins.LDrrCD, this._ins.LDrrCE,
+            this._ins.LDrrCH, this._ins.LDrrCL, this._ins.LDrmCHL, this._ins.LDrrCA,
+
+            this._ins.LDrrDB, this._ins.LDrrDC, this._ins.LDrrDD, this._ins.LDrrDE,
+            this._ins.LDrrDH, this._ins.LDrrDL, this._ins.LDrmDHL, this._ins.LDrrDA,
+            this._ins.LDrrEB, this._ins.LDrrEC, this._ins.LDrrED, this._ins.LDrrEE,
+            this._ins.LDrrEH, this._ins.LDrrEL, this._ins.LDrmEHL, this._ins.LDrrEA,
+
+            this._ins.LDrrHB, this._ins.LDrrHC, this._ins.LDrrHD, this._ins.LDrrHE,
+            this._ins.LDrrHH, this._ins.LDrrHL, this._ins.LDrmHHL, this._ins.LDrrHA,
+            this._ins.LDrrLB, this._ins.LDrrLC, this._ins.LDrrLD, this._ins.LDrrLE,
+            this._ins.LDrrLH, this._ins.LDrrLL, this._ins.LDrmLHL, this._ins.LDrrLA,
+
+            this._ins.LDmrHLB, this._ins.LDmrHLC, this._ins.LDmrHLD, this._ins.LDmrHLE,
+            this._ins.LDmrHLH, this._ins.LDmrHLL, this.HALT, this._ins.LDmrHLA,
+            this._ins.LDrrAB, this._ins.LDrrAC, this._ins.LDrrAD, this._ins.LDrrAE,
+            this._ins.LDrrAH, this._ins.LDrrAL, this._ins.LDrmAHL, this._ins.LDrrAA,
+
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.NI,
+
+            this.NI, this.NI, this.NI, this.EMPTY,
+            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this.NI, this.EMPTY,
+            this.NI, this.EMPTY, this.NI, this.NI,
+
+            this._ins.LDarA, this.NI, this._ins.LDmrCA, this.EMPTY,
+            this.EMPTY, this.NI, this.NI, this.NI,
+            this.NI, this.NI, this._ins.LDaarA, this.EMPTY,
+            this.EMPTY, this.EMPTY, this.NI, this.NI,
+
+            this._ins.LDraA, this.NI, this._ins.LDrmAC, this.NI,
+            this.EMPTY, this.NI, this.NI, this.NI,
+            this._ins.LDHLSPn, this._ins.LDSPHL, this._ins.LDraaA, this.NI,
+            this.EMPTY, this.EMPTY, this.NI, this.NI
+        ];
     };
 
     return new CPU();
