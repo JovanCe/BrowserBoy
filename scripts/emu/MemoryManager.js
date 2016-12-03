@@ -3,7 +3,7 @@
  */
 
 
-define(["lodash", "CPU", "GPU"], function(_, CPU, GPU) {
+define(["lodash", "events"], function(_, events) {
     function MemoryManager() {
         // Flag indicating BIOS is mapped in
         // BIOS is unmapped with the first instruction above 0x00FF
@@ -44,12 +44,12 @@ define(["lodash", "CPU", "GPU"], function(_, CPU, GPU) {
 
 
 
-        this._bios = [];
-        this._rom = [];
-        this._wram = [];
-        this._io = [];
-        this._eram = [];
-        this._zram = [];
+        // this._bios = [];
+        // this._rom = [];
+        // this._wram = [];
+        // this._io = [];
+        // this._eram = [];
+        // this._zram = [];
         // interrupt enable register
         this._ie = 0;
     }
@@ -61,12 +61,19 @@ define(["lodash", "CPU", "GPU"], function(_, CPU, GPU) {
 
     MemoryManager.prototype.loadROM = function (file) {
         var reader = new FileReader();
-        var rom = new Uint8Array(reader.readAsArrayBuffer(file));
-        // reset previous ROM memory
-        this._memory.fill(0, this._rom, this._rom_end + 1);
-        // copy ROM data to memory
-        this._memory.set(rom, this._rom);
-        // TODO: ROM size checks from cartridge header
+        var rom;
+        reader.onload = function(e) {
+            rom = new Uint8Array(reader.result);
+            // reset previous ROM memory
+            this._memory.fill(0, this._rom, this._rom_end + 1);
+            // copy ROM data to memory
+            this._memory.set(rom, this._rom);
+            // TODO: ROM size checks from cartridge header
+
+            events.dispatchEvent(events.ROMLoaded);
+
+        }.bind(this);
+        reader.readAsArrayBuffer(file);
     };
 
     MemoryManager.prototype.embedBios = function () {
