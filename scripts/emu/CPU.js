@@ -369,7 +369,7 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
 
             LDrmAC: this.LDrm.curry(C, A).bind(_this),
 
-            LDSPHL: this.LDr16rr.curry(H, L, SP),
+            LDSPHL: this.LDr16rr.curry(H, L, SP).bind(_this),
 
             LDHLSPn: this.LDrrr16n.curry(SP, H, L).bind(_this)
 
