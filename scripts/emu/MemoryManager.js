@@ -111,6 +111,12 @@ define(["lodash", "events"], function(_, events) {
 
     MemoryManager.prototype.writeByte = function(address, value) {
         this._memory[address] = value;
+
+        // temp code; check for output when running blargg's test roms
+        var data = this.readByte(0xFF02);
+        if (address == 0xFF02 && data == 0x81) {
+            console.log(this.readByte(0xFF01));
+        }
     };
 
     MemoryManager.prototype.readWord = function(address) {

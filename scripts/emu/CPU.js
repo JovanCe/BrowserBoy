@@ -96,10 +96,20 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
     };
 
     CPU.prototype.dispatch = function() {
+        // skip bios for now
+        this._reg.PC = 0x100;
+        this._reg.SP = 0xFFFE;
+        this._stop = false;
+
       while(!(this._halt || this._stop)) {
-            var instruction = MM.readByte(this._reg.PC++);
-            this._reg.PC &= 65536;
-            this._insMap[instruction]();
+          var instruction = MM.readByte(this._reg.PC++);
+          this._reg.PC &= 65535;
+          if(this._insMap[instruction]==undefined) {
+              console.log("bla");
+          }
+          if(instruction > 0) {
+              this._insMap[instruction].call(this);
+          }
 
       }
     };
