@@ -2,7 +2,7 @@
  * Created by JovanCe on 11/8/15.
  */
 
-define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
+define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU) {
     var A = "A";
     var B = "B";
     var C = "C";
@@ -34,6 +34,12 @@ define(["lodash", "MemoryManager", "GPU"], function(_, MM, GPU) {
 
         this._initInstructions();
         this._mapInstructions();
+
+        // register event handlers
+        events.registerEvent(events.ROMLoaded);
+        events.addEventListener(events.ROMLoaded, function() {
+            this.dispatch();
+        }.bind(this));
     };
 
     CPU.prototype._step = function(m, t) {
