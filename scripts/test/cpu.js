@@ -321,7 +321,50 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
 
         });
-
+        describe("POPrr", function() {
+            it("should pop two byte values from the stack, put them into provided registers, increasing the SP register twice in the meantime, " +
+                "and advance the clocks by 1 machine cycle and 16 cpu cycles respectively", function() {
+                CPU._reg.SP = 9;
+                MM.writeByte(10, 5);
+                MM.writeByte(9, 6);
+                CPU.POPrr("D", "E");
+                expect(CPU._reg.D).to.equal(5);
+                expect(CPU._reg.E).to.equal(6);
+                expect(CPU._reg.SP).to.equal(11);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(12);
+            });
+        });
+        describe("PUSHrr", function() {
+           it("should push provided registers to the stack, decreasing the SP register twice in the meantime, " +
+               "and advance the clocks by 1 machine cycle and 16 cpu cycles respectively", function() {
+               CPU._reg.SP = 10;
+               CPU._reg.D = 5;
+               CPU._reg.E = 6;
+               CPU.PUSHrr("D", "E");
+               var d = MM.readByte(9);
+               var e = MM.readByte(8);
+               expect(d).to.equal(CPU._reg.D);
+               expect(e).to.equal(CPU._reg.E);
+               expect(CPU._reg.SP).to.equal(8);
+               expect(CPU._reg.M).to.equal(1);
+               expect(CPU._reg.T).to.equal(16);
+           });
+        });
+        describe("PUSHrr and POPrr", function() {
+            it("", function() {
+                CPU._reg.SP = 10;
+                CPU._reg.D = 5;
+                CPU._reg.E = 6;
+                CPU.PUSHrr("D", "E");
+                CPU.POPrr("D", "E")
+                expect(CPU._reg.D).to.equal(5);
+                expect(CPU._reg.E).to.equal(6);
+                expect(CPU._reg.SP).to.equal(10);
+                expect(CPU._clock.M).to.equal(2);
+                expect(CPU._clock.T).to.equal(28);
+            });
+        });
     });
 
 
