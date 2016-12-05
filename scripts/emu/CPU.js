@@ -104,8 +104,9 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
       while(!(this._halt || this._stop)) {
           var instruction = MM.readByte(this._reg.PC++);
           this._reg.PC &= 65535;
+
           if(instruction > 0) {
-              this._insMap[instruction].call(this);
+              this._insMap[instruction].call(this, instruction);
           }
 
       }
@@ -401,12 +402,12 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
 
         }
     };
-    CPU.prototype.NI = function() {
-        console.log("Unimplemented instruction called");
+    CPU.prototype.NI = function(position) {
+        console.log("Unimplemented instruction called: " + position);
     };
 
-    CPU.prototype.EMPTY = function() {
-        console.log("Unmapped instruction called");
+    CPU.prototype.EMPTY = function(position) {
+        console.log("Unmapped instruction called: " + position);
     };
 
     CPU.prototype._mapInstructions = function() {
