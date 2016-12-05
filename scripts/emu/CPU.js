@@ -150,16 +150,17 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
         this._step(1);
     };
 
-    CPU.prototype.PUSH = function(reg) {
+    CPU.prototype.PUSHrr = function(reg1, reg2) {
         this._reg.SP--;
-        MM.writeByte(this._reg.SP, this._reg[reg]);
-        this._step(1);
+        MM.writeByte(this._reg.SP--, this._reg[reg1]);
+        MM.writeByte(this._reg.SP, this._reg[reg2]);
+        this._step(1, 16);
     };
 
-    CPU.prototype.POP = function(reg) {
-        this._reg[reg] = MM.readByte(this._reg.SP);
-        this._reg.SP++;
-        this._step(1);
+    CPU.prototype.POPrr = function(reg1, reg2) {
+        this._reg[reg1] = MM.readByte(this._reg.SP++);
+        this._reg[reg2] = MM.readByte(this._reg.SP++);
+        this._step(1, 12);
     };
 
     CPU.prototype.LDr = function(src, dest) {
@@ -384,7 +385,19 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
 
             LDSPHL: this.LDr16rr.curry(H, L, SP).bind(_this),
 
-            LDHLSPn: this.LDrrr16n.curry(SP, H, L).bind(_this)
+            LDHLSPn: this.LDrrr16n.curry(SP, H, L).bind(_this),
+
+            PUSHBC: this.PUSHrr.curry(B, C).bind(_this),
+            PUSHDE: this.PUSHrr.curry(D, E).bind(_this),
+            PUSHHL: this.PUSHrr.curry(H, L).bind(_this),
+            PUSHAF: this.PUSHrr.curry(A, F).bind(_this),
+
+            POPBC: this.POPrr.curry(B, C).bind(_this),
+            POPDE: this.POPrr.curry(D, E).bind(_this),
+            POPHL: this.POPrr.curry(H, L).bind(_this),
+            POPAF: this.POPrr.curry(A, F).bind(_this),
+
+
 
         }
     };
@@ -459,23 +472,23 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
             this.NI, this.NI, this.NI, this.NI,
             this.NI, this.NI, this.NI, this.NI,
 
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this._ins.POPBC, this.NI, this.NI,
+            this.NI, this._ins.PUSHBC, this.NI, this.NI,
             this.NI, this.NI, this.NI, this.NI,
             this.NI, this.NI, this.NI, this.NI,
 
-            this.NI, this.NI, this.NI, this.EMPTY,
-            this.NI, this.NI, this.NI, this.NI,
+            this.NI, this._ins.POPDE, this.NI, this.EMPTY,
+            this.NI, this._ins.PUSHDE, this.NI, this.NI,
             this.NI, this.NI, this.NI, this.EMPTY,
             this.NI, this.EMPTY, this.NI, this.NI,
 
-            this._ins.LDarA, this.NI, this._ins.LDmrCA, this.EMPTY,
-            this.EMPTY, this.NI, this.NI, this.NI,
+            this._ins.LDarA, this._ins.POPHL, this._ins.LDmrCA, this.EMPTY,
+            this.EMPTY, this._ins.PUSHHL, this.NI, this.NI,
             this.NI, this.NI, this._ins.LDaarA, this.EMPTY,
             this.EMPTY, this.EMPTY, this.NI, this.NI,
 
-            this._ins.LDraA, this.NI, this._ins.LDrmAC, this.NI,
-            this.EMPTY, this.NI, this.NI, this.NI,
+            this._ins.LDraA, this._ins.POPAF, this._ins.LDrmAC, this.NI,
+            this.EMPTY, this._ins.PUSHAF, this.NI, this.NI,
             this._ins.LDHLSPn, this._ins.LDSPHL, this._ins.LDraaA, this.NI,
             this.EMPTY, this.EMPTY, this.NI, this.NI
         ];
