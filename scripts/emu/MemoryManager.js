@@ -70,7 +70,7 @@ define(["lodash", "events"], function(_, events) {
             this._memory.set(rom, this._rom);
             // TODO: ROM size checks from cartridge header
 
-            events.dispatchEvent(events.ROMLoaded);
+            events.dispatch(events.ROMLoaded);
 
         }.bind(this);
         reader.readAsArrayBuffer(file);

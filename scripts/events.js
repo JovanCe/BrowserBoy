@@ -17,11 +17,11 @@ define(function(require) {
         this.events = {};
     }
 
-    Events.prototype.registerEvent = function(eventName){
+    Events.prototype.register = function(eventName){
         this.events[eventName] = new Event(eventName);
     };
 
-    Events.prototype.dispatchEvent = function(eventName, eventArgs){
+    Events.prototype.dispatch = function(eventName, eventArgs){
         this.events[eventName].callbacks.forEach(function(callback){
             callback(eventArgs);
         });
