@@ -104,9 +104,6 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
       while(!(this._halt || this._stop)) {
           var instruction = MM.readByte(this._reg.PC++);
           this._reg.PC &= 65535;
-          if(this._insMap[instruction]==undefined) {
-              console.log("bla");
-          }
           if(instruction > 0) {
               this._insMap[instruction].call(this);
           }
