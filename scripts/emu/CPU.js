@@ -159,8 +159,8 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
     };
 
     CPU.prototype.POPrr = function(reg1, reg2) {
-        this._reg[reg1] = MM.readByte(this._reg.SP++);
         this._reg[reg2] = MM.readByte(this._reg.SP++);
+        this._reg[reg1] = MM.readByte(this._reg.SP++);
         this._step(1, 12);
     };
 
