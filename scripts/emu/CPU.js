@@ -2,7 +2,7 @@
  * Created by JovanCe on 11/8/15.
  */
 
-define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU) {
+define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, config, events, MM, GPU) {
     var A = "A";
     var B = "B";
     var C = "C";
@@ -400,14 +400,21 @@ define(["lodash", "events", "MemoryManager", "GPU"], function(_, events, MM, GPU
 
 
 
+        };
+        if(config.debug) {
+            _.map(_.keys(this._ins), function (key) {
+                this._ins[key].toString = function () {
+                    return key
+                };
+            }.bind(this));
         }
     };
     CPU.prototype.NI = function(position) {
-        console.log("Unimplemented instruction called: " + position);
+        console.log("Unimplemented instruction called: " + position.toString(16));
     };
 
     CPU.prototype.EMPTY = function(position) {
-        console.log("Unmapped instruction called: " + position);
+        console.log("Unmapped instruction called: " + position.toString(16));
     };
 
     CPU.prototype._mapInstructions = function() {
