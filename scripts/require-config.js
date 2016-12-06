@@ -9,6 +9,7 @@ requirejs.config({
         GPU: "emu/GPU",
         MemoryManager: "emu/MemoryManager",
 
+        config: "config",
         events: "events",
 
         lodash: "lib/lodash",
