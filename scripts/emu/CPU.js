@@ -107,34 +107,6 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.ADDrr = function(reg1, reg2) {
-        var result = this._reg[reg1] + this._reg[reg2];
-
-        this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg1] & 0xF)  + (this._reg[reg2] & 0xF) > 0xF);
-        this._setFlag(this._FLAG_CARRY, result > 0xFF);
-
-        this._reg[reg1] = result & 0xFF;
-
-        this._step(1);
-    };
-    CPU.prototype.ADCrr = function(reg1, reg2) {
-        var carry = this._getFlag(this._FLAG_CARRY);
-        var result = this._reg[reg1] + this._reg[reg2] + carry;
-
-        this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg1] & 0xF)  + ((this._reg[reg2] + carry) & 0xF) > 0xF);
-        this._setFlag(this._FLAG_CARRY, result > 0xFF);
-
-        this._reg[reg1] = result & 0xFF;
-
-        this._step(1);
-    };
-
     CPU.prototype.CP = function(reg1, reg2) {
         var r1 = this._reg[reg1];
         r1 -= reg2;
@@ -264,6 +236,67 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._setFlag(this._FLAG_HALF_CARRY, (this._reg.SP & 0xF)  + (offset & 0xF) > 0xF);
 
         this._step(2, 12);
+    };
+
+    CPU.prototype.ADDrr = function(reg1, reg2) {
+        var result = this._reg[reg1] + this._reg[reg2];
+
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, result == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg1] & 0xF)  + (this._reg[reg2] & 0xF) > 0xF);
+        this._setFlag(this._FLAG_CARRY, result > 0xFF);
+
+        this._reg[reg1] = result & 0xFF;
+
+        this._step(1);
+    };
+    CPU.prototype.ADCrr = function(reg1, reg2) {
+        var carry = this._getFlag(this._FLAG_CARRY);
+        var result = this._reg[reg1] + this._reg[reg2] + carry;
+
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, result == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg1] & 0xF)  + ((this._reg[reg2] + carry) & 0xF) > 0xF);
+        this._setFlag(this._FLAG_CARRY, result > 0xFF);
+
+        this._reg[reg1] = result & 0xFF;
+
+        this._step(1);
+    };
+
+    CPU.prototype.ANDrr = function(reg) {
+        this._reg.A &= this._reg[reg];
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, true);
+        this._setFlag(this._FLAG_CARRY, false);
+
+        this._step(1);
+    };
+
+    CPU.prototype.ORrr = function(reg) {
+        this._reg.A |= this._reg[reg];
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, false);
+        this._setFlag(this._FLAG_CARRY, false);
+
+        this._step(1);
+    };
+
+    CPU.prototype.XORrr = function(reg) {
+        this._reg.A ^= this._reg[reg];
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, false);
+        this._setFlag(this._FLAG_CARRY, false);
+
+        this._step(1);
     };
 
     CPU.prototype._initInstructions = function() {
@@ -400,7 +433,31 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             ADCrrAD: this.ADCrr.curry(A, D).bind(_this),
             ADCrrAE: this.ADCrr.curry(A, E).bind(_this),
             ADCrrAH: this.ADCrr.curry(A, H).bind(_this),
-            ADCrrAL: this.ADCrr.curry(A, L).bind(_this)
+            ADCrrAL: this.ADCrr.curry(A, L).bind(_this),
+
+            ANDrrA: this.ANDrr(A).bind(_this),
+            ANDrrB: this.ANDrr(B).bind(_this),
+            ANDrrC: this.ANDrr(C).bind(_this),
+            ANDrrD: this.ANDrr(D).bind(_this),
+            ANDrrE: this.ANDrr(E).bind(_this),
+            ANDrrH: this.ANDrr(H).bind(_this),
+            ANDrrL: this.ANDrr(L).bind(_this),
+
+            ORrrA: this.ORrr(A).bind(_this),
+            ORrrB: this.ORrr(B).bind(_this),
+            ORrrC: this.ORrr(C).bind(_this),
+            ORrrD: this.ORrr(D).bind(_this),
+            ORrrE: this.ORrr(E).bind(_this),
+            ORrrH: this.ORrr(H).bind(_this),
+            ORrrL: this.ORrr(L).bind(_this),
+
+            XORrrA: this.XORrr(A).bind(_this),
+            XORrrB: this.XORrr(B).bind(_this),
+            XORrrC: this.XORrr(C).bind(_this),
+            XORrrD: this.XORrr(D).bind(_this),
+            XORrrE: this.XORrr(E).bind(_this),
+            XORrrH: this.XORrr(H).bind(_this),
+            XORrrL: this.XORrr(L).bind(_this),
 
         };
         if(config.debug) {
@@ -472,13 +529,13 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             this.NI, this.NI, this.NI, this.NI,
             this.NI, this.NI, this.NI, this.NI,
 
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
+            this._ins.ANDrrB, this._ins.ANDrrC, this._ins.ANDrrD, this._ins.ANDrrE,
+            this._ins.ANDrrH, this._ins.ANDrrL, this.NI, this._ins.ANDrrA,
+            this._ins.XORrrB, this._ins.XORrrC, this._ins.XORrrD, this._ins.XORrrE,
+            this._ins.XORrrH, this._ins.XORrrL, this.NI, this._ins.XORrrA,
 
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
+            this._ins.ORrrB, this._ins.ORrrC, this._ins.ORrrD, this._ins.ORrrE,
+            this._ins.ORrrH, this._ins.ORrrL, this.NI, this._ins.ORrrA,
             this.NI, this.NI, this.NI, this.NI,
             this.NI, this.NI, this.NI, this.NI,
 
