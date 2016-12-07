@@ -330,7 +330,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 });
             });
             describe("when there's a low nibble overflow", function() {
-                it("set the half-carry flag", function() {
+                it("should set the half-carry flag", function() {
                     execute(1000, -2);
                     expect(CPU._reg.H).to.equal(3);
                     expect(CPU._reg.L).to.equal(230);
@@ -408,7 +408,82 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU.ADDrr("A", "B");
                 expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(0);
             });
-        })
+            describe("when the result is zero", function(){
+                it("should set the zero flag", function() {
+                    CPU._reg.A = 5;
+                    CPU._reg.B = -5;
+                    CPU.ADDrr("A", "B");
+                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                });
+            });
+            describe("when there's a low nibble overflow", function(){
+                it("should set the half-carry flag", function() {
+                    CPU._reg.A = 0x0F;
+                    CPU._reg.B = 0xAB;
+                    CPU.ADDrr("A", "B");
+                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                });
+            });
+            describe("when there's an overflow", function(){
+                it("should set the carry flag", function() {
+                    CPU._reg.A = 0xFF;
+                    CPU._reg.B = 0xAB;
+                    CPU.ADDrr("A", "B");
+                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
+                });
+            });
+        });
+        describe("ADCrr", function() {
+            it("should behave exactly like ADDrr but take into account the carry flag", function() {
+                CPU._reg.A=5;
+                CPU._reg.B=10;
+                CPU.ADCrr("A", "B");
+                expect(CPU._reg.A).to.equal(15);
+                expect(CPU._clock.M).to.equal(1);
+                expect(CPU._clock.T).to.equal(4);
+            });
+            it("should also reset the substract flag", function() {
+                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
+                CPU._reg.A=5;
+                CPU._reg.B=10;
+                CPU.ADCrr("A", "B");
+                expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(0);
+            });
+            describe("when the result is zero", function(){
+                it("should set the zero flag", function() {
+                    CPU._reg.A = 5;
+                    CPU._reg.B = -5;
+                    CPU.ADCrr("A", "B");
+                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                });
+            });
+            describe("when there's a low nibble overflow", function(){
+                it("should set the half-carry flag", function() {
+                    CPU._reg.A = 0x0F;
+                    CPU._reg.B = 0xAB;
+                    CPU.ADCrr("A", "B");
+                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                });
+            });
+            describe("when there's an overflow", function(){
+                it("should set the carry flag", function() {
+                    CPU._reg.A = 0xFF;
+                    CPU._reg.B = 0xAB;
+                    CPU.ADCrr("A", "B");
+                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
+                });
+            });
+            describe("when the carry flag is set before", function(){
+                it("should add 1 to the final result and reset the carry flag", function() {
+                    CPU._setFlag(CPU._FLAG_CARRY, true);
+                    CPU._reg.A = 10;
+                    CPU._reg.B = 11;
+                    CPU.ADCrr("A", "B");
+                    expect(CPU._reg.A).to.equal(22);
+                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(0);
+                });
+            });
+        });
     });
 
 
