@@ -34,51 +34,77 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._clock.T).to.equal(8);
             });
         });
+        describe("_getFlag()", function(){
+            describe("get zero flag", function(){
+                it("should get current flag value", function(){
+                    CPU._setFlag(CPU._FLAG_ZERO, true);
+                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                });
+            });
+            describe("get substract flag", function(){
+                it("should get current flag value", function(){
+                    CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
+                    expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(1);
+                });
+            });
+            describe("get half-carry flag", function(){
+                it("should get current flag value", function(){
+                    CPU._setFlag(CPU._FLAG_HALF_CARRY, true);
+                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                });
+            });
+            describe("get carry flag", function(){
+                it("should get current flag value", function(){
+                    CPU._setFlag(CPU._FLAG_CARRY, true);
+                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
+                });
+            });
+        });
         describe("_resetZeroFlag()", function(){
-            it("should set the zero flag to 0", function(){
-                CPU._resetZeroFlag();
+            it("should should set the zero flag to 0", function(){
+                CPU._setFlag(CPU._FLAG_ZERO, false);
                 expect(CPU._reg.F & 0x80).to.equal(0);
             });
         });
         describe("_setZeroFlag()", function(){
             it("should set the zero flag to 1", function(){
-                CPU._setZeroFlag();
+                CPU._setFlag(CPU._FLAG_ZERO, true);
                 expect((CPU._reg.F & 0x80) >> 7).to.equal(1);
             });
         });
         describe("_resetSubstractFlag()", function(){
             it("should set the substract flag to 0", function(){
-                CPU._resetSubstractFlag();
+                CPU._setFlag(CPU._FLAG_SUBSTRACT, false);
                 expect(CPU._reg.F & 0x40).to.equal(0);
             });
         });
         describe("_setSubstractFlag()", function(){
             it("should set the substract flag to 1", function(){
-                CPU._setSubstractFlag();
+                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
                 expect((CPU._reg.F & 0x40) >> 6).to.equal(1);
             });
         });
         describe("_resetHalfCarryFlag()", function(){
             it("should set the half-carry flag to 0", function(){
-                CPU._resetHalfCarryFlag();
+                CPU._setFlag(CPU._FLAG_HALF_CARRY, false);
                 expect(CPU._reg.F & 0x20).to.equal(0);
             });
         });
         describe("_setHalfCarryFlag()", function(){
             it("should set the half-carry flag to 1", function(){
-                CPU._setHalfCarryFlag();
+                CPU._setFlag(CPU._FLAG_HALF_CARRY, true);
                 expect((CPU._reg.F & 0x20) >> 5).to.equal(1);
             });
         });
         describe("_resetCarryFlag()", function(){
             it("should set the carry flag to 0", function(){
-                CPU._resetCarryFlag();
+                CPU._setFlag(CPU._FLAG_CARRY, false);
                 expect(CPU._reg.F & 0x10).to.equal(0);
             });
         });
         describe("_setCarryFlag()", function(){
             it("should set the carry flag to 1", function(){
-                CPU._setCarryFlag();
+                CPU._setFlag(CPU._FLAG_CARRY, true);
                 expect((CPU._reg.F & 0x10) >> 4).to.equal(1);
             });
         });

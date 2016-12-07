@@ -31,6 +31,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         this._halt = false;
         this._stop = true;
+        
+        // flag masks
+        this._FLAG_ZERO = 0x80;
+        this._FLAG_SUBSTRACT = 0x40;
+        this._FLAG_HALF_CARRY = 0x20;
+        this._FLAG_CARRY = 0x10;
 
         this._initInstructions();
         this._mapInstructions();
@@ -63,36 +69,16 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._stop = true;
     };
 
-    CPU.prototype._resetZeroFlag = function() {
-        this._reg.F &= 0x70;
+    CPU.prototype._getFlag = function(flag) {
+        return (this._reg.F & flag) > 0 ? 1:0;
     };
-
-    CPU.prototype._resetSubstractFlag = function() {
-        this._reg.F &= 0xB0;
-    };
-
-    CPU.prototype._resetHalfCarryFlag = function() {
-        this._reg.F &= 0xD0;
-    };
-
-    CPU.prototype._resetCarryFlag = function() {
-        this._reg.F &= 0xE0;
-    };
-
-    CPU.prototype._setZeroFlag = function() {
-        this._reg.F |= 0x80;
-    };
-
-    CPU.prototype._setSubstractFlag = function() {
-        this._reg.F |= 0x40;
-    };
-
-    CPU.prototype._setHalfCarryFlag = function() {
-        this._reg.F |= 0x20;
-    };
-
-    CPU.prototype._setCarryFlag = function() {
-        this._reg.F |= 0x10;
+    CPU.prototype._setFlag = function(flag, value) {
+        if(value) {
+            this._reg.F |= flag;
+        }
+        else {
+            this._reg.F &= flag ^ 0xFF;
+        }
     };
 
     CPU.prototype.dispatch = function() {
@@ -262,18 +248,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         // set flags
         this._reg.F = 0;
-        if(value > 0xFFFF) {
-            this._setCarryFlag();
-        }
-        else {
-            this._resetCarryFlag();
-        }
-        if((this._reg.SP & 0xF)  + (offset & 0xF) > 0xF) {
-            this._setHalfCarryFlag();
-        }
-        else {
-            this._resetHalfCarryFlag();
-        }
+        this._setFlag(this._FLAG_CARRY, value > 0xFFFF);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg.SP & 0xF)  + (offset & 0xF) > 0xF);
 
         this._step(2, 12);
     };
