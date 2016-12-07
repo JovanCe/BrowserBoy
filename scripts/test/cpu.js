@@ -391,6 +391,24 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._clock.T).to.equal(28);
             });
         });
+        describe("ADDrr", function() {
+            it("should add the contents of the two registers and store them in the first one, " +
+                "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
+                CPU._reg.A=5;
+                CPU._reg.B=10;
+                CPU.ADDrr("A", "B");
+                expect(CPU._reg.A).to.equal(15);
+                expect(CPU._clock.M).to.equal(1);
+                expect(CPU._clock.T).to.equal(4);
+            });
+            it("should also reset the substract flag", function() {
+                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
+                CPU._reg.A=5;
+                CPU._reg.B=10;
+                CPU.ADDrr("A", "B");
+                expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(0);
+            });
+        })
     });
 
 
