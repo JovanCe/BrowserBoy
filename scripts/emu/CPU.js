@@ -266,6 +266,35 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
+    CPU.prototype.SUBrr = function(reg) {
+        var result = this._reg.A - this._reg[reg];
+
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, result == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, true);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg.A & 0xF) - (this._reg[reg] & 0xF) < 0);
+        this._setFlag(this._FLAG_CARRY, result < 0);
+
+        this._reg.A = result & 0xFF;
+
+        this._step(1);
+    };
+
+    CPU.prototype.SBCrr = function(reg) {
+        var toSubstract = this._reg[reg] + this._getFlag(this._FLAG_CARRY);
+        var result = this._reg.A - toSubstract;
+
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, result == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, true);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg.A & 0xF) - (toSubstract & 0xF) < 0);
+        this._setFlag(this._FLAG_CARRY, result < 0);
+
+        this._reg.A = result & 0xFF;
+
+        this._step(1);
+    };
+
     CPU.prototype.ANDrr = function(reg) {
         this._reg.A &= this._reg[reg];
         this._reg.F = 0;
@@ -435,6 +464,22 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             ADCrrAH: this.ADCrr.curry(A, H).bind(_this),
             ADCrrAL: this.ADCrr.curry(A, L).bind(_this),
 
+            SUBrrA: this.SUBrr.curry(A).bind(_this),
+            SUBrrB: this.SUBrr.curry(B).bind(_this),
+            SUBrrC: this.SUBrr.curry(C).bind(_this),
+            SUBrrD: this.SUBrr.curry(D).bind(_this),
+            SUBrrE: this.SUBrr.curry(E).bind(_this),
+            SUBrrH: this.SUBrr.curry(H).bind(_this),
+            SUBrrL: this.SUBrr.curry(L).bind(_this),
+
+            SBCrrA: this.SBCrr.curry(A).bind(_this),
+            SBCrrB: this.SBCrr.curry(B).bind(_this),
+            SBCrrC: this.SBCrr.curry(C).bind(_this),
+            SBCrrD: this.SBCrr.curry(D).bind(_this),
+            SBCrrE: this.SBCrr.curry(E).bind(_this),
+            SBCrrH: this.SBCrr.curry(H).bind(_this),
+            SBCrrL: this.SBCrr.curry(L).bind(_this),
+
             ANDrrA: this.ANDrr.curry(A).bind(_this),
             ANDrrB: this.ANDrr.curry(B).bind(_this),
             ANDrrC: this.ANDrr.curry(C).bind(_this),
@@ -524,10 +569,10 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             this._ins.ADCrrAB, this._ins.ADCrrAC, this._ins.ADCrrAD, this._ins.ADCrrAE,
             this._ins.ADCrrAH, this._ins.ADCrrAL, this.NI, this._ins.ADCrrAA,
 
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
+            this._ins.SUBrrB, this._ins.SUBrrC, this._ins.SUBrrD, this._ins.SUBrrE,
+            this._ins.SUBrrH, this._ins.SUBrrL, this.NI, this._ins.SUBrrA,
+            this._ins.SBCrrB, this._ins.SBCrrC, this._ins.SBCrrD, this._ins.SBCrrE,
+            this._ins.SBCrrH, this._ins.SBCrrL, this.NI, this._ins.SBCrrA,
 
             this._ins.ANDrrB, this._ins.ANDrrC, this._ins.ANDrrD, this._ins.ANDrrE,
             this._ins.ANDrrH, this._ins.ANDrrL, this.NI, this._ins.ANDrrA,
