@@ -237,14 +237,15 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         this._step(1);
     };
+
     CPU.prototype.ADCrr = function(reg1, reg2) {
-        var carry = this._getFlag(this._FLAG_CARRY);
-        var result = this._reg[reg1] + this._reg[reg2] + carry;
+        var toAdd = this._reg[reg2] + this._getFlag(this._FLAG_CARRY);
+        var result = this._reg[reg1] + toAdd;
 
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, result == 0);
         this._setFlag(this._FLAG_SUBSTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg1] & 0xF)  + ((this._reg[reg2] + carry) & 0xF) > 0xF);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg1] & 0xF)  + (toAdd & 0xF) > 0xF);
         this._setFlag(this._FLAG_CARRY, result > 0xFF);
 
         this._reg[reg1] = result & 0xFF;
@@ -292,8 +293,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.ORrr = function(reg) {
-        this._reg.A |= this._reg[reg];
+    CPU.prototype.XORrr = function(reg) {
+        this._reg.A ^= this._reg[reg];
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
         this._setFlag(this._FLAG_SUBSTRACT, false);
@@ -303,8 +304,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.XORrr = function(reg) {
-        this._reg.A ^= this._reg[reg];
+    CPU.prototype.ORrr = function(reg) {
+        this._reg.A |= this._reg[reg];
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
         this._setFlag(this._FLAG_SUBSTRACT, false);
