@@ -597,6 +597,26 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 });
             });
         });
+        describe("XORrr", function() {
+            it("should perform a bitwise xor between the A register and the given register " +
+                "and store the result in A. It should also advance " +
+                "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
+                CPU._reg.A = 7;
+                CPU._reg.B = 3;
+                CPU.XORrr("B");
+                expect(CPU._reg.A).to.equal(4);
+                expect(CPU._clock.M).to.equal(1);
+                expect(CPU._clock.T).to.equal(4);
+            });
+            describe("when the result equals zero", function() {
+                it("should set the zero flag", function() {
+                    CPU._reg.A = 7;
+                    CPU._reg.B = 7;
+                    CPU.XORrr("B");
+                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                });
+            });
+        });
         describe("ORrr", function() {
             it("should perform a bitwise or between the A register and the given register " +
                 "and store the result in A. It should also advance " +
@@ -617,23 +637,45 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 });
             });
         });
-        describe("XORrr", function() {
-            it("should perform a bitwise xor between the A register and the given register " +
-                "and store the result in A. It should also advance " +
-                "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
-                CPU._reg.A = 7;
-                CPU._reg.B = 3;
-                CPU.XORrr("B");
-                expect(CPU._reg.A).to.equal(4);
+        describe("CPrr", function() {
+            it("should compare the contents of the register A and the given and set the zero flag of they're equal, " +
+                "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
+                CPU._reg.A=10;
+                CPU._reg.B=10;
+                CPU.CPrr("B");
+                expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
                 expect(CPU._clock.M).to.equal(1);
                 expect(CPU._clock.T).to.equal(4);
             });
-            describe("when the result equals zero", function() {
-                it("should set the zero flag", function() {
-                    CPU._reg.A = 7;
-                    CPU._reg.B = 7;
-                    CPU.XORrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+            it("should also set the substract flag", function() {
+                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
+                CPU._reg.A=15;
+                CPU._reg.B=10;
+                CPU.CPrr("B");
+                expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(1);
+            });
+            describe("when the result is not zero", function() {
+                it("should reset the zero flag", function() {
+                    CPU._reg.A = 12;
+                    CPU._reg.B = 5;
+                    CPU.CPrr("B");
+                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(0);
+                });
+            });
+            describe("when there's a low nibble underflow", function() {
+                it("should set the half-carry flag", function() {
+                    CPU._reg.A = 0xFA;
+                    CPU._reg.B = 0xAB;
+                    CPU.CPrr("B");
+                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                });
+            });
+            describe("when there's an underflow", function() {
+                it("should set the carry flag", function() {
+                    CPU._reg.A = 0xAB;
+                    CPU._reg.B = 0xFF;
+                    CPU.CPrr("B");
+                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
                 });
             });
         });

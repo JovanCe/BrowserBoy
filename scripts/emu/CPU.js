@@ -107,20 +107,6 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.CP = function(reg1, reg2) {
-        var r1 = this._reg[reg1];
-        r1 -= reg2;
-        this._reg.F |= 0x40;
-        if(!(r1 & 255)) {
-            this._setZeroFlag();
-        }
-        if(r1 < 0) {
-            this._setCarryFlag();
-        }
-
-        this._step(1);
-    };
-
     CPU.prototype.PUSHrr = function(reg1, reg2) {
         this._reg.SP--;
         MM.writeByte(this._reg.SP--, this._reg[reg1]);
@@ -328,6 +314,18 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
+    CPU.prototype.CPrr = function(reg) {
+        var result = this._reg.A - this._reg[reg];
+
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, result == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, true);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg.A & 0xF) - (this._reg[reg] & 0xF) < 0);
+        this._setFlag(this._FLAG_CARRY, result < 0);
+
+        this._step(1);
+    };
+
     CPU.prototype._initInstructions = function() {
         var _this = this;
         this._ins = {
@@ -496,6 +494,14 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             ORrrH: this.ORrr.curry(H).bind(_this),
             ORrrL: this.ORrr.curry(L).bind(_this),
 
+            CPrrA: this.CPrr.curry(A).bind(_this),
+            CPrrB: this.CPrr.curry(B).bind(_this),
+            CPrrC: this.CPrr.curry(C).bind(_this),
+            CPrrD: this.CPrr.curry(D).bind(_this),
+            CPrrE: this.CPrr.curry(E).bind(_this),
+            CPrrH: this.CPrr.curry(H).bind(_this),
+            CPrrL: this.CPrr.curry(L).bind(_this),
+
             XORrrA: this.XORrr.curry(A).bind(_this),
             XORrrB: this.XORrr.curry(B).bind(_this),
             XORrrC: this.XORrr.curry(C).bind(_this),
@@ -581,8 +587,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
             this._ins.ORrrB, this._ins.ORrrC, this._ins.ORrrD, this._ins.ORrrE,
             this._ins.ORrrH, this._ins.ORrrL, this.NI, this._ins.ORrrA,
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
+            this._ins.CPrrB, this._ins.CPrrC, this._ins.CPrrD, this._ins.CPrrE,
+            this._ins.CPrrH, this._ins.CPrrL, this.NI, this._ins.CPrrA,
 
             this.NI, this._ins.POPBC, this.NI, this.NI,
             this.NI, this._ins.PUSHBC, this.NI, this.NI,
