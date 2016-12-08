@@ -484,6 +484,66 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 });
             });
         });
+        describe("ANDrr", function() {
+            it("should perform a bitwise and between the A register and the given register " +
+                "and store the result in A. It should also advance " +
+                "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
+                CPU._reg.A = 2;
+                CPU._reg.B = 3;
+                CPU.ANDrr("B");
+                expect(CPU._reg.A).to.equal(2);
+                expect(CPU._clock.M).to.equal(1);
+                expect(CPU._clock.T).to.equal(4);
+            });
+            describe("when the result equals zero", function() {
+                it("should set the zero flag", function() {
+                    CPU._reg.A = 4;
+                    CPU._reg.B = 3;
+                    CPU.ANDrr("B");
+                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                });
+            });
+        });
+        describe("ORrr", function() {
+            it("should perform a bitwise or between the A register and the given register " +
+                "and store the result in A. It should also advance " +
+                "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
+                CPU._reg.A = 4;
+                CPU._reg.B = 3;
+                CPU.ORrr("B");
+                expect(CPU._reg.A).to.equal(7);
+                expect(CPU._clock.M).to.equal(1);
+                expect(CPU._clock.T).to.equal(4);
+            });
+            describe("when the result equals zero", function() {
+                it("should set the zero flag", function() {
+                    CPU._reg.A = 0;
+                    CPU._reg.B = 0;
+                    CPU.ORrr("B");
+                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                });
+            });
+        });
+        describe("XORrr", function() {
+            it("should perform a bitwise xor between the A register and the given register " +
+                "and store the result in A. It should also advance " +
+                "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
+                CPU._reg.A = 7;
+                CPU._reg.B = 3;
+                CPU.XORrr("B");
+                expect(CPU._reg.A).to.equal(4);
+                expect(CPU._clock.M).to.equal(1);
+                expect(CPU._clock.T).to.equal(4);
+            });
+            describe("when the result equals zero", function() {
+                it("should set the zero flag", function() {
+                    CPU._reg.A = 7;
+                    CPU._reg.B = 7;
+                    CPU.XORrr("B");
+                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                });
+            });
+        });
     });
 
 
