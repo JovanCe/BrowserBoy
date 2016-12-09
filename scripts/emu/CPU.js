@@ -224,58 +224,53 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(2, 12);
     };
 
-    CPU.prototype.ADDrr = function(reg1, reg2) {
-        var result = this._reg[reg1] + this._reg[reg2];
-
+    CPU.prototype._performADD = function(val1, val2) {
+        var result = val1 + val2;
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, result == 0);
         this._setFlag(this._FLAG_SUBSTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg1] & 0xF)  + (this._reg[reg2] & 0xF) > 0xF);
+        this._setFlag(this._FLAG_HALF_CARRY, (val1 & 0xF)  + (val2 & 0xF) > 0xF);
         this._setFlag(this._FLAG_CARRY, result > 0xFF);
 
-        this._reg[reg1] = result & 0xFF;
+        return result & 0xFF;
+    };
 
+    CPU.prototype.ADDrr = function(reg1, reg2) {
+        this._reg[reg1] = this._performADD(this._reg[reg1], this._reg[reg2]);
         this._step(1);
     };
 
     CPU.prototype.ADCrr = function(reg1, reg2) {
         var toAdd = this._reg[reg2] + this._getFlag(this._FLAG_CARRY);
-        var result = this._reg[reg1] + toAdd;
-
-        this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg1] & 0xF)  + (toAdd & 0xF) > 0xF);
-        this._setFlag(this._FLAG_CARRY, result > 0xFF);
-
-        this._reg[reg1] = result & 0xFF;
-
+        this._reg[reg1] = this._performADD(this._reg[reg1], toAdd);
         this._step(1);
     };
 
     CPU.prototype.SUBrr = function(reg) {
         var result = this._reg.A - this._reg[reg];
 
+    CPU.prototype._performSUB = function(val1, val2) {
+        var result = val1 - val2;
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, result == 0);
         this._setFlag(this._FLAG_SUBSTRACT, true);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg.A & 0xF) - (this._reg[reg] & 0xF) < 0);
+        this._setFlag(this._FLAG_HALF_CARRY, (val1 & 0xF) - (val2 & 0xF) < 0);
         this._setFlag(this._FLAG_CARRY, result < 0);
 
-        this._reg.A = result & 0xFF;
+        return result & 0xFF;
+    };
 
+    CPU.prototype.SUBrr = function(reg) {
+        this._reg.A = this._performSUB(this._reg.A, this._reg[reg]);
         this._step(1);
     };
 
     CPU.prototype.SBCrr = function(reg) {
         var toSubstract = this._reg[reg] + this._getFlag(this._FLAG_CARRY);
-        var result = this._reg.A - toSubstract;
+        this._reg.A = this._performSUB(this._reg.A, toSubstract);
 
-        this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, true);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg.A & 0xF) - (toSubstract & 0xF) < 0);
-        this._setFlag(this._FLAG_CARRY, result < 0);
+        this._step(1);
+    };
 
         this._reg.A = result & 0xFF;
 
@@ -315,15 +310,19 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.CPrr = function(reg) {
-        var result = this._reg.A - this._reg[reg];
-
+    CPU.prototype.ORrmm = function(src1, src2) {
+        this._reg.A |= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, true);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg.A & 0xF) - (this._reg[reg] & 0xF) < 0);
-        this._setFlag(this._FLAG_CARRY, result < 0);
+        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, false);
+        this._setFlag(this._FLAG_CARRY, false);
 
+        this._step(1, 8);
+    };
+
+    CPU.prototype.CPrr = function(reg) {
+        this._performSUB(this._reg.A, this._reg[reg]);
         this._step(1);
     };
 
