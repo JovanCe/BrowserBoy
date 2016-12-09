@@ -442,37 +442,6 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._clock.M).to.equal(1);
                 expect(CPU._clock.T).to.equal(4);
             });
-            it("should also reset the substract flag", function() {
-                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
-                CPU._reg.A=5;
-                CPU._reg.B=10;
-                CPU.ADCrr("A", "B");
-                expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(0);
-            });
-            describe("when the result is zero", function() {
-                it("should set the zero flag", function() {
-                    CPU._reg.A = 5;
-                    CPU._reg.B = -5;
-                    CPU.ADCrr("A", "B");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
-                });
-            });
-            describe("when there's a low nibble overflow", function() {
-                it("should set the half-carry flag", function() {
-                    CPU._reg.A = 0x0F;
-                    CPU._reg.B = 0xAB;
-                    CPU.ADCrr("A", "B");
-                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
-                });
-            });
-            describe("when there's an overflow", function() {
-                it("should set the carry flag", function() {
-                    CPU._reg.A = 0xFF;
-                    CPU._reg.B = 0xAB;
-                    CPU.ADCrr("A", "B");
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
-                });
-            });
             describe("when the carry flag is set before", function() {
                 it("should add 1 to the final result and reset the carry flag", function() {
                     CPU._setFlag(CPU._FLAG_CARRY, true);
@@ -481,6 +450,16 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     CPU.ADCrr("A", "B");
                     expect(CPU._reg.A).to.equal(22);
                     expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(0);
+                });
+            });
+            describe("when the carry flag is set before and the result is 255", function() {
+            it("should set the carry flag because of overflow", function() {
+                    CPU._setFlag(CPU._FLAG_CARRY, true);
+                    CPU._reg.A = 200;
+                    CPU._reg.B = 55;
+                    CPU.ADCrr("A", "B");
+                    expect(CPU._reg.A).to.equal(0);
+                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
                 });
             });
         });
@@ -535,37 +514,6 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._clock.M).to.equal(1);
                 expect(CPU._clock.T).to.equal(4);
             });
-            it("should also set the substract flag", function() {
-                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
-                CPU._reg.A=15;
-                CPU._reg.B=10;
-                CPU.SBCrr("B");
-                expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(1);
-            });
-            describe("when the result is zero", function() {
-                it("should set the zero flag", function() {
-                    CPU._reg.A = 5;
-                    CPU._reg.B = 5;
-                    CPU.SBCrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
-                });
-            });
-            describe("when there's a low nibble underflow", function() {
-                it("should set the half-carry flag", function() {
-                    CPU._reg.A = 0xFA;
-                    CPU._reg.B = 0xAB;
-                    CPU.SBCrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
-                });
-            });
-            describe("when there's an underflow", function() {
-                it("should set the carry flag", function() {
-                    CPU._reg.A = 0xAB;
-                    CPU._reg.B = 0xFF;
-                    CPU.SBCrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
-                });
-            });
             describe("when the carry flag is set before", function() {
                 it("should substract 1 from the final result and reset the carry flag", function() {
                     CPU._setFlag(CPU._FLAG_CARRY, true);
@@ -574,6 +522,16 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     CPU.SBCrr("B");
                     expect(CPU._reg.A).to.equal(3);
                     expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(0);
+                });
+            });
+            describe("when the carry flag is set before and the result is zero", function() {
+                it("should set the carry flag because of underflow", function() {
+                    CPU._setFlag(CPU._FLAG_CARRY, true);
+                    CPU._reg.A = 15;
+                    CPU._reg.B = 15;
+                    CPU.SBCrr("B");
+                    expect(CPU._reg.A).to.equal(255);
+                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
                 });
             });
         });
