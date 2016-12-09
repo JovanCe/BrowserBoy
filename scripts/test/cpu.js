@@ -398,8 +398,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B=10;
                 CPU.ADDrr("A", "B");
                 expect(CPU._reg.A).to.equal(15);
-                expect(CPU._clock.M).to.equal(1);
-                expect(CPU._clock.T).to.equal(4);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
             });
             it("should also reset the substract flag", function() {
                 CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
@@ -439,8 +439,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B=10;
                 CPU.ADCrr("A", "B");
                 expect(CPU._reg.A).to.equal(15);
-                expect(CPU._clock.M).to.equal(1);
-                expect(CPU._clock.T).to.equal(4);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
             });
             describe("when the carry flag is set before", function() {
                 it("should add 1 to the final result and reset the carry flag", function() {
@@ -470,8 +470,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B=10;
                 CPU.SUBrr("B");
                 expect(CPU._reg.A).to.equal(10);
-                expect(CPU._clock.M).to.equal(1);
-                expect(CPU._clock.T).to.equal(4);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
             });
             it("should also set the substract flag", function() {
                 CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
@@ -511,8 +511,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B=10;
                 CPU.SBCrr("B");
                 expect(CPU._reg.A).to.equal(10);
-                expect(CPU._clock.M).to.equal(1);
-                expect(CPU._clock.T).to.equal(4);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
             });
             describe("when the carry flag is set before", function() {
                 it("should substract 1 from the final result and reset the carry flag", function() {
@@ -543,8 +543,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B = 3;
                 CPU.ANDrr("B");
                 expect(CPU._reg.A).to.equal(2);
-                expect(CPU._clock.M).to.equal(1);
-                expect(CPU._clock.T).to.equal(4);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
             });
             describe("when the result equals zero", function() {
                 it("should set the zero flag", function() {
@@ -563,8 +563,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B = 3;
                 CPU.XORrr("B");
                 expect(CPU._reg.A).to.equal(4);
-                expect(CPU._clock.M).to.equal(1);
-                expect(CPU._clock.T).to.equal(4);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
             });
             describe("when the result equals zero", function() {
                 it("should set the zero flag", function() {
@@ -583,8 +583,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B = 3;
                 CPU.ORrr("B");
                 expect(CPU._reg.A).to.equal(7);
-                expect(CPU._clock.M).to.equal(1);
-                expect(CPU._clock.T).to.equal(4);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
             });
             describe("when the result equals zero", function() {
                 it("should set the zero flag", function() {
@@ -602,8 +602,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B=10;
                 CPU.CPrr("B");
                 expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
-                expect(CPU._clock.M).to.equal(1);
-                expect(CPU._clock.T).to.equal(4);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
             });
             it("should also set the substract flag", function() {
                 CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
