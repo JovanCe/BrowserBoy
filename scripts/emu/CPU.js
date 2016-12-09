@@ -240,14 +240,23 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
+    CPU.prototype.ADDrmm = function(src1, src2, dest) {
+        var toAdd = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
+        this._reg[dest] = this._performADD(this._reg[dest], toAdd);
+        this._step(1, 8);
+    };
+
     CPU.prototype.ADCrr = function(reg1, reg2) {
         var toAdd = this._reg[reg2] + this._getFlag(this._FLAG_CARRY);
         this._reg[reg1] = this._performADD(this._reg[reg1], toAdd);
         this._step(1);
     };
 
-    CPU.prototype.SUBrr = function(reg) {
-        var result = this._reg.A - this._reg[reg];
+    CPU.prototype.ADCrmm = function(src1, src2, dest) {
+        var toAdd = MM.readByte((this._reg[src1] << 8) + this._reg[src2]) + this._getFlag(this._FLAG_CARRY);
+        this._reg[dest] = this._performADD(this._reg[dest], toAdd);
+        this._step(1, 8);
+    };
 
     CPU.prototype._performSUB = function(val1, val2) {
         var result = val1 - val2;
@@ -265,6 +274,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
+    CPU.prototype.SUBrmm = function(src1, src2) {
+        var toSubtract = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
+        this._reg.A = this._performSUB(this._reg.A, toSubtract);
+        this._step(1, 8);
+    };
+
     CPU.prototype.SBCrr = function(reg) {
         var toSubstract = this._reg[reg] + this._getFlag(this._FLAG_CARRY);
         this._reg.A = this._performSUB(this._reg.A, toSubstract);
@@ -272,9 +287,11 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-        this._reg.A = result & 0xFF;
+    CPU.prototype.SBCrmm = function(reg) {
+        var toSubstract = MM.readByte((this._reg[src1] << 8) + this._reg[reg]) + this._getFlag(this._FLAG_CARRY);
+        this._reg.A = this._performSUB(this._reg.A, toSubstract);
 
-        this._step(1);
+        this._step(1, 8);
     };
 
     CPU.prototype.ANDrr = function(reg) {
@@ -288,6 +305,17 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
+    CPU.prototype.ANDrmm = function(src1, src2) {
+        this._reg.A &= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, true);
+        this._setFlag(this._FLAG_CARRY, false);
+
+        this._step(1, 8);
+    };
+
     CPU.prototype.XORrr = function(reg) {
         this._reg.A ^= this._reg[reg];
         this._reg.F = 0;
@@ -297,6 +325,17 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._setFlag(this._FLAG_CARRY, false);
 
         this._step(1);
+    };
+
+    CPU.prototype.XORrmm = function(src1, src2) {
+        this._reg.A ^= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
+        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, false);
+        this._setFlag(this._FLAG_CARRY, false);
+
+        this._step(1, 8);
     };
 
     CPU.prototype.ORrr = function(reg) {
@@ -324,6 +363,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.CPrr = function(reg) {
         this._performSUB(this._reg.A, this._reg[reg]);
         this._step(1);
+    };
+
+    CPU.prototype.CPrmm = function(src1, src2) {
+        var toCompare = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
+        this._performSUB(this._reg.A, toCompare);
+        this._step(1, 8);
     };
 
     CPU.prototype._initInstructions = function() {
@@ -453,6 +498,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             ADDrrAE: this.ADDrr.curry(A, E).bind(_this),
             ADDrrAH: this.ADDrr.curry(A, H).bind(_this),
             ADDrrAL: this.ADDrr.curry(A, L).bind(_this),
+            ADDrmAHL: this.ADDrmm.curry(H, L, A).bind(_this),
 
             ADCrrAA: this.ADCrr.curry(A, A).bind(_this),
             ADCrrAB: this.ADCrr.curry(A, B).bind(_this),
@@ -461,6 +507,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             ADCrrAE: this.ADCrr.curry(A, E).bind(_this),
             ADCrrAH: this.ADCrr.curry(A, H).bind(_this),
             ADCrrAL: this.ADCrr.curry(A, L).bind(_this),
+            ADCrmAHL: this.ADCrmm.curry(H, L, A).bind(_this),
 
             SUBrrA: this.SUBrr.curry(A).bind(_this),
             SUBrrB: this.SUBrr.curry(B).bind(_this),
@@ -469,6 +516,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             SUBrrE: this.SUBrr.curry(E).bind(_this),
             SUBrrH: this.SUBrr.curry(H).bind(_this),
             SUBrrL: this.SUBrr.curry(L).bind(_this),
+            SUBrmHL: this.SUBrmm.curry(H, L).bind(_this),
 
             SBCrrA: this.SBCrr.curry(A).bind(_this),
             SBCrrB: this.SBCrr.curry(B).bind(_this),
@@ -477,6 +525,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             SBCrrE: this.SBCrr.curry(E).bind(_this),
             SBCrrH: this.SBCrr.curry(H).bind(_this),
             SBCrrL: this.SBCrr.curry(L).bind(_this),
+            SBCrmHL: this.SBCrmm.curry(H, L).bind(_this),
 
             ANDrrA: this.ANDrr.curry(A).bind(_this),
             ANDrrB: this.ANDrr.curry(B).bind(_this),
@@ -485,6 +534,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             ANDrrE: this.ANDrr.curry(E).bind(_this),
             ANDrrH: this.ANDrr.curry(H).bind(_this),
             ANDrrL: this.ANDrr.curry(L).bind(_this),
+            ANDrmHL: this.ANDrmm.curry(H, L).bind(_this),
 
             ORrrA: this.ORrr.curry(A).bind(_this),
             ORrrB: this.ORrr.curry(B).bind(_this),
@@ -493,6 +543,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             ORrrE: this.ORrr.curry(E).bind(_this),
             ORrrH: this.ORrr.curry(H).bind(_this),
             ORrrL: this.ORrr.curry(L).bind(_this),
+            ORrmHL: this.ORrmm.curry(H, L).bind(_this),
 
             CPrrA: this.CPrr.curry(A).bind(_this),
             CPrrB: this.CPrr.curry(B).bind(_this),
@@ -501,6 +552,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             CPrrE: this.CPrr.curry(E).bind(_this),
             CPrrH: this.CPrr.curry(H).bind(_this),
             CPrrL: this.CPrr.curry(L).bind(_this),
+            CPrmHL: this.CPrmm.curry(H, L).bind(_this),
 
             XORrrA: this.XORrr.curry(A).bind(_this),
             XORrrB: this.XORrr.curry(B).bind(_this),
@@ -508,7 +560,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             XORrrD: this.XORrr.curry(D).bind(_this),
             XORrrE: this.XORrr.curry(E).bind(_this),
             XORrrH: this.XORrr.curry(H).bind(_this),
-            XORrrL: this.XORrr.curry(L).bind(_this)
+            XORrrL: this.XORrr.curry(L).bind(_this),
+            XORrmHL: this.XORrmm.curry(H, L).bind(_this)
 
         };
         if(config.debug) {
@@ -571,24 +624,24 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             this._ins.LDrrAH, this._ins.LDrrAL, this._ins.LDrmAHL, this._ins.LDrrAA,
 
             this._ins.ADDrrAB, this._ins.ADDrrAC, this._ins.ADDrrAD, this._ins.ADDrrAE,
-            this._ins.ADDrrAH, this._ins.ADDrrAL, this.NI, this._ins.ADDrrAA,
+            this._ins.ADDrrAH, this._ins.ADDrrAL, this._ins.ADDrmAHL, this._ins.ADDrrAA,
             this._ins.ADCrrAB, this._ins.ADCrrAC, this._ins.ADCrrAD, this._ins.ADCrrAE,
-            this._ins.ADCrrAH, this._ins.ADCrrAL, this.NI, this._ins.ADCrrAA,
+            this._ins.ADCrrAH, this._ins.ADCrrAL, this._ins.ADCrmAHL, this._ins.ADCrrAA,
 
             this._ins.SUBrrB, this._ins.SUBrrC, this._ins.SUBrrD, this._ins.SUBrrE,
-            this._ins.SUBrrH, this._ins.SUBrrL, this.NI, this._ins.SUBrrA,
+            this._ins.SUBrrH, this._ins.SUBrrL, this._ins.SUBrmHL, this._ins.SUBrrA,
             this._ins.SBCrrB, this._ins.SBCrrC, this._ins.SBCrrD, this._ins.SBCrrE,
-            this._ins.SBCrrH, this._ins.SBCrrL, this.NI, this._ins.SBCrrA,
+            this._ins.SBCrrH, this._ins.SBCrrL, this._ins.SBCrmHL, this._ins.SBCrrA,
 
             this._ins.ANDrrB, this._ins.ANDrrC, this._ins.ANDrrD, this._ins.ANDrrE,
-            this._ins.ANDrrH, this._ins.ANDrrL, this.NI, this._ins.ANDrrA,
+            this._ins.ANDrrH, this._ins.ANDrrL, this.ANDrmHL, this._ins.ANDrrA,
             this._ins.XORrrB, this._ins.XORrrC, this._ins.XORrrD, this._ins.XORrrE,
-            this._ins.XORrrH, this._ins.XORrrL, this.NI, this._ins.XORrrA,
+            this._ins.XORrrH, this._ins.XORrrL, this._ins.XORrmHL, this._ins.XORrrA,
 
             this._ins.ORrrB, this._ins.ORrrC, this._ins.ORrrD, this._ins.ORrrE,
-            this._ins.ORrrH, this._ins.ORrrL, this.NI, this._ins.ORrrA,
+            this._ins.ORrrH, this._ins.ORrrL, this._ins.ORrmHL, this._ins.ORrrA,
             this._ins.CPrrB, this._ins.CPrrC, this._ins.CPrrD, this._ins.CPrrE,
-            this._ins.CPrrH, this._ins.CPrrL, this.NI, this._ins.CPrrA,
+            this._ins.CPrrH, this._ins.CPrrL, this._ins.CPrmHL, this._ins.CPrrA,
 
             this.NI, this._ins.POPBC, this.NI, this.NI,
             this.NI, this._ins.PUSHBC, this.NI, this.NI,
