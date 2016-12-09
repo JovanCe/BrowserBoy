@@ -287,8 +287,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.SBCrmm = function(reg) {
-        var toSubstract = MM.readByte((this._reg[src1] << 8) + this._reg[reg]) + this._getFlag(this._FLAG_CARRY);
+    CPU.prototype.SBCrmm = function(src1, src2) {
+        var toSubstract = MM.readByte((this._reg[src1] << 8) + this._reg[src2]) + this._getFlag(this._FLAG_CARRY);
         this._reg.A = this._performSUB(this._reg.A, toSubstract);
 
         this._step(1, 8);
