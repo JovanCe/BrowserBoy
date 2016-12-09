@@ -433,6 +433,20 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 });
             });
         });
+        describe("ADDrmm", function() {
+            it("should behave exactly like ADDrr but take the operand from the address stored in provided registers," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.A=10;
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._reg.B = 5;
+                CPU._ins.LDmrHLB();
+                CPU.ADDrmm("H", "L", "A");
+                expect(CPU._reg.A).to.equal(15);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
         describe("ADCrr", function() {
             it("should behave exactly like ADDrr but take into account the carry flag", function() {
                 CPU._reg.A=5;
@@ -461,6 +475,21 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     expect(CPU._reg.A).to.equal(0);
                     expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
                 });
+            });
+        });
+        describe("ADCrmm", function() {
+            it("should behave exactly like ADCrr but take the operand from the address stored in provided registers," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.A=10;
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._reg.B = 5;
+                CPU._ins.LDmrHLB();
+                CPU._setFlag(CPU._FLAG_CARRY, true);
+                CPU.ADCrmm("H", "L", "A");
+                expect(CPU._reg.A).to.equal(16);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
             });
         });
         describe("SUBrr", function() {
@@ -505,6 +534,20 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 });
             });
         });
+        describe("SUBrmm", function() {
+            it("should behave exactly like SUBrr but take the operand from the address stored in provided registers," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.A=20;
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._reg.B = 10;
+                CPU._ins.LDmrHLB();
+                CPU.SUBrmm("H", "L");
+                expect(CPU._reg.A).to.equal(10);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
         describe("SBCrr", function() {
             it("should behave exactly like SUBrr but take into account the carry flag", function() {
                 CPU._reg.A=20;
@@ -535,6 +578,21 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 });
             });
         });
+        describe("SBCrmm", function() {
+            it("should behave exactly like SBCrr but take the operand from the address stored in provided registers," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.A=20;
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._reg.B = 10;
+                CPU._ins.LDmrHLB();
+                CPU._setFlag(CPU._FLAG_CARRY, true);
+                CPU.SBCrmm("H", "L");
+                expect(CPU._reg.A).to.equal(9);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
         describe("ANDrr", function() {
             it("should perform a bitwise and between the A register and the given register " +
                 "and store the result in A. It should also advance " +
@@ -553,6 +611,20 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     CPU.ANDrr("B");
                     expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
                 });
+            });
+        });
+        describe("ANDrmm", function() {
+            it("should behave like ANDrr but take the operand from the address stored in provided registers," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._reg.B = 3;
+                CPU._ins.LDmrHLB();
+                CPU._reg.A = 2;
+                CPU.ANDrmm("H", "L");
+                expect(CPU._reg.A).to.equal(2);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
             });
         });
         describe("XORrr", function() {
@@ -575,6 +647,20 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 });
             });
         });
+        describe("XORrmm", function() {
+            it("should behave like XORrr but take the operand from the address stored in provided registers," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._reg.B = 4;
+                CPU._ins.LDmrHLB();
+                CPU._reg.A = 7;
+                CPU.XORrmm("H", "L");
+                expect(CPU._reg.A).to.equal(3);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
         describe("ORrr", function() {
             it("should perform a bitwise or between the A register and the given register " +
                 "and store the result in A. It should also advance " +
@@ -593,6 +679,20 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     CPU.ORrr("B");
                     expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
                 });
+            });
+        });
+        describe("ORrmm", function() {
+            it("should behave like ORrr but take the operand from the address stored in provided registers," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._reg.B = 3;
+                CPU._ins.LDmrHLB();
+                CPU._reg.A = 4;
+                CPU.ORrmm("H", "L");
+                expect(CPU._reg.A).to.equal(7);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
             });
         });
         describe("CPrr", function() {
@@ -635,6 +735,20 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     CPU.CPrr("B");
                     expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
                 });
+            });
+        });
+        describe("CPrmm", function() {
+            it("should behave like CPrr but take the operand from the address stored in provided registers," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._reg.B = 10;
+                CPU._ins.LDmrHLB();
+                CPU._reg.A = 10;
+                CPU.CPrmm("H", "L");
+                expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
             });
         });
     });
