@@ -492,6 +492,20 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(8);
             });
         });
+        describe("ADDrrrr", function() {
+            it("should behave exactly like ADDrr but treats the  operands as single, 16-bit registers," +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._reg.B = 1;
+                CPU._reg.C = 5;
+                CPU.ADDrrrr("H", "L", "B", "C");
+                expect(CPU._reg.H).to.equal(6);
+                expect(CPU._reg.L).to.equal(11);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
         describe("SUBrr", function() {
             it("should substract the contents of the register A and the given and store them in A, " +
                 "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
