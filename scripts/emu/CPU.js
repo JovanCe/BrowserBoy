@@ -34,7 +34,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         
         // flag masks
         this._FLAG_ZERO = 0x80;
-        this._FLAG_SUBSTRACT = 0x40;
+        this._FLAG_SUBTRACT = 0x40;
         this._FLAG_HALF_CARRY = 0x20;
         this._FLAG_CARRY = 0x10;
 
@@ -228,7 +228,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         var result = val1 + val2;
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, (val1 & 0xF)  + (val2 & 0xF) > 0xF);
         this._setFlag(this._FLAG_CARRY, result > 0xFF);
 
@@ -262,7 +262,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         var result = val1 - val2;
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, true);
+        this._setFlag(this._FLAG_SUBTRACT, true);
         this._setFlag(this._FLAG_HALF_CARRY, (val1 & 0xF) - (val2 & 0xF) < 0);
         this._setFlag(this._FLAG_CARRY, result < 0);
 
@@ -298,7 +298,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._reg.A &= this._reg[reg];
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, true);
         this._setFlag(this._FLAG_CARRY, false);
 
@@ -309,7 +309,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._reg.A &= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, true);
         this._setFlag(this._FLAG_CARRY, false);
 
@@ -320,7 +320,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._reg.A ^= this._reg[reg];
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, false);
         this._setFlag(this._FLAG_CARRY, false);
 
@@ -331,7 +331,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._reg.A ^= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, false);
         this._setFlag(this._FLAG_CARRY, false);
 
@@ -342,7 +342,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._reg.A |= this._reg[reg];
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, false);
         this._setFlag(this._FLAG_CARRY, false);
 
@@ -353,7 +353,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._reg.A |= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBSTRACT, false);
+        this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, false);
         this._setFlag(this._FLAG_CARRY, false);
 

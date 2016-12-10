@@ -43,8 +43,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
             describe("get substract flag", function() {
                 it("should get current flag value", function() {
-                    CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
-                    expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(1);
+                    CPU._setFlag(CPU._FLAG_SUBTRACT, true);
+                    expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(1);
                 });
             });
             describe("get half-carry flag", function() {
@@ -74,13 +74,13 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
         });
         describe("_resetSubstractFlag()", function() {
             it("should set the substract flag to 0", function() {
-                CPU._setFlag(CPU._FLAG_SUBSTRACT, false);
+                CPU._setFlag(CPU._FLAG_SUBTRACT, false);
                 expect(CPU._reg.F & 0x40).to.equal(0);
             });
         });
         describe("_setSubstractFlag()", function() {
             it("should set the substract flag to 1", function() {
-                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
+                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
                 expect((CPU._reg.F & 0x40) >> 6).to.equal(1);
             });
         });
@@ -402,11 +402,11 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(4);
             });
             it("should also reset the substract flag", function() {
-                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
+                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
                 CPU._reg.A=5;
                 CPU._reg.B=10;
                 CPU.ADDrr("A", "B");
-                expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(0);
+                expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(0);
             });
             describe("when the result is zero", function() {
                 it("should set the zero flag", function() {
@@ -503,11 +503,11 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(4);
             });
             it("should also set the substract flag", function() {
-                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
+                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
                 CPU._reg.A=15;
                 CPU._reg.B=10;
                 CPU.SUBrr("B");
-                expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(1);
+                expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(1);
             });
             describe("when the result is zero", function() {
                 it("should set the zero flag", function() {
@@ -706,11 +706,11 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(4);
             });
             it("should also set the substract flag", function() {
-                CPU._setFlag(CPU._FLAG_SUBSTRACT, true);
+                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
                 CPU._reg.A=15;
                 CPU._reg.B=10;
                 CPU.CPrr("B");
-                expect(CPU._getFlag(CPU._FLAG_SUBSTRACT)).to.equal(1);
+                expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(1);
             });
             describe("when the result is not zero", function() {
                 it("should reset the zero flag", function() {
