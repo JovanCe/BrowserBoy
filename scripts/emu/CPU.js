@@ -267,15 +267,15 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.ADDrrrr = function(dest1, dest2, src1, src2) {
         var toAdd;
         if(src2) {
-            toAdd = this._reg[src1] << 8 + this._reg[src2];
+            toAdd = (this._reg[src1] << 8) + this._reg[src2];
         }
         else {
             toAdd = this._reg[src1];
         }
         var zero = this._getFlag(this._FLAG_ZERO);
-        var result = this._performADD((this._reg[dest1] << 8) + this._reg[dest2], toAdd);
+        var result = this._performADD((this._reg[dest1] << 8) + this._reg[dest2], toAdd, true);
         this._setFlag(this._FLAG_ZERO, zero == 0);
-        this._reg[dest1] = result >> 8;
+        this._reg[dest1] = (result >> 8) & 0xFF;
         this._reg[dest2] = result & 0xFF;
         this._step(1, 8);
     };
@@ -685,22 +685,22 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         // position of the instructions corresponds to its memory address
         _this.NOP, _this._ins.LDnnBC, _this._ins.LDmrBCA, _this._ins.INCrrBC,
         _this._ins.INCrB, _this._ins.DECrB, _this._ins.LDnB, _this.NI,
-        _this._ins.LDarSP, _this.NI, _this._ins.LDrmABC, _this._ins.DECrrBC,
+        _this._ins.LDarSP, _this._ins.ADDrrHLBC, _this._ins.LDrmABC, _this._ins.DECrrBC,
         _this._ins.INCrC, _this._ins.DECrC, _this._ins.LDnC, _this.NI,
 
         _this.NI, _this._ins.LDnnDE, _this._ins.LDmrDEA, _this._ins.INCrrDE,
         _this._ins.INCrD, _this._ins.DECrD, _this._ins.LDnD, _this.NI,
-        _this.NI, _this.NI, _this._ins.LDrmADE, _this._ins.DECrrDE,
+        _this.NI, _this._ins.ADDrrHLDE, _this._ins.LDrmADE, _this._ins.DECrrDE,
         _this._ins.INCrE, _this._ins.DECrE, _this._ins.LDnE, _this.NI,
 
         _this.NI, _this._ins.LDnnHL, _this._ins.LDmrHLplusA, _this._ins.INCrrHL,
         _this._ins.INCrH, _this._ins.DECrH, _this._ins.LDnH, _this.NI,
-        _this.NI, _this.NI, _this._ins.LDrmAHLplus, _this._ins.DECrrHL,
+        _this.NI, _this._ins.ADDrrHLHL, _this._ins.LDrmAHLplus, _this._ins.DECrrHL,
         _this._ins.INCrL, _this._ins.DECrL, _this._ins.LDnL, _this.NI,
 
         _this.NI, _this._ins.LDnnSP, _this._ins.LDmrHLminusA, _this._ins.INCrrSP,
         _this._ins.INCmHL, _this._ins.DECmHL, _this._ins.LDmnHL, _this.NI,
-        _this.NI, _this.NI, _this._ins.LDrmAHLminus, _this._ins.DECrrSP,
+        _this.NI, _this._ins.ADDrrHLSP, _this._ins.LDrmAHLminus, _this._ins.DECrrSP,
         _this._ins.INCrA, _this._ins.DECrA, _this._ins.LDnA, _this.NI,
 
         _this._ins.LDrrBB, _this._ins.LDrrBC, _this._ins.LDrrBD, _this._ins.LDrrBE,
