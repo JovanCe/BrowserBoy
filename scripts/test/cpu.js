@@ -751,6 +751,77 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(8);
             });
         });
+        describe("INCr", function() {
+            it("should increment the given register" +
+                "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
+                CPU._reg.A = 10;
+                CPU.INCr("A");
+                expect(CPU._reg.A).to.equal(11);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
+            });
+            it("should reset the subtract flag", function() {
+                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
+                CPU._reg.A = 10;
+                CPU.INCr("A");
+                expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(0);
+            });
+            describe("when the result is zero", function() {
+                it("should set the zero flag", function() {
+                    CPU._reg.A = 255;
+                    CPU.INCr("A");
+                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                });
+            });
+            describe("when there's a low nibble overflow", function() {
+                it("should set the half-carry flag", function() {
+                    CPU._reg.A = 0xAE;
+                    CPU.INCr("A");
+                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                });
+            });
+        });
+        describe("INCmm", function() {
+            it("should behave like INCr but increment the value on address stored in two provided registers" +
+                "and advance the clocks by 1 machine cycle and 12 cpu cycles respectively", function() {
+                CPU._reg.A = 10;
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                CPU._ins.LDmrHLA();
+                CPU.INCmm("H", "L");
+                expect(MM.readByte((CPU._reg.H << 8) + CPU._reg.L)).to.equal(11);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(12);
+            });
+        });
+        describe("INCrr", function() {
+            it("should increment provided register pair as if they're a single 16-bit value" +
+                "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
+                CPU._reg.B = 10;
+                CPU._reg.C = 5;
+                CPU.INCrr("C", "B");
+                expect(CPU._reg.C).to.equal(6);
+                expect(CPU._reg.B).to.equal(10);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+            describe("when there's an overflow", function() {
+                it("should increment the second register also (high byte)", function() {
+                    CPU._reg.B = 10;
+                    CPU._reg.C = 0xFF;
+                    CPU.INCrr("C", "B");
+                    expect(CPU._reg.C).to.equal(0);
+                    expect(CPU._reg.B).to.equal(11);
+                });
+            });
+            describe("when only one argument is provided (16-bit register inc)", function() {
+                it("should increment it", function() {
+                    CPU._reg.SP = 10;
+                    CPU.INCrr("SP");
+                    expect(CPU._reg.SP).to.equal(11);
+                });
+            });
+        });
     });
 
 
