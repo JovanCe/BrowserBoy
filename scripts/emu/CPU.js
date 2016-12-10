@@ -24,7 +24,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             M:0, T:0
         };
 
-        // machine cycle and cpu cycle counters (1 machine cycle = 4 cpu cycles)
+        // machine cycle and cpu cycle counters
         this._clock= {
             M:0, T:0
         };
@@ -618,9 +618,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             XORrrL: this.XORrr.curry(L).bind(_this),
             XORrmHL: this.XORrmm.curry(H, L).bind(_this),
 
-            INCrrBC: this.INCrr.curry(B, C).bind(_this),
-            INCrrDE: this.INCrr.curry(D, E).bind(_this),
-            INCrrHL: this.INCrr.curry(H, L).bind(_this),
+            INCrrBC: this.INCrr.curry(C, B).bind(_this),
+            INCrrDE: this.INCrr.curry(E, D).bind(_this),
+            INCrrHL: this.INCrr.curry(L, H).bind(_this),
             INCrrSP: this.INCrr.curry(SP).bind(_this),
 
             INCrA: this.INCr.curry(A).bind(_this),
@@ -632,9 +632,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             INCrL: this.INCr.curry(L).bind(_this),
             INCmHL: this.INCmm.curry(H, L).bind(_this),
 
-            DECrrBC: this.DECrr.curry(B, C).bind(_this),
-            DECrrDE: this.DECrr.curry(D, E).bind(_this),
-            DECrrHL: this.DECrr.curry(H, L).bind(_this),
+            DECrrBC: this.DECrr.curry(C, B).bind(_this),
+            DECrrDE: this.DECrr.curry(E, D).bind(_this),
+            DECrrHL: this.DECrr.curry(L, H).bind(_this),
             DECrrSP: this.DECrr.curry(SP).bind(_this),
 
             DECrA: this.DECr.curry(A).bind(_this),
