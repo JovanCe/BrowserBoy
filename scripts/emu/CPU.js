@@ -16,7 +16,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     var M = "M";
     var T = "T";
 
-    var CPU = function() {
+    function CPU() {
         // registers
         this._reg = {
             A:0, B:0, C:0, D:0, E:0, H:0, L:0, F:0,    // 8-bit registers
@@ -38,15 +38,21 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._FLAG_HALF_CARRY = 0x20;
         this._FLAG_CARRY = 0x10;
 
-        this._initInstructions();
-        this._mapInstructions();
-
         // register event handlers
         events.register(events.ROMLoaded);
         events.addEventListener(events.ROMLoaded, function() {
             this.dispatch();
         }.bind(this));
-    };
+
+        // show instruction names in debug
+        if(config.debug) {
+            _.map(_.keys(this._ins), function (key) {
+                this._ins[key].toString = function () {
+                    return key
+                };
+            }.bind(this));
+        }
+    }
 
     CPU.prototype._step = function(m, t) {
         if(!t) {
@@ -94,7 +100,6 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
           if(instruction > 0) {
               this._insMap[instruction].call(this, instruction);
           }
-
       }
     };
 
@@ -425,236 +430,232 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         }
         this._step(1, 8);
     };
+    var _this = CPU.prototype;
+    CPU.prototype._ins = {
+        LDrrAA: _this.LDr.curry(A, A),
+        LDrrAB: _this.LDr.curry(B, A),
+        LDrrAC: _this.LDr.curry(C, A),
+        LDrrAD: _this.LDr.curry(D, A),
+        LDrrAE: _this.LDr.curry(E, A),
+        LDrrAH: _this.LDr.curry(H, A),
+        LDrrAL: _this.LDr.curry(L, A),
+        LDrrBA: _this.LDr.curry(A, B),
+        LDrrBB: _this.LDr.curry(B, B),
+        LDrrBC: _this.LDr.curry(C, B),
+        LDrrBD: _this.LDr.curry(D, B),
+        LDrrBE: _this.LDr.curry(E, B),
+        LDrrBH: _this.LDr.curry(H, B),
+        LDrrBL: _this.LDr.curry(L, B),
+        LDrrCA: _this.LDr.curry(A, C),
+        LDrrCB: _this.LDr.curry(B, C),
+        LDrrCC: _this.LDr.curry(C, C),
+        LDrrCD: _this.LDr.curry(D, C),
+        LDrrCE: _this.LDr.curry(E, C),
+        LDrrCH: _this.LDr.curry(H, C),
+        LDrrCL: _this.LDr.curry(L, C),
+        LDrrDA: _this.LDr.curry(A, D),
+        LDrrDB: _this.LDr.curry(B, D),
+        LDrrDC: _this.LDr.curry(C, D),
+        LDrrDD: _this.LDr.curry(D, D),
+        LDrrDE: _this.LDr.curry(E, D),
+        LDrrDH: _this.LDr.curry(H, D),
+        LDrrDL: _this.LDr.curry(L, D),
+        LDrrEA: _this.LDr.curry(A, E),
+        LDrrEB: _this.LDr.curry(B, E),
+        LDrrEC: _this.LDr.curry(C, E),
+        LDrrED: _this.LDr.curry(D, E),
+        LDrrEE: _this.LDr.curry(E, E),
+        LDrrEH: _this.LDr.curry(H, E),
+        LDrrEL: _this.LDr.curry(L, E),
+        LDrrHA: _this.LDr.curry(A, H),
+        LDrrHB: _this.LDr.curry(B, H),
+        LDrrHC: _this.LDr.curry(C, H),
+        LDrrHD: _this.LDr.curry(D, H),
+        LDrrHE: _this.LDr.curry(E, H),
+        LDrrHH: _this.LDr.curry(H, H),
+        LDrrHL: _this.LDr.curry(L, H),
+        LDrrLA: _this.LDr.curry(A, L),
+        LDrrLB: _this.LDr.curry(B, L),
+        LDrrLC: _this.LDr.curry(C, L),
+        LDrrLD: _this.LDr.curry(D, L),
+        LDrrLE: _this.LDr.curry(E, L),
+        LDrrLH: _this.LDr.curry(H, L),
+        LDrrLL: _this.LDr.curry(L, L),
 
-    CPU.prototype._initInstructions = function() {
-        var _this = this;
-        this._ins = {
-            LDrrAA: this.LDr.curry(A, A).bind(_this),
-            LDrrAB: this.LDr.curry(B, A).bind(_this),
-            LDrrAC: this.LDr.curry(C, A).bind(_this),
-            LDrrAD: this.LDr.curry(D, A).bind(_this),
-            LDrrAE: this.LDr.curry(E, A).bind(_this),
-            LDrrAH: this.LDr.curry(H, A).bind(_this),
-            LDrrAL: this.LDr.curry(L, A).bind(_this),
-            LDrrBA: this.LDr.curry(A, B).bind(_this),
-            LDrrBB: this.LDr.curry(B, B).bind(_this),
-            LDrrBC: this.LDr.curry(C, B).bind(_this),
-            LDrrBD: this.LDr.curry(D, B).bind(_this),
-            LDrrBE: this.LDr.curry(E, B).bind(_this),
-            LDrrBH: this.LDr.curry(H, B).bind(_this),
-            LDrrBL: this.LDr.curry(L, B).bind(_this),
-            LDrrCA: this.LDr.curry(A, C).bind(_this),
-            LDrrCB: this.LDr.curry(B, C).bind(_this),
-            LDrrCC: this.LDr.curry(C, C).bind(_this),
-            LDrrCD: this.LDr.curry(D, C).bind(_this),
-            LDrrCE: this.LDr.curry(E, C).bind(_this),
-            LDrrCH: this.LDr.curry(H, C).bind(_this),
-            LDrrCL: this.LDr.curry(L, C).bind(_this),
-            LDrrDA: this.LDr.curry(A, D).bind(_this),
-            LDrrDB: this.LDr.curry(B, D).bind(_this),
-            LDrrDC: this.LDr.curry(C, D).bind(_this),
-            LDrrDD: this.LDr.curry(D, D).bind(_this),
-            LDrrDE: this.LDr.curry(E, D).bind(_this),
-            LDrrDH: this.LDr.curry(H, D).bind(_this),
-            LDrrDL: this.LDr.curry(L, D).bind(_this),
-            LDrrEA: this.LDr.curry(A, E).bind(_this),
-            LDrrEB: this.LDr.curry(B, E).bind(_this),
-            LDrrEC: this.LDr.curry(C, E).bind(_this),
-            LDrrED: this.LDr.curry(D, E).bind(_this),
-            LDrrEE: this.LDr.curry(E, E).bind(_this),
-            LDrrEH: this.LDr.curry(H, E).bind(_this),
-            LDrrEL: this.LDr.curry(L, E).bind(_this),
-            LDrrHA: this.LDr.curry(A, H).bind(_this),
-            LDrrHB: this.LDr.curry(B, H).bind(_this),
-            LDrrHC: this.LDr.curry(C, H).bind(_this),
-            LDrrHD: this.LDr.curry(D, H).bind(_this),
-            LDrrHE: this.LDr.curry(E, H).bind(_this),
-            LDrrHH: this.LDr.curry(H, H).bind(_this),
-            LDrrHL: this.LDr.curry(L, H).bind(_this),
-            LDrrLA: this.LDr.curry(A, L).bind(_this),
-            LDrrLB: this.LDr.curry(B, L).bind(_this),
-            LDrrLC: this.LDr.curry(C, L).bind(_this),
-            LDrrLD: this.LDr.curry(D, L).bind(_this),
-            LDrrLE: this.LDr.curry(E, L).bind(_this),
-            LDrrLH: this.LDr.curry(H, L).bind(_this),
-            LDrrLL: this.LDr.curry(L, L).bind(_this),
+        LDnA: _this.LDrn.curry(A),
+        LDnB: _this.LDrn.curry(B),
+        LDnC: _this.LDrn.curry(C),
+        LDnD: _this.LDrn.curry(D),
+        LDnE: _this.LDrn.curry(E),
+        LDnH: _this.LDrn.curry(H),
+        LDnL: _this.LDrn.curry(L),
 
-            LDnA: this.LDrn.curry(A).bind(_this),
-            LDnB: this.LDrn.curry(B).bind(_this),
-            LDnC: this.LDrn.curry(C).bind(_this),
-            LDnD: this.LDrn.curry(D).bind(_this),
-            LDnE: this.LDrn.curry(E).bind(_this),
-            LDnH: this.LDrn.curry(H).bind(_this),
-            LDnL: this.LDrn.curry(L).bind(_this),
+        LDnnBC: _this.LDrn16.curry(B, C),
+        LDnnDE: _this.LDrn16.curry(D, E),
+        LDnnHL: _this.LDrn16.curry(H, L),
+        LDnnSP: _this.LDr16n16.curry(SP),
 
-            LDnnBC: this.LDrn16.curry(B, C).bind(_this),
-            LDnnDE: this.LDrn16.curry(D, E).bind(_this),
-            LDnnHL: this.LDrn16.curry(H, L).bind(_this),
-            LDnnSP: this.LDr16n16.curry(SP).bind(_this),
+        LDrmAHL: _this.LDrmm.curry(H, L, A),
+        LDrmAHLplus: _this.LDrmm.curry(H, L, A, 1),
+        LDrmAHLminus: _this.LDrmm.curry(H, L, A, -1),
+        LDrmBHL: _this.LDrmm.curry(H, L, B),
+        LDrmCHL: _this.LDrmm.curry(H, L, C),
+        LDrmDHL: _this.LDrmm.curry(H, L, D),
+        LDrmEHL: _this.LDrmm.curry(H, L, E),
+        LDrmHHL: _this.LDrmm.curry(H, L, H),
+        LDrmLHL: _this.LDrmm.curry(H, L, L),
+        LDrmABC: _this.LDrmm.curry(B, C, A),
+        LDrmADE: _this.LDrmm.curry(D, E, A),
 
-            LDrmAHL: this.LDrmm.curry(H, L, A).bind(_this),
-            LDrmAHLplus: this.LDrmm.curry(H, L, A, 1).bind(_this),
-            LDrmAHLminus: this.LDrmm.curry(H, L, A, -1).bind(_this),
-            LDrmBHL: this.LDrmm.curry(H, L, B).bind(_this),
-            LDrmCHL: this.LDrmm.curry(H, L, C).bind(_this),
-            LDrmDHL: this.LDrmm.curry(H, L, D).bind(_this),
-            LDrmEHL: this.LDrmm.curry(H, L, E).bind(_this),
-            LDrmHHL: this.LDrmm.curry(H, L, H).bind(_this),
-            LDrmLHL: this.LDrmm.curry(H, L, L).bind(_this),
-            LDrmABC: this.LDrmm.curry(B, C, A).bind(_this),
-            LDrmADE: this.LDrmm.curry(D, E, A).bind(_this),
+        LDmrHLA: _this.LDmmr.curry(A, H, L),
+        LDmrHLplusA: _this.LDmmr.curry(A, H, L, 1),
+        LDmrHLminusA: _this.LDmmr.curry(A, H, L, -1),
+        LDmrHLB: _this.LDmmr.curry(B, H, L),
+        LDmrHLC: _this.LDmmr.curry(C, H, L),
+        LDmrHLD: _this.LDmmr.curry(D, H, L),
+        LDmrHLE: _this.LDmmr.curry(E, H, L),
+        LDmrHLH: _this.LDmmr.curry(H, H, L),
+        LDmrHLL: _this.LDmmr.curry(L, H, L),
+        LDmrBCA: _this.LDmmr.curry(A, B, C),
+        LDmrDEA: _this.LDmmr.curry(A, D, E),
 
-            LDmrHLA: this.LDmmr.curry(A, H, L).bind(_this),
-            LDmrHLplusA: this.LDmmr.curry(A, H, L, 1).bind(_this),
-            LDmrHLminusA: this.LDmmr.curry(A, H, L, -1).bind(_this),
-            LDmrHLB: this.LDmmr.curry(B, H, L).bind(_this),
-            LDmrHLC: this.LDmmr.curry(C, H, L).bind(_this),
-            LDmrHLD: this.LDmmr.curry(D, H, L).bind(_this),
-            LDmrHLE: this.LDmmr.curry(E, H, L).bind(_this),
-            LDmrHLH: this.LDmmr.curry(H, H, L).bind(_this),
-            LDmrHLL: this.LDmmr.curry(L, H, L).bind(_this),
-            LDmrBCA: this.LDmmr.curry(A, B, C).bind(_this),
-            LDmrDEA: this.LDmmr.curry(A, D, E).bind(_this),
+        LDmnHL: _this.LDmn.curry(H, L),
 
-            LDmnHL: this.LDmn.curry(H, L).bind(_this),
+        LDarSP: _this.LDa16r16.curry(SP),
 
-            LDarSP: this.LDa16r16.curry(SP).bind(_this),
+        LDaarA: _this.LDa16r.curry(A),
 
-            LDaarA: this.LDa16r.curry(A).bind(_this),
+        LDraaA: _this.LDra16.curry(A),
 
-            LDraaA: this.LDra16.curry(A).bind(_this),
+        LDarA: _this.LDar.curry(A),
 
-            LDarA: this.LDar.curry(A).bind(_this),
+        LDraA: _this.LDra.curry(A),
 
-            LDraA: this.LDra.curry(A).bind(_this),
+        LDmrCA: _this.LDmr.curry(A, C),
 
-            LDmrCA: this.LDmr.curry(A, C).bind(_this),
+        LDrmAC: _this.LDrm.curry(C, A),
 
-            LDrmAC: this.LDrm.curry(C, A).bind(_this),
+        LDSPHL: _this.LDr16rr.curry(H, L, SP),
 
-            LDSPHL: this.LDr16rr.curry(H, L, SP).bind(_this),
+        LDHLSPn: _this.LDrrr16n.curry(SP, H, L),
 
-            LDHLSPn: this.LDrrr16n.curry(SP, H, L).bind(_this),
+        PUSHBC: _this.PUSHrr.curry(B, C),
+        PUSHDE: _this.PUSHrr.curry(D, E),
+        PUSHHL: _this.PUSHrr.curry(H, L),
+        PUSHAF: _this.PUSHrr.curry(A, F),
 
-            PUSHBC: this.PUSHrr.curry(B, C).bind(_this),
-            PUSHDE: this.PUSHrr.curry(D, E).bind(_this),
-            PUSHHL: this.PUSHrr.curry(H, L).bind(_this),
-            PUSHAF: this.PUSHrr.curry(A, F).bind(_this),
+        POPBC: _this.POPrr.curry(B, C),
+        POPDE: _this.POPrr.curry(D, E),
+        POPHL: _this.POPrr.curry(H, L),
+        POPAF: _this.POPrr.curry(A, F),
 
-            POPBC: this.POPrr.curry(B, C).bind(_this),
-            POPDE: this.POPrr.curry(D, E).bind(_this),
-            POPHL: this.POPrr.curry(H, L).bind(_this),
-            POPAF: this.POPrr.curry(A, F).bind(_this),
+        ADDrrAA: _this.ADDrr.curry(A, A),
+        ADDrrAB: _this.ADDrr.curry(A, B),
+        ADDrrAC: _this.ADDrr.curry(A, C),
+        ADDrrAD: _this.ADDrr.curry(A, D),
+        ADDrrAE: _this.ADDrr.curry(A, E),
+        ADDrrAH: _this.ADDrr.curry(A, H),
+        ADDrrAL: _this.ADDrr.curry(A, L),
+        ADDrmAHL: _this.ADDrmm.curry(H, L, A),
 
-            ADDrrAA: this.ADDrr.curry(A, A).bind(_this),
-            ADDrrAB: this.ADDrr.curry(A, B).bind(_this),
-            ADDrrAC: this.ADDrr.curry(A, C).bind(_this),
-            ADDrrAD: this.ADDrr.curry(A, D).bind(_this),
-            ADDrrAE: this.ADDrr.curry(A, E).bind(_this),
-            ADDrrAH: this.ADDrr.curry(A, H).bind(_this),
-            ADDrrAL: this.ADDrr.curry(A, L).bind(_this),
-            ADDrmAHL: this.ADDrmm.curry(H, L, A).bind(_this),
+        ADCrrAA: _this.ADCrr.curry(A, A),
+        ADCrrAB: _this.ADCrr.curry(A, B),
+        ADCrrAC: _this.ADCrr.curry(A, C),
+        ADCrrAD: _this.ADCrr.curry(A, D),
+        ADCrrAE: _this.ADCrr.curry(A, E),
+        ADCrrAH: _this.ADCrr.curry(A, H),
+        ADCrrAL: _this.ADCrr.curry(A, L),
+        ADCrmAHL: _this.ADCrmm.curry(H, L, A),
 
-            ADCrrAA: this.ADCrr.curry(A, A).bind(_this),
-            ADCrrAB: this.ADCrr.curry(A, B).bind(_this),
-            ADCrrAC: this.ADCrr.curry(A, C).bind(_this),
-            ADCrrAD: this.ADCrr.curry(A, D).bind(_this),
-            ADCrrAE: this.ADCrr.curry(A, E).bind(_this),
-            ADCrrAH: this.ADCrr.curry(A, H).bind(_this),
-            ADCrrAL: this.ADCrr.curry(A, L).bind(_this),
-            ADCrmAHL: this.ADCrmm.curry(H, L, A).bind(_this),
+        ADDrrHLBC: _this.ADDrrrr.curry(H, L, B, C),
+        ADDrrHLDE: _this.ADDrrrr.curry(H, L, D, E),
+        ADDrrHLHL: _this.ADDrrrr.curry(H, L, H, L),
+        ADDrrHLSP: _this.ADDrrrr.curry(H, L, SP),
 
-            SUBrrA: this.SUBrr.curry(A).bind(_this),
-            SUBrrB: this.SUBrr.curry(B).bind(_this),
-            SUBrrC: this.SUBrr.curry(C).bind(_this),
-            SUBrrD: this.SUBrr.curry(D).bind(_this),
-            SUBrrE: this.SUBrr.curry(E).bind(_this),
-            SUBrrH: this.SUBrr.curry(H).bind(_this),
-            SUBrrL: this.SUBrr.curry(L).bind(_this),
-            SUBrmHL: this.SUBrmm.curry(H, L).bind(_this),
+        SUBrrA: _this.SUBrr.curry(A),
+        SUBrrB: _this.SUBrr.curry(B),
+        SUBrrC: _this.SUBrr.curry(C),
+        SUBrrD: _this.SUBrr.curry(D),
+        SUBrrE: _this.SUBrr.curry(E),
+        SUBrrH: _this.SUBrr.curry(H),
+        SUBrrL: _this.SUBrr.curry(L),
+        SUBrmHL: _this.SUBrmm.curry(H, L),
 
-            SBCrrA: this.SBCrr.curry(A).bind(_this),
-            SBCrrB: this.SBCrr.curry(B).bind(_this),
-            SBCrrC: this.SBCrr.curry(C).bind(_this),
-            SBCrrD: this.SBCrr.curry(D).bind(_this),
-            SBCrrE: this.SBCrr.curry(E).bind(_this),
-            SBCrrH: this.SBCrr.curry(H).bind(_this),
-            SBCrrL: this.SBCrr.curry(L).bind(_this),
-            SBCrmHL: this.SBCrmm.curry(H, L).bind(_this),
+        SBCrrA: _this.SBCrr.curry(A),
+        SBCrrB: _this.SBCrr.curry(B),
+        SBCrrC: _this.SBCrr.curry(C),
+        SBCrrD: _this.SBCrr.curry(D),
+        SBCrrE: _this.SBCrr.curry(E),
+        SBCrrH: _this.SBCrr.curry(H),
+        SBCrrL: _this.SBCrr.curry(L),
+        SBCrmHL: _this.SBCrmm.curry(H, L),
 
-            ANDrrA: this.ANDrr.curry(A).bind(_this),
-            ANDrrB: this.ANDrr.curry(B).bind(_this),
-            ANDrrC: this.ANDrr.curry(C).bind(_this),
-            ANDrrD: this.ANDrr.curry(D).bind(_this),
-            ANDrrE: this.ANDrr.curry(E).bind(_this),
-            ANDrrH: this.ANDrr.curry(H).bind(_this),
-            ANDrrL: this.ANDrr.curry(L).bind(_this),
-            ANDrmHL: this.ANDrmm.curry(H, L).bind(_this),
+        ANDrrA: _this.ANDrr.curry(A),
+        ANDrrB: _this.ANDrr.curry(B),
+        ANDrrC: _this.ANDrr.curry(C),
+        ANDrrD: _this.ANDrr.curry(D),
+        ANDrrE: _this.ANDrr.curry(E),
+        ANDrrH: _this.ANDrr.curry(H),
+        ANDrrL: _this.ANDrr.curry(L),
+        ANDrmHL: _this.ANDrmm.curry(H, L),
 
-            ORrrA: this.ORrr.curry(A).bind(_this),
-            ORrrB: this.ORrr.curry(B).bind(_this),
-            ORrrC: this.ORrr.curry(C).bind(_this),
-            ORrrD: this.ORrr.curry(D).bind(_this),
-            ORrrE: this.ORrr.curry(E).bind(_this),
-            ORrrH: this.ORrr.curry(H).bind(_this),
-            ORrrL: this.ORrr.curry(L).bind(_this),
-            ORrmHL: this.ORrmm.curry(H, L).bind(_this),
+        ORrrA: _this.ORrr.curry(A),
+        ORrrB: _this.ORrr.curry(B),
+        ORrrC: _this.ORrr.curry(C),
+        ORrrD: _this.ORrr.curry(D),
+        ORrrE: _this.ORrr.curry(E),
+        ORrrH: _this.ORrr.curry(H),
+        ORrrL: _this.ORrr.curry(L),
+        ORrmHL: _this.ORrmm.curry(H, L),
 
-            CPrrA: this.CPrr.curry(A).bind(_this),
-            CPrrB: this.CPrr.curry(B).bind(_this),
-            CPrrC: this.CPrr.curry(C).bind(_this),
-            CPrrD: this.CPrr.curry(D).bind(_this),
-            CPrrE: this.CPrr.curry(E).bind(_this),
-            CPrrH: this.CPrr.curry(H).bind(_this),
-            CPrrL: this.CPrr.curry(L).bind(_this),
-            CPrmHL: this.CPrmm.curry(H, L).bind(_this),
+        CPrrA: _this.CPrr.curry(A),
+        CPrrB: _this.CPrr.curry(B),
+        CPrrC: _this.CPrr.curry(C),
+        CPrrD: _this.CPrr.curry(D),
+        CPrrE: _this.CPrr.curry(E),
+        CPrrH: _this.CPrr.curry(H),
+        CPrrL: _this.CPrr.curry(L),
+        CPrmHL: _this.CPrmm.curry(H, L),
 
-            XORrrA: this.XORrr.curry(A).bind(_this),
-            XORrrB: this.XORrr.curry(B).bind(_this),
-            XORrrC: this.XORrr.curry(C).bind(_this),
-            XORrrD: this.XORrr.curry(D).bind(_this),
-            XORrrE: this.XORrr.curry(E).bind(_this),
-            XORrrH: this.XORrr.curry(H).bind(_this),
-            XORrrL: this.XORrr.curry(L).bind(_this),
-            XORrmHL: this.XORrmm.curry(H, L).bind(_this),
+        XORrrA: _this.XORrr.curry(A),
+        XORrrB: _this.XORrr.curry(B),
+        XORrrC: _this.XORrr.curry(C),
+        XORrrD: _this.XORrr.curry(D),
+        XORrrE: _this.XORrr.curry(E),
+        XORrrH: _this.XORrr.curry(H),
+        XORrrL: _this.XORrr.curry(L),
+        XORrmHL: _this.XORrmm.curry(H, L),
 
-            INCrrBC: this.INCrr.curry(C, B).bind(_this),
-            INCrrDE: this.INCrr.curry(E, D).bind(_this),
-            INCrrHL: this.INCrr.curry(L, H).bind(_this),
-            INCrrSP: this.INCrr.curry(SP).bind(_this),
+        INCrrBC: _this.INCrr.curry(C, B),
+        INCrrDE: _this.INCrr.curry(E, D),
+        INCrrHL: _this.INCrr.curry(L, H),
+        INCrrSP: _this.INCrr.curry(SP),
 
-            INCrA: this.INCr.curry(A).bind(_this),
-            INCrB: this.INCr.curry(B).bind(_this),
-            INCrC: this.INCr.curry(C).bind(_this),
-            INCrD: this.INCr.curry(D).bind(_this),
-            INCrE: this.INCr.curry(E).bind(_this),
-            INCrH: this.INCr.curry(H).bind(_this),
-            INCrL: this.INCr.curry(L).bind(_this),
-            INCmHL: this.INCmm.curry(H, L).bind(_this),
+        INCrA: _this.INCr.curry(A),
+        INCrB: _this.INCr.curry(B),
+        INCrC: _this.INCr.curry(C),
+        INCrD: _this.INCr.curry(D),
+        INCrE: _this.INCr.curry(E),
+        INCrH: _this.INCr.curry(H),
+        INCrL: _this.INCr.curry(L),
+        INCmHL: _this.INCmm.curry(H, L),
 
-            DECrrBC: this.DECrr.curry(C, B).bind(_this),
-            DECrrDE: this.DECrr.curry(E, D).bind(_this),
-            DECrrHL: this.DECrr.curry(L, H).bind(_this),
-            DECrrSP: this.DECrr.curry(SP).bind(_this),
+        DECrrBC: _this.DECrr.curry(C, B),
+        DECrrDE: _this.DECrr.curry(E, D),
+        DECrrHL: _this.DECrr.curry(L, H),
+        DECrrSP: _this.DECrr.curry(SP),
 
-            DECrA: this.DECr.curry(A).bind(_this),
-            DECrB: this.DECr.curry(B).bind(_this),
-            DECrC: this.DECr.curry(C).bind(_this),
-            DECrD: this.DECr.curry(D).bind(_this),
-            DECrE: this.DECr.curry(E).bind(_this),
-            DECrH: this.DECr.curry(H).bind(_this),
-            DECrL: this.DECr.curry(L).bind(_this),
-            DECmHL: this.DECmm.curry(H, L).bind(_this),
+        DECrA: _this.DECr.curry(A),
+        DECrB: _this.DECr.curry(B),
+        DECrC: _this.DECr.curry(C),
+        DECrD: _this.DECr.curry(D),
+        DECrE: _this.DECr.curry(E),
+        DECrH: _this.DECr.curry(H),
+        DECrL: _this.DECr.curry(L),
+        DECmHL: _this.DECmm.curry(H, L),
 
-        };
-        if(config.debug) {
-            _.map(_.keys(this._ins), function (key) {
-                this._ins[key].toString = function () {
-                    return key
-                };
-            }.bind(this));
-        }
     };
+
     CPU.prototype.NI = function(position) {
         console.log("Unimplemented instruction called: " + position.toString(16));
     };
@@ -663,90 +664,88 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         console.log("Unmapped instruction called: " + position.toString(16));
     };
 
-    CPU.prototype._mapInstructions = function() {
+    CPU.prototype._insMap = [
         // position of the instructions corresponds to its memory address
-        this._insMap = [
-            this.NOP, this._ins.LDnnBC, this._ins.LDmrBCA, this._ins.INCrrBC,
-            this._ins.INCrB, this._ins.DECrB, this._ins.LDnB, this.NI,
-            this._ins.LDarSP, this.NI, this._ins.LDrmABC, this._ins.DECrrBC,
-            this._ins.INCrC, this._ins.DECrC, this._ins.LDnC, this.NI,
+        _this.NOP, _this._ins.LDnnBC, _this._ins.LDmrBCA, _this._ins.INCrrBC,
+        _this._ins.INCrB, _this._ins.DECrB, _this._ins.LDnB, _this.NI,
+        _this._ins.LDarSP, _this.NI, _this._ins.LDrmABC, _this._ins.DECrrBC,
+        _this._ins.INCrC, _this._ins.DECrC, _this._ins.LDnC, _this.NI,
 
-            this.NI, this._ins.LDnnDE, this._ins.LDmrDEA, this._ins.INCrrDE,
-            this._ins.INCrD, this._ins.DECrD, this._ins.LDnD, this.NI,
-            this.NI, this.NI, this._ins.LDrmADE, this._ins.DECrrDE,
-            this._ins.INCrE, this._ins.DECrE, this._ins.LDnE, this.NI,
+        _this.NI, _this._ins.LDnnDE, _this._ins.LDmrDEA, _this._ins.INCrrDE,
+        _this._ins.INCrD, _this._ins.DECrD, _this._ins.LDnD, _this.NI,
+        _this.NI, _this.NI, _this._ins.LDrmADE, _this._ins.DECrrDE,
+        _this._ins.INCrE, _this._ins.DECrE, _this._ins.LDnE, _this.NI,
 
-            this.NI, this._ins.LDnnHL, this._ins.LDmrHLplusA, this._ins.INCrrHL,
-            this._ins.INCrH, this._ins.DECrH, this._ins.LDnH, this.NI,
-            this.NI, this.NI, this._ins.LDrmAHLplus, this._ins.DECrrHL,
-            this._ins.INCrL, this._ins.DECrL, this._ins.LDnL, this.NI,
+        _this.NI, _this._ins.LDnnHL, _this._ins.LDmrHLplusA, _this._ins.INCrrHL,
+        _this._ins.INCrH, _this._ins.DECrH, _this._ins.LDnH, _this.NI,
+        _this.NI, _this.NI, _this._ins.LDrmAHLplus, _this._ins.DECrrHL,
+        _this._ins.INCrL, _this._ins.DECrL, _this._ins.LDnL, _this.NI,
 
-            this.NI, this._ins.LDnnSP, this._ins.LDmrHLminusA, this._ins.INCrrSP,
-            this._ins.INCmHL, this._ins.DECmHL, this._ins.LDmnHL, this.NI,
-            this.NI, this.NI, this._ins.LDrmAHLminus, this._ins.DECrrSP,
-            this._ins.INCrA, this._ins.DECrA, this._ins.LDnA, this.NI,
+        _this.NI, _this._ins.LDnnSP, _this._ins.LDmrHLminusA, _this._ins.INCrrSP,
+        _this._ins.INCmHL, _this._ins.DECmHL, _this._ins.LDmnHL, _this.NI,
+        _this.NI, _this.NI, _this._ins.LDrmAHLminus, _this._ins.DECrrSP,
+        _this._ins.INCrA, _this._ins.DECrA, _this._ins.LDnA, _this.NI,
 
-            this._ins.LDrrBB, this._ins.LDrrBC, this._ins.LDrrBD, this._ins.LDrrBE,
-            this._ins.LDrrBH, this._ins.LDrrBL, this._ins.LDrmBHL, this._ins.LDrrBA,
-            this._ins.LDrrCB, this._ins.LDrrCC, this._ins.LDrrCD, this._ins.LDrrCE,
-            this._ins.LDrrCH, this._ins.LDrrCL, this._ins.LDrmCHL, this._ins.LDrrCA,
+        _this._ins.LDrrBB, _this._ins.LDrrBC, _this._ins.LDrrBD, _this._ins.LDrrBE,
+        _this._ins.LDrrBH, _this._ins.LDrrBL, _this._ins.LDrmBHL, _this._ins.LDrrBA,
+        _this._ins.LDrrCB, _this._ins.LDrrCC, _this._ins.LDrrCD, _this._ins.LDrrCE,
+        _this._ins.LDrrCH, _this._ins.LDrrCL, _this._ins.LDrmCHL, _this._ins.LDrrCA,
 
-            this._ins.LDrrDB, this._ins.LDrrDC, this._ins.LDrrDD, this._ins.LDrrDE,
-            this._ins.LDrrDH, this._ins.LDrrDL, this._ins.LDrmDHL, this._ins.LDrrDA,
-            this._ins.LDrrEB, this._ins.LDrrEC, this._ins.LDrrED, this._ins.LDrrEE,
-            this._ins.LDrrEH, this._ins.LDrrEL, this._ins.LDrmEHL, this._ins.LDrrEA,
+        _this._ins.LDrrDB, _this._ins.LDrrDC, _this._ins.LDrrDD, _this._ins.LDrrDE,
+        _this._ins.LDrrDH, _this._ins.LDrrDL, _this._ins.LDrmDHL, _this._ins.LDrrDA,
+        _this._ins.LDrrEB, _this._ins.LDrrEC, _this._ins.LDrrED, _this._ins.LDrrEE,
+        _this._ins.LDrrEH, _this._ins.LDrrEL, _this._ins.LDrmEHL, _this._ins.LDrrEA,
 
-            this._ins.LDrrHB, this._ins.LDrrHC, this._ins.LDrrHD, this._ins.LDrrHE,
-            this._ins.LDrrHH, this._ins.LDrrHL, this._ins.LDrmHHL, this._ins.LDrrHA,
-            this._ins.LDrrLB, this._ins.LDrrLC, this._ins.LDrrLD, this._ins.LDrrLE,
-            this._ins.LDrrLH, this._ins.LDrrLL, this._ins.LDrmLHL, this._ins.LDrrLA,
+        _this._ins.LDrrHB, _this._ins.LDrrHC, _this._ins.LDrrHD, _this._ins.LDrrHE,
+        _this._ins.LDrrHH, _this._ins.LDrrHL, _this._ins.LDrmHHL, _this._ins.LDrrHA,
+        _this._ins.LDrrLB, _this._ins.LDrrLC, _this._ins.LDrrLD, _this._ins.LDrrLE,
+        _this._ins.LDrrLH, _this._ins.LDrrLL, _this._ins.LDrmLHL, _this._ins.LDrrLA,
 
-            this._ins.LDmrHLB, this._ins.LDmrHLC, this._ins.LDmrHLD, this._ins.LDmrHLE,
-            this._ins.LDmrHLH, this._ins.LDmrHLL, this.HALT, this._ins.LDmrHLA,
-            this._ins.LDrrAB, this._ins.LDrrAC, this._ins.LDrrAD, this._ins.LDrrAE,
-            this._ins.LDrrAH, this._ins.LDrrAL, this._ins.LDrmAHL, this._ins.LDrrAA,
+        _this._ins.LDmrHLB, _this._ins.LDmrHLC, _this._ins.LDmrHLD, _this._ins.LDmrHLE,
+        _this._ins.LDmrHLH, _this._ins.LDmrHLL, _this.HALT, _this._ins.LDmrHLA,
+        _this._ins.LDrrAB, _this._ins.LDrrAC, _this._ins.LDrrAD, _this._ins.LDrrAE,
+        _this._ins.LDrrAH, _this._ins.LDrrAL, _this._ins.LDrmAHL, _this._ins.LDrrAA,
 
-            this._ins.ADDrrAB, this._ins.ADDrrAC, this._ins.ADDrrAD, this._ins.ADDrrAE,
-            this._ins.ADDrrAH, this._ins.ADDrrAL, this._ins.ADDrmAHL, this._ins.ADDrrAA,
-            this._ins.ADCrrAB, this._ins.ADCrrAC, this._ins.ADCrrAD, this._ins.ADCrrAE,
-            this._ins.ADCrrAH, this._ins.ADCrrAL, this._ins.ADCrmAHL, this._ins.ADCrrAA,
+        _this._ins.ADDrrAB, _this._ins.ADDrrAC, _this._ins.ADDrrAD, _this._ins.ADDrrAE,
+        _this._ins.ADDrrAH, _this._ins.ADDrrAL, _this._ins.ADDrmAHL, _this._ins.ADDrrAA,
+        _this._ins.ADCrrAB, _this._ins.ADCrrAC, _this._ins.ADCrrAD, _this._ins.ADCrrAE,
+        _this._ins.ADCrrAH, _this._ins.ADCrrAL, _this._ins.ADCrmAHL, _this._ins.ADCrrAA,
 
-            this._ins.SUBrrB, this._ins.SUBrrC, this._ins.SUBrrD, this._ins.SUBrrE,
-            this._ins.SUBrrH, this._ins.SUBrrL, this._ins.SUBrmHL, this._ins.SUBrrA,
-            this._ins.SBCrrB, this._ins.SBCrrC, this._ins.SBCrrD, this._ins.SBCrrE,
-            this._ins.SBCrrH, this._ins.SBCrrL, this._ins.SBCrmHL, this._ins.SBCrrA,
+        _this._ins.SUBrrB, _this._ins.SUBrrC, _this._ins.SUBrrD, _this._ins.SUBrrE,
+        _this._ins.SUBrrH, _this._ins.SUBrrL, _this._ins.SUBrmHL, _this._ins.SUBrrA,
+        _this._ins.SBCrrB, _this._ins.SBCrrC, _this._ins.SBCrrD, _this._ins.SBCrrE,
+        _this._ins.SBCrrH, _this._ins.SBCrrL, _this._ins.SBCrmHL, _this._ins.SBCrrA,
 
-            this._ins.ANDrrB, this._ins.ANDrrC, this._ins.ANDrrD, this._ins.ANDrrE,
-            this._ins.ANDrrH, this._ins.ANDrrL, this.ANDrmHL, this._ins.ANDrrA,
-            this._ins.XORrrB, this._ins.XORrrC, this._ins.XORrrD, this._ins.XORrrE,
-            this._ins.XORrrH, this._ins.XORrrL, this._ins.XORrmHL, this._ins.XORrrA,
+        _this._ins.ANDrrB, _this._ins.ANDrrC, _this._ins.ANDrrD, _this._ins.ANDrrE,
+        _this._ins.ANDrrH, _this._ins.ANDrrL, _this.ANDrmHL, _this._ins.ANDrrA,
+        _this._ins.XORrrB, _this._ins.XORrrC, _this._ins.XORrrD, _this._ins.XORrrE,
+        _this._ins.XORrrH, _this._ins.XORrrL, _this._ins.XORrmHL, _this._ins.XORrrA,
 
-            this._ins.ORrrB, this._ins.ORrrC, this._ins.ORrrD, this._ins.ORrrE,
-            this._ins.ORrrH, this._ins.ORrrL, this._ins.ORrmHL, this._ins.ORrrA,
-            this._ins.CPrrB, this._ins.CPrrC, this._ins.CPrrD, this._ins.CPrrE,
-            this._ins.CPrrH, this._ins.CPrrL, this._ins.CPrmHL, this._ins.CPrrA,
+        _this._ins.ORrrB, _this._ins.ORrrC, _this._ins.ORrrD, _this._ins.ORrrE,
+        _this._ins.ORrrH, _this._ins.ORrrL, _this._ins.ORrmHL, _this._ins.ORrrA,
+        _this._ins.CPrrB, _this._ins.CPrrC, _this._ins.CPrrD, _this._ins.CPrrE,
+        _this._ins.CPrrH, _this._ins.CPrrL, _this._ins.CPrmHL, _this._ins.CPrrA,
 
-            this.NI, this._ins.POPBC, this.NI, this.NI,
-            this.NI, this._ins.PUSHBC, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.NI,
+        _this.NI, _this._ins.POPBC, _this.NI, _this.NI,
+        _this.NI, _this._ins.PUSHBC, _this.NI, _this.NI,
+        _this.NI, _this.NI, _this.NI, _this.NI,
+        _this.NI, _this.NI, _this.NI, _this.NI,
 
-            this.NI, this._ins.POPDE, this.NI, this.EMPTY,
-            this.NI, this._ins.PUSHDE, this.NI, this.NI,
-            this.NI, this.NI, this.NI, this.EMPTY,
-            this.NI, this.EMPTY, this.NI, this.NI,
+        _this.NI, _this._ins.POPDE, _this.NI, _this.EMPTY,
+        _this.NI, _this._ins.PUSHDE, _this.NI, _this.NI,
+        _this.NI, _this.NI, _this.NI, _this.EMPTY,
+        _this.NI, _this.EMPTY, _this.NI, _this.NI,
 
-            this._ins.LDarA, this._ins.POPHL, this._ins.LDmrCA, this.EMPTY,
-            this.EMPTY, this._ins.PUSHHL, this.NI, this.NI,
-            this.NI, this.NI, this._ins.LDaarA, this.EMPTY,
-            this.EMPTY, this.EMPTY, this.NI, this.NI,
+        _this._ins.LDarA, _this._ins.POPHL, _this._ins.LDmrCA, _this.EMPTY,
+        _this.EMPTY, _this._ins.PUSHHL, _this.NI, _this.NI,
+        _this.NI, _this.NI, _this._ins.LDaarA, _this.EMPTY,
+        _this.EMPTY, _this.EMPTY, _this.NI, _this.NI,
 
-            this._ins.LDraA, this._ins.POPAF, this._ins.LDrmAC, this.NI,
-            this.EMPTY, this._ins.PUSHAF, this.NI, this.NI,
-            this._ins.LDHLSPn, this._ins.LDSPHL, this._ins.LDraaA, this.NI,
-            this.EMPTY, this.EMPTY, this.NI, this.NI
-        ];
-    };
+        _this._ins.LDraA, _this._ins.POPAF, _this._ins.LDrmAC, _this.NI,
+        _this.EMPTY, _this._ins.PUSHAF, _this.NI, _this.NI,
+        _this._ins.LDHLSPn, _this._ins.LDSPHL, _this._ins.LDraaA, _this.NI,
+        _this.EMPTY, _this.EMPTY, _this.NI, _this.NI
+    ];
 
     return new CPU();
 });
