@@ -392,7 +392,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.INCrr = function(reg1, reg2) {
         this._reg[reg1]++;
         this._reg[reg1] &= 0xFF;
-        if(reg2) {
+        if(reg2 && this._reg[reg1] == 0) {
             this._reg[reg2]++;
             this._reg[reg2] &= 0xFF;
         }
@@ -419,7 +419,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.DECrr = function(reg1, reg2) {
         this._reg[reg1]--;
         this._reg[reg1] &= 0xFF;
-        if(reg2) {
+        if(reg2 && this._reg[reg1] == 0xFF) {
             this._reg[reg2]--;
             this._reg[reg2] &= 0xFF;
         }
