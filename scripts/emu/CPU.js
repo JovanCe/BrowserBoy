@@ -371,6 +371,61 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 8);
     };
 
+    CPU.prototype.INCr = function(reg) {
+        this._reg[reg]++;
+        this._reg[reg] &= 0xFF;
+        this._setFlag(this._FLAG_ZERO, this._reg[reg] == 0);
+        this._setFlag(this._FLAG_SUBTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg] & 0xF) + (1 & 0xF) > 0xF);
+        this._step(1);
+    };
+    CPU.prototype.INCmm = function(src1, src2) {
+        var value = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
+        value++;
+        value &= 0xFF;
+        MM.writeByte((this._reg[src1] << 8) + this._reg[src2], value);
+        this._setFlag(this._FLAG_ZERO, value == 0);
+        this._setFlag(this._FLAG_SUBTRACT, false);
+        this._setFlag(this._FLAG_HALF_CARRY, (value & 0xF) + (1 & 0xF) > 0xF);
+        this._step(1, 12);
+    };
+    CPU.prototype.INCrr = function(reg1, reg2) {
+        this._reg[reg1]++;
+        this._reg[reg1] &= 0xFF;
+        if(reg2) {
+            this._reg[reg2]++;
+            this._reg[reg2] &= 0xFF;
+        }
+        this._step(1, 8);
+    };
+    CPU.prototype.DECr = function(reg) {
+        this._reg[reg]--;
+        this._reg[reg] &= 0xFF;
+        this._setFlag(this._FLAG_ZERO, this._reg[reg] == 0);
+        this._setFlag(this._FLAG_SUBTRACT, true);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg] & 0xF) - (1 & 0xF) < 0);
+        this._step(1);
+    };
+    CPU.prototype.DECmm = function(src1, src2) {
+        var value = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
+        value--;
+        value &= 0xFF;
+        MM.writeByte((this._reg[src1] << 8) + this._reg[src2], value);
+        this._setFlag(this._FLAG_ZERO, value == 0);
+        this._setFlag(this._FLAG_SUBTRACT, true);
+        this._setFlag(this._FLAG_HALF_CARRY, (value & 0xF) - (1 & 0xF) < 0);
+        this._step(1, 12);
+    };
+    CPU.prototype.DECrr = function(reg1, reg2) {
+        this._reg[reg1]--;
+        this._reg[reg1] &= 0xFF;
+        if(reg2) {
+            this._reg[reg2]--;
+            this._reg[reg2] &= 0xFF;
+        }
+        this._step(1, 8);
+    };
+
     CPU.prototype._initInstructions = function() {
         var _this = this;
         this._ins = {
@@ -561,7 +616,35 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             XORrrE: this.XORrr.curry(E).bind(_this),
             XORrrH: this.XORrr.curry(H).bind(_this),
             XORrrL: this.XORrr.curry(L).bind(_this),
-            XORrmHL: this.XORrmm.curry(H, L).bind(_this)
+            XORrmHL: this.XORrmm.curry(H, L).bind(_this),
+
+            INCrrBC: this.INCrr.curry(B, C).bind(_this),
+            INCrrDE: this.INCrr.curry(D, E).bind(_this),
+            INCrrHL: this.INCrr.curry(H, L).bind(_this),
+            INCrrSP: this.INCrr.curry(SP).bind(_this),
+
+            INCrA: this.INCr.curry(A).bind(_this),
+            INCrB: this.INCr.curry(B).bind(_this),
+            INCrC: this.INCr.curry(C).bind(_this),
+            INCrD: this.INCr.curry(D).bind(_this),
+            INCrE: this.INCr.curry(E).bind(_this),
+            INCrH: this.INCr.curry(H).bind(_this),
+            INCrL: this.INCr.curry(L).bind(_this),
+            INCmHL: this.INCmm.curry(H, L).bind(_this),
+
+            DECrrBC: this.DECrr.curry(B, C).bind(_this),
+            DECrrDE: this.DECrr.curry(D, E).bind(_this),
+            DECrrHL: this.DECrr.curry(H, L).bind(_this),
+            DECrrSP: this.DECrr.curry(SP).bind(_this),
+
+            DECrA: this.DECr.curry(A).bind(_this),
+            DECrB: this.DECr.curry(B).bind(_this),
+            DECrC: this.DECr.curry(C).bind(_this),
+            DECrD: this.DECr.curry(D).bind(_this),
+            DECrE: this.DECr.curry(E).bind(_this),
+            DECrH: this.DECr.curry(H).bind(_this),
+            DECrL: this.DECr.curry(L).bind(_this),
+            DECmHL: this.DECmm.curry(H, L).bind(_this),
 
         };
         if(config.debug) {
@@ -583,25 +666,25 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._mapInstructions = function() {
         // position of the instructions corresponds to its memory address
         this._insMap = [
-            this.NOP, this._ins.LDnnBC, this._ins.LDmrBCA, this.NI,
-            this.NI, this.NI, this._ins.LDnB, this.NI,
-            this._ins.LDarSP, this.NI, this._ins.LDrmABC, this.NI,
-            this.NI, this.NI, this._ins.LDnC, this.NI,
+            this.NOP, this._ins.LDnnBC, this._ins.LDmrBCA, this._ins.INCrrBC,
+            this._ins.INCrB, this._ins.DECrB, this._ins.LDnB, this.NI,
+            this._ins.LDarSP, this.NI, this._ins.LDrmABC, this._ins.DECrrBC,
+            this._ins.INCrC, this._ins.DECrC, this._ins.LDnC, this.NI,
 
-            this.NI, this._ins.LDnnDE, this._ins.LDmrDEA, this.NI,
-            this.NI, this.NI, this._ins.LDnD, this.NI,
-            this.NI, this.NI, this._ins.LDrmADE, this.NI,
-            this.NI, this.NI, this._ins.LDnE, this.NI,
+            this.NI, this._ins.LDnnDE, this._ins.LDmrDEA, this._ins.INCrrDE,
+            this._ins.INCrD, this._ins.DECrD, this._ins.LDnD, this.NI,
+            this.NI, this.NI, this._ins.LDrmADE, this._ins.DECrrDE,
+            this._ins.INCrE, this._ins.DECrE, this._ins.LDnE, this.NI,
 
-            this.NI, this._ins.LDnnHL, this._ins.LDmrHLplusA, this.NI,
-            this.NI, this.NI, this._ins.LDnH, this.NI,
-            this.NI, this.NI, this._ins.LDrmAHLplus, this.NI,
-            this.NI, this.NI, this._ins.LDnL, this.NI,
+            this.NI, this._ins.LDnnHL, this._ins.LDmrHLplusA, this._ins.INCrrHL,
+            this._ins.INCrH, this._ins.DECrH, this._ins.LDnH, this.NI,
+            this.NI, this.NI, this._ins.LDrmAHLplus, this._ins.DECrrHL,
+            this._ins.INCrL, this._ins.DECrL, this._ins.LDnL, this.NI,
 
-            this.NI, this._ins.LDnnSP, this._ins.LDmrHLminusA, this.NI,
-            this.NI, this.NI, this._ins.LDmnHL, this.NI,
-            this.NI, this.NI, this._ins.LDrmAHLminus, this.NI,
-            this.NI, this.NI, this._ins.LDnA, this.NI,
+            this.NI, this._ins.LDnnSP, this._ins.LDmrHLminusA, this._ins.INCrrSP,
+            this._ins.INCmHL, this._ins.DECmHL, this._ins.LDmnHL, this.NI,
+            this.NI, this.NI, this._ins.LDrmAHLminus, this._ins.DECrrSP,
+            this._ins.INCrA, this._ins.DECrA, this._ins.LDnA, this.NI,
 
             this._ins.LDrrBB, this._ins.LDrrBC, this._ins.LDrrBD, this._ins.LDrrBE,
             this._ins.LDrrBH, this._ins.LDrrBL, this._ins.LDrmBHL, this._ins.LDrrBA,
