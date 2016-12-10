@@ -229,15 +229,17 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(2, 12);
     };
 
-    CPU.prototype._performADD = function(val1, val2) {
+    CPU.prototype._performADD = function(val1, val2, word) {
         var result = val1 + val2;
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, result == 0);
         this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, (val1 & 0xF)  + (val2 & 0xF) > 0xF);
         this._setFlag(this._FLAG_CARRY, result > 0xFF);
-
-        return result & 0xFF;
+        if(!word) {
+            result &= 0xFF;
+        }
+        return result;
     };
 
     CPU.prototype.ADDrr = function(reg1, reg2) {
