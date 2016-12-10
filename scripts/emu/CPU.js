@@ -262,6 +262,21 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._reg[dest] = this._performADD(this._reg[dest], toAdd);
         this._step(1, 8);
     };
+    CPU.prototype.ADDrrrr = function(dest1, dest2, src1, src2) {
+        var toAdd;
+        if(src2) {
+            toAdd = this._reg[src1] << 8 + this._reg[src2];
+        }
+        else {
+            toAdd = this._reg[src1];
+        }
+        var zero = this._getFlag(this._FLAG_ZERO);
+        var result = this._performADD((this._reg[dest1] << 8) + this._reg[dest2], toAdd);
+        this._setFlag(this._FLAG_ZERO, zero == 0);
+        this._reg[dest1] = result >> 8;
+        this._reg[dest2] = result & 0xFF;
+        this._step(1, 8);
+    };
 
     CPU.prototype._performSUB = function(val1, val2) {
         var result = val1 - val2;
