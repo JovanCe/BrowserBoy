@@ -112,42 +112,42 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.PUSHrr = function(reg1, reg2) {
+    CPU.prototype._PUSHrr = function(reg1, reg2) {
         this._reg.SP--;
         MM.writeByte(this._reg.SP--, this._reg[reg1]);
         MM.writeByte(this._reg.SP, this._reg[reg2]);
         this._step(1, 16);
     };
 
-    CPU.prototype.POPrr = function(reg1, reg2) {
+    CPU.prototype._POPrr = function(reg1, reg2) {
         this._reg[reg2] = MM.readByte(this._reg.SP++);
         this._reg[reg1] = MM.readByte(this._reg.SP++);
         this._step(1, 12);
     };
 
-    CPU.prototype.LDr = function(src, dest) {
+    CPU.prototype._LDr = function(src, dest) {
         this._reg[dest] = this._reg[src];
         this._step(1);
     };
 
-    CPU.prototype.LDrn = function(reg) {
+    CPU.prototype._LDrn = function(reg) {
         this._reg[reg] = MM.readByte(this._reg.PC++);
         this._step(2);
     };
 
-    CPU.prototype.LDrn16 = function(reg1, reg2) {
+    CPU.prototype._LDrn16 = function(reg1, reg2) {
         this._reg[reg1] = MM.readByte(this._reg.PC++);
         this._reg[reg2] = MM.readByte(this._reg.PC++);
         this._step(3);
     };
 
-    CPU.prototype.LDr16n16 = function(reg) {
+    CPU.prototype._LDr16n16 = function(reg) {
         this._reg[reg] = MM.readWord(this._reg.PC);
         this._reg.PC+=2;
         this._step(3);
     };
 
-    CPU.prototype.LDrmm = function(src1, src2, dest, offset) {
+    CPU.prototype._LDrmm = function(src1, src2, dest, offset) {
         if(!offset) {
             offset = 0;
         }
@@ -155,7 +155,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1,8);
     };
 
-    CPU.prototype.LDmmr = function(src, dest1, dest2, offset) {
+    CPU.prototype._LDmmr = function(src, dest1, dest2, offset) {
         if(!offset) {
             offset = 0;
         }
@@ -163,55 +163,55 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1,8);
     };
 
-    CPU.prototype.LDmn = function(dest1, dest2) {
+    CPU.prototype._LDmn = function(dest1, dest2) {
         MM.writeByte((this._reg[dest1] << 8) + this._reg[dest2], MM.readByte(this._reg.PC++));
         this._step(2, 12);
     };
 
-    CPU.prototype.LDa16r = function(reg) {
+    CPU.prototype._LDa16r = function(reg) {
         MM.writeByte(MM.readWord(this._reg[PC]), this._reg[reg]);
         this._reg.PC += 2;
         this._step(3, 16);
     };
 
-    CPU.prototype.LDa16r16 = function(reg) {
+    CPU.prototype._LDa16r16 = function(reg) {
         MM.writeWord(MM.readWord(this._reg[PC]), this._reg[reg]);
         this._reg.PC += 2;
         this._step(3, 20);
     };
 
-    CPU.prototype.LDra16 = function(reg) {
+    CPU.prototype._LDra16 = function(reg) {
         this._reg[reg] = MM.readByte(MM.readWord(this._reg[PC]));
         this._reg.PC += 2;
         this._step(3, 16);
     };
 
-    CPU.prototype.LDar = function(reg) {
+    CPU.prototype._LDar = function(reg) {
         MM.writeByte(0xFF00 + MM.readByte(this._reg.PC++), this._reg[reg]);
         this._step(2, 12);
     };
 
-    CPU.prototype.LDra = function(reg) {
+    CPU.prototype._LDra = function(reg) {
         this._reg[reg] = MM.readByte(0xFF00 + MM.readByte(this._reg.PC++));
         this._step(2, 12);
     };
 
-    CPU.prototype.LDmr = function(src, destAddr) {
+    CPU.prototype._LDmr = function(src, destAddr) {
         MM.writeByte(0xFF00 + this._reg[destAddr], this._reg[src]);
         this._step(2, 8);
     };
 
-    CPU.prototype.LDrm = function(srcAddr, dest) {
+    CPU.prototype._LDrm = function(srcAddr, dest) {
         this._reg[dest] = MM.readByte(0xFF00 + this._reg[srcAddr]);
         this._step(2, 8);
     };
 
-    CPU.prototype.LDr16rr = function(src1, src2, dest) {
+    CPU.prototype._LDr16rr = function(src1, src2, dest) {
         this._reg[dest] = (this._reg[src1] << 8) + this._reg[src2];
         this._step(1, 8);
     };
 
-    CPU.prototype.LDrrr16n = function(src, dest1, dest2) {
+    CPU.prototype._LDrrr16n = function(src, dest1, dest2) {
         var offset = MM.readByte(this._reg.PC++);
         // the offset is signed, need to convert it from 2-complement representation
         if (offset > 127) {
@@ -242,29 +242,29 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         return result;
     };
 
-    CPU.prototype.ADDrr = function(reg1, reg2) {
+    CPU.prototype._ADDrr = function(reg1, reg2) {
         this._reg[reg1] = this._performADD(this._reg[reg1], this._reg[reg2]);
         this._step(1);
     };
 
-    CPU.prototype.ADDrmm = function(src1, src2, dest) {
+    CPU.prototype._ADDrmm = function(src1, src2, dest) {
         var toAdd = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg[dest] = this._performADD(this._reg[dest], toAdd);
         this._step(1, 8);
     };
 
-    CPU.prototype.ADCrr = function(reg1, reg2) {
+    CPU.prototype._ADCrr = function(reg1, reg2) {
         var toAdd = this._reg[reg2] + this._getFlag(this._FLAG_CARRY);
         this._reg[reg1] = this._performADD(this._reg[reg1], toAdd);
         this._step(1);
     };
 
-    CPU.prototype.ADCrmm = function(src1, src2, dest) {
+    CPU.prototype._ADCrmm = function(src1, src2, dest) {
         var toAdd = MM.readByte((this._reg[src1] << 8) + this._reg[src2]) + this._getFlag(this._FLAG_CARRY);
         this._reg[dest] = this._performADD(this._reg[dest], toAdd);
         this._step(1, 8);
     };
-    CPU.prototype.ADDrrrr = function(dest1, dest2, src1, src2) {
+    CPU.prototype._ADDrrrr = function(dest1, dest2, src1, src2) {
         var toAdd;
         if(src2) {
             toAdd = (this._reg[src1] << 8) + this._reg[src2];
@@ -291,32 +291,32 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         return result & 0xFF;
     };
 
-    CPU.prototype.SUBrr = function(reg) {
+    CPU.prototype._SUBrr = function(reg) {
         this._reg.A = this._performSUB(this._reg.A, this._reg[reg]);
         this._step(1);
     };
 
-    CPU.prototype.SUBrmm = function(src1, src2) {
+    CPU.prototype._SUBrmm = function(src1, src2) {
         var toSubtract = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg.A = this._performSUB(this._reg.A, toSubtract);
         this._step(1, 8);
     };
 
-    CPU.prototype.SBCrr = function(reg) {
+    CPU.prototype._SBCrr = function(reg) {
         var toSubstract = this._reg[reg] + this._getFlag(this._FLAG_CARRY);
         this._reg.A = this._performSUB(this._reg.A, toSubstract);
 
         this._step(1);
     };
 
-    CPU.prototype.SBCrmm = function(src1, src2) {
+    CPU.prototype._SBCrmm = function(src1, src2) {
         var toSubstract = MM.readByte((this._reg[src1] << 8) + this._reg[src2]) + this._getFlag(this._FLAG_CARRY);
         this._reg.A = this._performSUB(this._reg.A, toSubstract);
 
         this._step(1, 8);
     };
 
-    CPU.prototype.ANDrr = function(reg) {
+    CPU.prototype._ANDrr = function(reg) {
         this._reg.A &= this._reg[reg];
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
@@ -327,7 +327,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.ANDrmm = function(src1, src2) {
+    CPU.prototype._ANDrmm = function(src1, src2) {
         this._reg.A &= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
@@ -338,7 +338,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 8);
     };
 
-    CPU.prototype.XORrr = function(reg) {
+    CPU.prototype._XORrr = function(reg) {
         this._reg.A ^= this._reg[reg];
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
@@ -349,7 +349,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.XORrmm = function(src1, src2) {
+    CPU.prototype._XORrmm = function(src1, src2) {
         this._reg.A ^= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
@@ -360,7 +360,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 8);
     };
 
-    CPU.prototype.ORrr = function(reg) {
+    CPU.prototype._ORrr = function(reg) {
         this._reg.A |= this._reg[reg];
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
@@ -371,7 +371,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
-    CPU.prototype.ORrmm = function(src1, src2) {
+    CPU.prototype._ORrmm = function(src1, src2) {
         this._reg.A |= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
@@ -382,18 +382,18 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 8);
     };
 
-    CPU.prototype.CPrr = function(reg) {
+    CPU.prototype._CPrr = function(reg) {
         this._performSUB(this._reg.A, this._reg[reg]);
         this._step(1);
     };
 
-    CPU.prototype.CPrmm = function(src1, src2) {
+    CPU.prototype._CPrmm = function(src1, src2) {
         var toCompare = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._performSUB(this._reg.A, toCompare);
         this._step(1, 8);
     };
 
-    CPU.prototype.INCr = function(reg) {
+    CPU.prototype._INCr = function(reg) {
         this._reg[reg]++;
         this._reg[reg] &= 0xFF;
         this._setFlag(this._FLAG_ZERO, this._reg[reg] == 0);
@@ -401,7 +401,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg] & 0xF) + (1 & 0xF) > 0xF);
         this._step(1);
     };
-    CPU.prototype.INCmm = function(src1, src2) {
+    CPU.prototype._INCmm = function(src1, src2) {
         var value = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         value++;
         value &= 0xFF;
@@ -411,7 +411,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._setFlag(this._FLAG_HALF_CARRY, (value & 0xF) + (1 & 0xF) > 0xF);
         this._step(1, 12);
     };
-    CPU.prototype.INCrr = function(reg1, reg2) {
+    CPU.prototype._INCrr = function(reg1, reg2) {
         this._reg[reg1]++;
         this._reg[reg1] &= 0xFF;
         if(reg2 && this._reg[reg1] == 0) {
@@ -420,7 +420,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         }
         this._step(1, 8);
     };
-    CPU.prototype.DECr = function(reg) {
+    CPU.prototype._DECr = function(reg) {
         this._reg[reg]--;
         this._reg[reg] &= 0xFF;
         this._setFlag(this._FLAG_ZERO, this._reg[reg] == 0);
@@ -428,7 +428,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg] & 0xF) - (1 & 0xF) < 0);
         this._step(1);
     };
-    CPU.prototype.DECmm = function(src1, src2) {
+    CPU.prototype._DECmm = function(src1, src2) {
         var value = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         value--;
         value &= 0xFF;
@@ -438,7 +438,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._setFlag(this._FLAG_HALF_CARRY, (value & 0xF) - (1 & 0xF) < 0);
         this._step(1, 12);
     };
-    CPU.prototype.DECrr = function(reg1, reg2) {
+    CPU.prototype._DECrr = function(reg1, reg2) {
         this._reg[reg1]--;
         this._reg[reg1] &= 0xFF;
         if(reg2 && this._reg[reg1] == 0xFF) {
@@ -447,321 +447,320 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         }
         this._step(1, 8);
     };
-    var _this = CPU.prototype;
-    CPU.prototype._ins = {
-        LDrrAA: _this.LDr.curry(A, A),
-        LDrrAB: _this.LDr.curry(B, A),
-        LDrrAC: _this.LDr.curry(C, A),
-        LDrrAD: _this.LDr.curry(D, A),
-        LDrrAE: _this.LDr.curry(E, A),
-        LDrrAH: _this.LDr.curry(H, A),
-        LDrrAL: _this.LDr.curry(L, A),
-        LDrrBA: _this.LDr.curry(A, B),
-        LDrrBB: _this.LDr.curry(B, B),
-        LDrrBC: _this.LDr.curry(C, B),
-        LDrrBD: _this.LDr.curry(D, B),
-        LDrrBE: _this.LDr.curry(E, B),
-        LDrrBH: _this.LDr.curry(H, B),
-        LDrrBL: _this.LDr.curry(L, B),
-        LDrrCA: _this.LDr.curry(A, C),
-        LDrrCB: _this.LDr.curry(B, C),
-        LDrrCC: _this.LDr.curry(C, C),
-        LDrrCD: _this.LDr.curry(D, C),
-        LDrrCE: _this.LDr.curry(E, C),
-        LDrrCH: _this.LDr.curry(H, C),
-        LDrrCL: _this.LDr.curry(L, C),
-        LDrrDA: _this.LDr.curry(A, D),
-        LDrrDB: _this.LDr.curry(B, D),
-        LDrrDC: _this.LDr.curry(C, D),
-        LDrrDD: _this.LDr.curry(D, D),
-        LDrrDE: _this.LDr.curry(E, D),
-        LDrrDH: _this.LDr.curry(H, D),
-        LDrrDL: _this.LDr.curry(L, D),
-        LDrrEA: _this.LDr.curry(A, E),
-        LDrrEB: _this.LDr.curry(B, E),
-        LDrrEC: _this.LDr.curry(C, E),
-        LDrrED: _this.LDr.curry(D, E),
-        LDrrEE: _this.LDr.curry(E, E),
-        LDrrEH: _this.LDr.curry(H, E),
-        LDrrEL: _this.LDr.curry(L, E),
-        LDrrHA: _this.LDr.curry(A, H),
-        LDrrHB: _this.LDr.curry(B, H),
-        LDrrHC: _this.LDr.curry(C, H),
-        LDrrHD: _this.LDr.curry(D, H),
-        LDrrHE: _this.LDr.curry(E, H),
-        LDrrHH: _this.LDr.curry(H, H),
-        LDrrHL: _this.LDr.curry(L, H),
-        LDrrLA: _this.LDr.curry(A, L),
-        LDrrLB: _this.LDr.curry(B, L),
-        LDrrLC: _this.LDr.curry(C, L),
-        LDrrLD: _this.LDr.curry(D, L),
-        LDrrLE: _this.LDr.curry(E, L),
-        LDrrLH: _this.LDr.curry(H, L),
-        LDrrLL: _this.LDr.curry(L, L),
 
-        LDnA: _this.LDrn.curry(A),
-        LDnB: _this.LDrn.curry(B),
-        LDnC: _this.LDrn.curry(C),
-        LDnD: _this.LDrn.curry(D),
-        LDnE: _this.LDrn.curry(E),
-        LDnH: _this.LDrn.curry(H),
-        LDnL: _this.LDrn.curry(L),
+    // concrete instructions
+    CPU.prototype.LDrrAA =  CPU.prototype._LDr.curry(A, A);
+    CPU.prototype.LDrrAB =  CPU.prototype._LDr.curry(B, A);
+    CPU.prototype.LDrrAC =  CPU.prototype._LDr.curry(C, A);
+    CPU.prototype.LDrrAD =  CPU.prototype._LDr.curry(D, A);
+    CPU.prototype.LDrrAE =  CPU.prototype._LDr.curry(E, A);
+    CPU.prototype.LDrrAH =  CPU.prototype._LDr.curry(H, A);
+    CPU.prototype.LDrrAL =  CPU.prototype._LDr.curry(L, A);
+    CPU.prototype.LDrrBA =  CPU.prototype._LDr.curry(A, B);
+    CPU.prototype.LDrrBB =  CPU.prototype._LDr.curry(B, B);
+    CPU.prototype.LDrrBC =  CPU.prototype._LDr.curry(C, B);
+    CPU.prototype.LDrrBD =  CPU.prototype._LDr.curry(D, B);
+    CPU.prototype.LDrrBE =  CPU.prototype._LDr.curry(E, B);
+    CPU.prototype.LDrrBH =  CPU.prototype._LDr.curry(H, B);
+    CPU.prototype.LDrrBL =  CPU.prototype._LDr.curry(L, B);
+    CPU.prototype.LDrrCA =  CPU.prototype._LDr.curry(A, C);
+    CPU.prototype.LDrrCB =  CPU.prototype._LDr.curry(B, C);
+    CPU.prototype.LDrrCC =  CPU.prototype._LDr.curry(C, C);
+    CPU.prototype.LDrrCD =  CPU.prototype._LDr.curry(D, C);
+    CPU.prototype.LDrrCE =  CPU.prototype._LDr.curry(E, C);
+    CPU.prototype.LDrrCH =  CPU.prototype._LDr.curry(H, C);
+    CPU.prototype.LDrrCL =  CPU.prototype._LDr.curry(L, C);
+    CPU.prototype.LDrrDA =  CPU.prototype._LDr.curry(A, D);
+    CPU.prototype.LDrrDB =  CPU.prototype._LDr.curry(B, D);
+    CPU.prototype.LDrrDC =  CPU.prototype._LDr.curry(C, D);
+    CPU.prototype.LDrrDD =  CPU.prototype._LDr.curry(D, D);
+    CPU.prototype.LDrrDE =  CPU.prototype._LDr.curry(E, D);
+    CPU.prototype.LDrrDH =  CPU.prototype._LDr.curry(H, D);
+    CPU.prototype.LDrrDL =  CPU.prototype._LDr.curry(L, D);
+    CPU.prototype.LDrrEA =  CPU.prototype._LDr.curry(A, E);
+    CPU.prototype.LDrrEB =  CPU.prototype._LDr.curry(B, E);
+    CPU.prototype.LDrrEC =  CPU.prototype._LDr.curry(C, E);
+    CPU.prototype.LDrrED =  CPU.prototype._LDr.curry(D, E);
+    CPU.prototype.LDrrEE =  CPU.prototype._LDr.curry(E, E);
+    CPU.prototype.LDrrEH =  CPU.prototype._LDr.curry(H, E);
+    CPU.prototype.LDrrEL =  CPU.prototype._LDr.curry(L, E);
+    CPU.prototype.LDrrHA =  CPU.prototype._LDr.curry(A, H);
+    CPU.prototype.LDrrHB =  CPU.prototype._LDr.curry(B, H);
+    CPU.prototype.LDrrHC =  CPU.prototype._LDr.curry(C, H);
+    CPU.prototype.LDrrHD =  CPU.prototype._LDr.curry(D, H);
+    CPU.prototype.LDrrHE =  CPU.prototype._LDr.curry(E, H);
+    CPU.prototype.LDrrHH =  CPU.prototype._LDr.curry(H, H);
+    CPU.prototype.LDrrHL =  CPU.prototype._LDr.curry(L, H);
+    CPU.prototype.LDrrLA =  CPU.prototype._LDr.curry(A, L);
+    CPU.prototype.LDrrLB =  CPU.prototype._LDr.curry(B, L);
+    CPU.prototype.LDrrLC =  CPU.prototype._LDr.curry(C, L);
+    CPU.prototype.LDrrLD =  CPU.prototype._LDr.curry(D, L);
+    CPU.prototype.LDrrLE =  CPU.prototype._LDr.curry(E, L);
+    CPU.prototype.LDrrLH =  CPU.prototype._LDr.curry(H, L);
+    CPU.prototype.LDrrLL =  CPU.prototype._LDr.curry(L, L);
 
-        LDnnBC: _this.LDrn16.curry(B, C),
-        LDnnDE: _this.LDrn16.curry(D, E),
-        LDnnHL: _this.LDrn16.curry(H, L),
-        LDnnSP: _this.LDr16n16.curry(SP),
+    CPU.prototype.LDnA =  CPU.prototype._LDrn.curry(A);
+    CPU.prototype.LDnB =  CPU.prototype._LDrn.curry(B);
+    CPU.prototype.LDnC =  CPU.prototype._LDrn.curry(C);
+    CPU.prototype.LDnD =  CPU.prototype._LDrn.curry(D);
+    CPU.prototype.LDnE =  CPU.prototype._LDrn.curry(E);
+    CPU.prototype.LDnH =  CPU.prototype._LDrn.curry(H);
+    CPU.prototype.LDnL =  CPU.prototype._LDrn.curry(L);
 
-        LDrmAHL: _this.LDrmm.curry(H, L, A),
-        LDrmAHLplus: _this.LDrmm.curry(H, L, A, 1),
-        LDrmAHLminus: _this.LDrmm.curry(H, L, A, -1),
-        LDrmBHL: _this.LDrmm.curry(H, L, B),
-        LDrmCHL: _this.LDrmm.curry(H, L, C),
-        LDrmDHL: _this.LDrmm.curry(H, L, D),
-        LDrmEHL: _this.LDrmm.curry(H, L, E),
-        LDrmHHL: _this.LDrmm.curry(H, L, H),
-        LDrmLHL: _this.LDrmm.curry(H, L, L),
-        LDrmABC: _this.LDrmm.curry(B, C, A),
-        LDrmADE: _this.LDrmm.curry(D, E, A),
+    CPU.prototype.LDnnBC =  CPU.prototype._LDrn16.curry(B, C);
+    CPU.prototype.LDnnDE =  CPU.prototype._LDrn16.curry(D, E);
+    CPU.prototype.LDnnHL =  CPU.prototype._LDrn16.curry(H, L);
+    CPU.prototype.LDnnSP =  CPU.prototype._LDr16n16.curry(SP);
 
-        LDmrHLA: _this.LDmmr.curry(A, H, L),
-        LDmrHLplusA: _this.LDmmr.curry(A, H, L, 1),
-        LDmrHLminusA: _this.LDmmr.curry(A, H, L, -1),
-        LDmrHLB: _this.LDmmr.curry(B, H, L),
-        LDmrHLC: _this.LDmmr.curry(C, H, L),
-        LDmrHLD: _this.LDmmr.curry(D, H, L),
-        LDmrHLE: _this.LDmmr.curry(E, H, L),
-        LDmrHLH: _this.LDmmr.curry(H, H, L),
-        LDmrHLL: _this.LDmmr.curry(L, H, L),
-        LDmrBCA: _this.LDmmr.curry(A, B, C),
-        LDmrDEA: _this.LDmmr.curry(A, D, E),
+    CPU.prototype.LDrmAHL =  CPU.prototype._LDrmm.curry(H, L, A);
+    CPU.prototype.LDrmAHLplus =  CPU.prototype._LDrmm.curry(H, L, A, 1);
+    CPU.prototype.LDrmAHLminus =  CPU.prototype._LDrmm.curry(H, L, A, -1);
+    CPU.prototype.LDrmBHL =  CPU.prototype._LDrmm.curry(H, L, B);
+    CPU.prototype.LDrmCHL =  CPU.prototype._LDrmm.curry(H, L, C);
+    CPU.prototype.LDrmDHL =  CPU.prototype._LDrmm.curry(H, L, D);
+    CPU.prototype.LDrmEHL =  CPU.prototype._LDrmm.curry(H, L, E);
+    CPU.prototype.LDrmHHL =  CPU.prototype._LDrmm.curry(H, L, H);
+    CPU.prototype.LDrmLHL =  CPU.prototype._LDrmm.curry(H, L, L);
+    CPU.prototype.LDrmABC =  CPU.prototype._LDrmm.curry(B, C, A);
+    CPU.prototype.LDrmADE =  CPU.prototype._LDrmm.curry(D, E, A);
 
-        LDmnHL: _this.LDmn.curry(H, L),
+    CPU.prototype.LDmrHLA =  CPU.prototype._LDmmr.curry(A, H, L);
+    CPU.prototype.LDmrHLplusA =  CPU.prototype._LDmmr.curry(A, H, L, 1);
+    CPU.prototype.LDmrHLminusA =  CPU.prototype._LDmmr.curry(A, H, L, -1);
+    CPU.prototype.LDmrHLB =  CPU.prototype._LDmmr.curry(B, H, L);
+    CPU.prototype.LDmrHLC =  CPU.prototype._LDmmr.curry(C, H, L);
+    CPU.prototype.LDmrHLD =  CPU.prototype._LDmmr.curry(D, H, L);
+    CPU.prototype.LDmrHLE =  CPU.prototype._LDmmr.curry(E, H, L);
+    CPU.prototype.LDmrHLH =  CPU.prototype._LDmmr.curry(H, H, L);
+    CPU.prototype.LDmrHLL =  CPU.prototype._LDmmr.curry(L, H, L);
+    CPU.prototype.LDmrBCA =  CPU.prototype._LDmmr.curry(A, B, C);
+    CPU.prototype.LDmrDEA =  CPU.prototype._LDmmr.curry(A, D, E);
 
-        LDarSP: _this.LDa16r16.curry(SP),
+    CPU.prototype.LDmnHL =  CPU.prototype._LDmn.curry(H, L);
 
-        LDaarA: _this.LDa16r.curry(A),
+    CPU.prototype.LDarSP =  CPU.prototype._LDa16r16.curry(SP);
 
-        LDraaA: _this.LDra16.curry(A),
+    CPU.prototype.LDaarA =  CPU.prototype._LDa16r.curry(A);
 
-        LDarA: _this.LDar.curry(A),
+    CPU.prototype.LDraaA =  CPU.prototype._LDra16.curry(A);
 
-        LDraA: _this.LDra.curry(A),
+    CPU.prototype.LDarA =  CPU.prototype._LDar.curry(A);
 
-        LDmrCA: _this.LDmr.curry(A, C),
+    CPU.prototype.LDraA =  CPU.prototype._LDra.curry(A);
 
-        LDrmAC: _this.LDrm.curry(C, A),
+    CPU.prototype.LDmrCA =  CPU.prototype._LDmr.curry(A, C);
 
-        LDSPHL: _this.LDr16rr.curry(H, L, SP),
+    CPU.prototype.LDrmAC =  CPU.prototype._LDrm.curry(C, A);
 
-        LDHLSPn: _this.LDrrr16n.curry(SP, H, L),
+    CPU.prototype.LDSPHL =  CPU.prototype._LDr16rr.curry(H, L, SP);
 
-        PUSHBC: _this.PUSHrr.curry(B, C),
-        PUSHDE: _this.PUSHrr.curry(D, E),
-        PUSHHL: _this.PUSHrr.curry(H, L),
-        PUSHAF: _this.PUSHrr.curry(A, F),
+    CPU.prototype.LDHLSPn =  CPU.prototype._LDrrr16n.curry(SP, H, L);
 
-        POPBC: _this.POPrr.curry(B, C),
-        POPDE: _this.POPrr.curry(D, E),
-        POPHL: _this.POPrr.curry(H, L),
-        POPAF: _this.POPrr.curry(A, F),
+    CPU.prototype.PUSHBC =  CPU.prototype._PUSHrr.curry(B, C);
+    CPU.prototype.PUSHDE =  CPU.prototype._PUSHrr.curry(D, E);
+    CPU.prototype.PUSHHL =  CPU.prototype._PUSHrr.curry(H, L);
+    CPU.prototype.PUSHAF =  CPU.prototype._PUSHrr.curry(A, F);
 
-        ADDrrAA: _this.ADDrr.curry(A, A),
-        ADDrrAB: _this.ADDrr.curry(A, B),
-        ADDrrAC: _this.ADDrr.curry(A, C),
-        ADDrrAD: _this.ADDrr.curry(A, D),
-        ADDrrAE: _this.ADDrr.curry(A, E),
-        ADDrrAH: _this.ADDrr.curry(A, H),
-        ADDrrAL: _this.ADDrr.curry(A, L),
-        ADDrmAHL: _this.ADDrmm.curry(H, L, A),
+    CPU.prototype.POPBC =  CPU.prototype._POPrr.curry(B, C);
+    CPU.prototype.POPDE =  CPU.prototype._POPrr.curry(D, E);
+    CPU.prototype.POPHL =  CPU.prototype._POPrr.curry(H, L);
+    CPU.prototype.POPAF =  CPU.prototype._POPrr.curry(A, F);
 
-        ADCrrAA: _this.ADCrr.curry(A, A),
-        ADCrrAB: _this.ADCrr.curry(A, B),
-        ADCrrAC: _this.ADCrr.curry(A, C),
-        ADCrrAD: _this.ADCrr.curry(A, D),
-        ADCrrAE: _this.ADCrr.curry(A, E),
-        ADCrrAH: _this.ADCrr.curry(A, H),
-        ADCrrAL: _this.ADCrr.curry(A, L),
-        ADCrmAHL: _this.ADCrmm.curry(H, L, A),
+    CPU.prototype.ADDrrAA =  CPU.prototype._ADDrr.curry(A, A);
+    CPU.prototype.ADDrrAB =  CPU.prototype._ADDrr.curry(A, B);
+    CPU.prototype.ADDrrAC =  CPU.prototype._ADDrr.curry(A, C);
+    CPU.prototype.ADDrrAD =  CPU.prototype._ADDrr.curry(A, D);
+    CPU.prototype.ADDrrAE =  CPU.prototype._ADDrr.curry(A, E);
+    CPU.prototype.ADDrrAH =  CPU.prototype._ADDrr.curry(A, H);
+    CPU.prototype.ADDrrAL =  CPU.prototype._ADDrr.curry(A, L);
+    CPU.prototype.ADDrmAHL =  CPU.prototype._ADDrmm.curry(H, L, A);
 
-        ADDrrHLBC: _this.ADDrrrr.curry(H, L, B, C),
-        ADDrrHLDE: _this.ADDrrrr.curry(H, L, D, E),
-        ADDrrHLHL: _this.ADDrrrr.curry(H, L, H, L),
-        ADDrrHLSP: _this.ADDrrrr.curry(H, L, SP),
+    CPU.prototype.ADCrrAA =  CPU.prototype._ADCrr.curry(A, A);
+    CPU.prototype.ADCrrAB =  CPU.prototype._ADCrr.curry(A, B);
+    CPU.prototype.ADCrrAC =  CPU.prototype._ADCrr.curry(A, C);
+    CPU.prototype.ADCrrAD =  CPU.prototype._ADCrr.curry(A, D);
+    CPU.prototype.ADCrrAE =  CPU.prototype._ADCrr.curry(A, E);
+    CPU.prototype.ADCrrAH =  CPU.prototype._ADCrr.curry(A, H);
+    CPU.prototype.ADCrrAL =  CPU.prototype._ADCrr.curry(A, L);
+    CPU.prototype.ADCrmAHL =  CPU.prototype._ADCrmm.curry(H, L, A);
 
-        SUBrrA: _this.SUBrr.curry(A),
-        SUBrrB: _this.SUBrr.curry(B),
-        SUBrrC: _this.SUBrr.curry(C),
-        SUBrrD: _this.SUBrr.curry(D),
-        SUBrrE: _this.SUBrr.curry(E),
-        SUBrrH: _this.SUBrr.curry(H),
-        SUBrrL: _this.SUBrr.curry(L),
-        SUBrmHL: _this.SUBrmm.curry(H, L),
+    CPU.prototype.ADDrrHLBC =  CPU.prototype._ADDrrrr.curry(H, L, B, C);
+    CPU.prototype.ADDrrHLDE =  CPU.prototype._ADDrrrr.curry(H, L, D, E);
+    CPU.prototype.ADDrrHLHL =  CPU.prototype._ADDrrrr.curry(H, L, H, L);
+    CPU.prototype.ADDrrHLSP =  CPU.prototype._ADDrrrr.curry(H, L, SP);
 
-        SBCrrA: _this.SBCrr.curry(A),
-        SBCrrB: _this.SBCrr.curry(B),
-        SBCrrC: _this.SBCrr.curry(C),
-        SBCrrD: _this.SBCrr.curry(D),
-        SBCrrE: _this.SBCrr.curry(E),
-        SBCrrH: _this.SBCrr.curry(H),
-        SBCrrL: _this.SBCrr.curry(L),
-        SBCrmHL: _this.SBCrmm.curry(H, L),
+    CPU.prototype.SUBrrA =  CPU.prototype._SUBrr.curry(A);
+    CPU.prototype.SUBrrB =  CPU.prototype._SUBrr.curry(B);
+    CPU.prototype.SUBrrC =  CPU.prototype._SUBrr.curry(C);
+    CPU.prototype.SUBrrD =  CPU.prototype._SUBrr.curry(D);
+    CPU.prototype.SUBrrE =  CPU.prototype._SUBrr.curry(E);
+    CPU.prototype.SUBrrH =  CPU.prototype._SUBrr.curry(H);
+    CPU.prototype.SUBrrL =  CPU.prototype._SUBrr.curry(L);
+    CPU.prototype.SUBrmHL =  CPU.prototype._SUBrmm.curry(H, L);
 
-        ANDrrA: _this.ANDrr.curry(A),
-        ANDrrB: _this.ANDrr.curry(B),
-        ANDrrC: _this.ANDrr.curry(C),
-        ANDrrD: _this.ANDrr.curry(D),
-        ANDrrE: _this.ANDrr.curry(E),
-        ANDrrH: _this.ANDrr.curry(H),
-        ANDrrL: _this.ANDrr.curry(L),
-        ANDrmHL: _this.ANDrmm.curry(H, L),
+    CPU.prototype.SBCrrA =  CPU.prototype._SBCrr.curry(A);
+    CPU.prototype.SBCrrB =  CPU.prototype._SBCrr.curry(B);
+    CPU.prototype.SBCrrC =  CPU.prototype._SBCrr.curry(C);
+    CPU.prototype.SBCrrD =  CPU.prototype._SBCrr.curry(D);
+    CPU.prototype.SBCrrE =  CPU.prototype._SBCrr.curry(E);
+    CPU.prototype.SBCrrH =  CPU.prototype._SBCrr.curry(H);
+    CPU.prototype.SBCrrL =  CPU.prototype._SBCrr.curry(L);
+    CPU.prototype.SBCrmHL =  CPU.prototype._SBCrmm.curry(H, L);
 
-        ORrrA: _this.ORrr.curry(A),
-        ORrrB: _this.ORrr.curry(B),
-        ORrrC: _this.ORrr.curry(C),
-        ORrrD: _this.ORrr.curry(D),
-        ORrrE: _this.ORrr.curry(E),
-        ORrrH: _this.ORrr.curry(H),
-        ORrrL: _this.ORrr.curry(L),
-        ORrmHL: _this.ORrmm.curry(H, L),
+    CPU.prototype.ANDrrA =  CPU.prototype._ANDrr.curry(A);
+    CPU.prototype.ANDrrB =  CPU.prototype._ANDrr.curry(B);
+    CPU.prototype.ANDrrC =  CPU.prototype._ANDrr.curry(C);
+    CPU.prototype.ANDrrD =  CPU.prototype._ANDrr.curry(D);
+    CPU.prototype.ANDrrE =  CPU.prototype._ANDrr.curry(E);
+    CPU.prototype.ANDrrH =  CPU.prototype._ANDrr.curry(H);
+    CPU.prototype.ANDrrL =  CPU.prototype._ANDrr.curry(L);
+    CPU.prototype.ANDrmHL =  CPU.prototype._ANDrmm.curry(H, L);
 
-        CPrrA: _this.CPrr.curry(A),
-        CPrrB: _this.CPrr.curry(B),
-        CPrrC: _this.CPrr.curry(C),
-        CPrrD: _this.CPrr.curry(D),
-        CPrrE: _this.CPrr.curry(E),
-        CPrrH: _this.CPrr.curry(H),
-        CPrrL: _this.CPrr.curry(L),
-        CPrmHL: _this.CPrmm.curry(H, L),
+    CPU.prototype.ORrrA =  CPU.prototype._ORrr.curry(A);
+    CPU.prototype.ORrrB =  CPU.prototype._ORrr.curry(B);
+    CPU.prototype.ORrrC =  CPU.prototype._ORrr.curry(C);
+    CPU.prototype.ORrrD =  CPU.prototype._ORrr.curry(D);
+    CPU.prototype.ORrrE =  CPU.prototype._ORrr.curry(E);
+    CPU.prototype.ORrrH =  CPU.prototype._ORrr.curry(H);
+    CPU.prototype.ORrrL =  CPU.prototype._ORrr.curry(L);
+    CPU.prototype.ORrmHL =  CPU.prototype._ORrmm.curry(H, L);
 
-        XORrrA: _this.XORrr.curry(A),
-        XORrrB: _this.XORrr.curry(B),
-        XORrrC: _this.XORrr.curry(C),
-        XORrrD: _this.XORrr.curry(D),
-        XORrrE: _this.XORrr.curry(E),
-        XORrrH: _this.XORrr.curry(H),
-        XORrrL: _this.XORrr.curry(L),
-        XORrmHL: _this.XORrmm.curry(H, L),
+    CPU.prototype.CPrrA =  CPU.prototype._CPrr.curry(A);
+    CPU.prototype.CPrrB =  CPU.prototype._CPrr.curry(B);
+    CPU.prototype.CPrrC =  CPU.prototype._CPrr.curry(C);
+    CPU.prototype.CPrrD =  CPU.prototype._CPrr.curry(D);
+    CPU.prototype.CPrrE =  CPU.prototype._CPrr.curry(E);
+    CPU.prototype.CPrrH =  CPU.prototype._CPrr.curry(H);
+    CPU.prototype.CPrrL =  CPU.prototype._CPrr.curry(L);
+    CPU.prototype.CPrmHL =  CPU.prototype._CPrmm.curry(H, L);
 
-        INCrrBC: _this.INCrr.curry(C, B),
-        INCrrDE: _this.INCrr.curry(E, D),
-        INCrrHL: _this.INCrr.curry(L, H),
-        INCrrSP: _this.INCrr.curry(SP),
+    CPU.prototype.XORrrA =  CPU.prototype._XORrr.curry(A);
+    CPU.prototype.XORrrB =  CPU.prototype._XORrr.curry(B);
+    CPU.prototype.XORrrC =  CPU.prototype._XORrr.curry(C);
+    CPU.prototype.XORrrD =  CPU.prototype._XORrr.curry(D);
+    CPU.prototype.XORrrE =  CPU.prototype._XORrr.curry(E);
+    CPU.prototype.XORrrH =  CPU.prototype._XORrr.curry(H);
+    CPU.prototype.XORrrL =  CPU.prototype._XORrr.curry(L);
+    CPU.prototype.XORrmHL =  CPU.prototype._XORrmm.curry(H, L);
 
-        INCrA: _this.INCr.curry(A),
-        INCrB: _this.INCr.curry(B),
-        INCrC: _this.INCr.curry(C),
-        INCrD: _this.INCr.curry(D),
-        INCrE: _this.INCr.curry(E),
-        INCrH: _this.INCr.curry(H),
-        INCrL: _this.INCr.curry(L),
-        INCmHL: _this.INCmm.curry(H, L),
+    CPU.prototype.INCrrBC =  CPU.prototype._INCrr.curry(C, B);
+    CPU.prototype.INCrrDE =  CPU.prototype._INCrr.curry(E, D);
+    CPU.prototype.INCrrHL =  CPU.prototype._INCrr.curry(L, H);
+    CPU.prototype.INCrrSP =  CPU.prototype._INCrr.curry(SP);
 
-        DECrrBC: _this.DECrr.curry(C, B),
-        DECrrDE: _this.DECrr.curry(E, D),
-        DECrrHL: _this.DECrr.curry(L, H),
-        DECrrSP: _this.DECrr.curry(SP),
+    CPU.prototype.INCrA =  CPU.prototype._INCr.curry(A);
+    CPU.prototype.INCrB =  CPU.prototype._INCr.curry(B);
+    CPU.prototype.INCrC =  CPU.prototype._INCr.curry(C);
+    CPU.prototype.INCrD =  CPU.prototype._INCr.curry(D);
+    CPU.prototype.INCrE =  CPU.prototype._INCr.curry(E);
+    CPU.prototype.INCrH =  CPU.prototype._INCr.curry(H);
+    CPU.prototype.INCrL =  CPU.prototype._INCr.curry(L);
+    CPU.prototype.INCmHL =  CPU.prototype._INCmm.curry(H, L);
 
-        DECrA: _this.DECr.curry(A),
-        DECrB: _this.DECr.curry(B),
-        DECrC: _this.DECr.curry(C),
-        DECrD: _this.DECr.curry(D),
-        DECrE: _this.DECr.curry(E),
-        DECrH: _this.DECr.curry(H),
-        DECrL: _this.DECr.curry(L),
-        DECmHL: _this.DECmm.curry(H, L),
+    CPU.prototype.DECrrBC =  CPU.prototype._DECrr.curry(C, B);
+    CPU.prototype.DECrrDE =  CPU.prototype._DECrr.curry(E, D);
+    CPU.prototype.DECrrHL =  CPU.prototype._DECrr.curry(L, H);
+    CPU.prototype.DECrrSP =  CPU.prototype._DECrr.curry(SP);
 
-    };
+    CPU.prototype.DECrA =  CPU.prototype._DECr.curry(A);
+    CPU.prototype.DECrB =  CPU.prototype._DECr.curry(B);
+    CPU.prototype.DECrC =  CPU.prototype._DECr.curry(C);
+    CPU.prototype.DECrD =  CPU.prototype._DECr.curry(D);
+    CPU.prototype.DECrE =  CPU.prototype._DECr.curry(E);
+    CPU.prototype.DECrH =  CPU.prototype._DECr.curry(H);
+    CPU.prototype.DECrL =  CPU.prototype._DECr.curry(L);
+    CPU.prototype.DECmHL =  CPU.prototype._DECmm.curry(H, L);
+    
 
-    CPU.prototype.NI = function(position) {
+    CPU.prototype._NI = function(position) {
         console.log("Unimplemented instruction called: " + position.toString(16));
     };
 
-    CPU.prototype.EMPTY = function(position) {
+    CPU.prototype._EMPTY = function(position) {
         console.log("Unmapped instruction called: " + position.toString(16));
     };
 
     CPU.prototype._insMap = [
         // position of the instructions corresponds to its memory address
-        _this.NOP, _this._ins.LDnnBC, _this._ins.LDmrBCA, _this._ins.INCrrBC,
-        _this._ins.INCrB, _this._ins.DECrB, _this._ins.LDnB, _this.NI,
-        _this._ins.LDarSP, _this._ins.ADDrrHLBC, _this._ins.LDrmABC, _this._ins.DECrrBC,
-        _this._ins.INCrC, _this._ins.DECrC, _this._ins.LDnC, _this.NI,
+        CPU.prototype.NOP, CPU.prototype.LDnnBC, CPU.prototype.LDmrBCA, CPU.prototype.INCrrBC,
+        CPU.prototype.INCrB, CPU.prototype.DECrB, CPU.prototype.LDnB, CPU.prototype._NI,
+        CPU.prototype.LDarSP, CPU.prototype.ADDrrHLBC, CPU.prototype.LDrmABC, CPU.prototype.DECrrBC,
+        CPU.prototype.INCrC, CPU.prototype.DECrC, CPU.prototype.LDnC, CPU.prototype._NI,
 
-        _this.NI, _this._ins.LDnnDE, _this._ins.LDmrDEA, _this._ins.INCrrDE,
-        _this._ins.INCrD, _this._ins.DECrD, _this._ins.LDnD, _this.NI,
-        _this.NI, _this._ins.ADDrrHLDE, _this._ins.LDrmADE, _this._ins.DECrrDE,
-        _this._ins.INCrE, _this._ins.DECrE, _this._ins.LDnE, _this.NI,
+        CPU.prototype._NI, CPU.prototype.LDnnDE, CPU.prototype.LDmrDEA, CPU.prototype.INCrrDE,
+        CPU.prototype.INCrD, CPU.prototype.DECrD, CPU.prototype.LDnD, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype.ADDrrHLDE, CPU.prototype.LDrmADE, CPU.prototype.DECrrDE,
+        CPU.prototype.INCrE, CPU.prototype.DECrE, CPU.prototype.LDnE, CPU.prototype._NI,
 
-        _this.NI, _this._ins.LDnnHL, _this._ins.LDmrHLplusA, _this._ins.INCrrHL,
-        _this._ins.INCrH, _this._ins.DECrH, _this._ins.LDnH, _this.NI,
-        _this.NI, _this._ins.ADDrrHLHL, _this._ins.LDrmAHLplus, _this._ins.DECrrHL,
-        _this._ins.INCrL, _this._ins.DECrL, _this._ins.LDnL, _this.NI,
+        CPU.prototype._NI, CPU.prototype.LDnnHL, CPU.prototype.LDmrHLplusA, CPU.prototype.INCrrHL,
+        CPU.prototype.INCrH, CPU.prototype.DECrH, CPU.prototype.LDnH, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype.ADDrrHLHL, CPU.prototype.LDrmAHLplus, CPU.prototype.DECrrHL,
+        CPU.prototype.INCrL, CPU.prototype.DECrL, CPU.prototype.LDnL, CPU.prototype._NI,
 
-        _this.NI, _this._ins.LDnnSP, _this._ins.LDmrHLminusA, _this._ins.INCrrSP,
-        _this._ins.INCmHL, _this._ins.DECmHL, _this._ins.LDmnHL, _this.NI,
-        _this.NI, _this._ins.ADDrrHLSP, _this._ins.LDrmAHLminus, _this._ins.DECrrSP,
-        _this._ins.INCrA, _this._ins.DECrA, _this._ins.LDnA, _this.NI,
+        CPU.prototype._NI, CPU.prototype.LDnnSP, CPU.prototype.LDmrHLminusA, CPU.prototype.INCrrSP,
+        CPU.prototype.INCmHL, CPU.prototype.DECmHL, CPU.prototype.LDmnHL, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype.ADDrrHLSP, CPU.prototype.LDrmAHLminus, CPU.prototype.DECrrSP,
+        CPU.prototype.INCrA, CPU.prototype.DECrA, CPU.prototype.LDnA, CPU.prototype._NI,
 
-        _this._ins.LDrrBB, _this._ins.LDrrBC, _this._ins.LDrrBD, _this._ins.LDrrBE,
-        _this._ins.LDrrBH, _this._ins.LDrrBL, _this._ins.LDrmBHL, _this._ins.LDrrBA,
-        _this._ins.LDrrCB, _this._ins.LDrrCC, _this._ins.LDrrCD, _this._ins.LDrrCE,
-        _this._ins.LDrrCH, _this._ins.LDrrCL, _this._ins.LDrmCHL, _this._ins.LDrrCA,
+        CPU.prototype.LDrrBB, CPU.prototype.LDrrBC, CPU.prototype.LDrrBD, CPU.prototype.LDrrBE,
+        CPU.prototype.LDrrBH, CPU.prototype.LDrrBL, CPU.prototype.LDrmBHL, CPU.prototype.LDrrBA,
+        CPU.prototype.LDrrCB, CPU.prototype.LDrrCC, CPU.prototype.LDrrCD, CPU.prototype.LDrrCE,
+        CPU.prototype.LDrrCH, CPU.prototype.LDrrCL, CPU.prototype.LDrmCHL, CPU.prototype.LDrrCA,
 
-        _this._ins.LDrrDB, _this._ins.LDrrDC, _this._ins.LDrrDD, _this._ins.LDrrDE,
-        _this._ins.LDrrDH, _this._ins.LDrrDL, _this._ins.LDrmDHL, _this._ins.LDrrDA,
-        _this._ins.LDrrEB, _this._ins.LDrrEC, _this._ins.LDrrED, _this._ins.LDrrEE,
-        _this._ins.LDrrEH, _this._ins.LDrrEL, _this._ins.LDrmEHL, _this._ins.LDrrEA,
+        CPU.prototype.LDrrDB, CPU.prototype.LDrrDC, CPU.prototype.LDrrDD, CPU.prototype.LDrrDE,
+        CPU.prototype.LDrrDH, CPU.prototype.LDrrDL, CPU.prototype.LDrmDHL, CPU.prototype.LDrrDA,
+        CPU.prototype.LDrrEB, CPU.prototype.LDrrEC, CPU.prototype.LDrrED, CPU.prototype.LDrrEE,
+        CPU.prototype.LDrrEH, CPU.prototype.LDrrEL, CPU.prototype.LDrmEHL, CPU.prototype.LDrrEA,
 
-        _this._ins.LDrrHB, _this._ins.LDrrHC, _this._ins.LDrrHD, _this._ins.LDrrHE,
-        _this._ins.LDrrHH, _this._ins.LDrrHL, _this._ins.LDrmHHL, _this._ins.LDrrHA,
-        _this._ins.LDrrLB, _this._ins.LDrrLC, _this._ins.LDrrLD, _this._ins.LDrrLE,
-        _this._ins.LDrrLH, _this._ins.LDrrLL, _this._ins.LDrmLHL, _this._ins.LDrrLA,
+        CPU.prototype.LDrrHB, CPU.prototype.LDrrHC, CPU.prototype.LDrrHD, CPU.prototype.LDrrHE,
+        CPU.prototype.LDrrHH, CPU.prototype.LDrrHL, CPU.prototype.LDrmHHL, CPU.prototype.LDrrHA,
+        CPU.prototype.LDrrLB, CPU.prototype.LDrrLC, CPU.prototype.LDrrLD, CPU.prototype.LDrrLE,
+        CPU.prototype.LDrrLH, CPU.prototype.LDrrLL, CPU.prototype.LDrmLHL, CPU.prototype.LDrrLA,
 
-        _this._ins.LDmrHLB, _this._ins.LDmrHLC, _this._ins.LDmrHLD, _this._ins.LDmrHLE,
-        _this._ins.LDmrHLH, _this._ins.LDmrHLL, _this.HALT, _this._ins.LDmrHLA,
-        _this._ins.LDrrAB, _this._ins.LDrrAC, _this._ins.LDrrAD, _this._ins.LDrrAE,
-        _this._ins.LDrrAH, _this._ins.LDrrAL, _this._ins.LDrmAHL, _this._ins.LDrrAA,
+        CPU.prototype.LDmrHLB, CPU.prototype.LDmrHLC, CPU.prototype.LDmrHLD, CPU.prototype.LDmrHLE,
+        CPU.prototype.LDmrHLH, CPU.prototype.LDmrHLL, CPU.prototype.HALT, CPU.prototype.LDmrHLA,
+        CPU.prototype.LDrrAB, CPU.prototype.LDrrAC, CPU.prototype.LDrrAD, CPU.prototype.LDrrAE,
+        CPU.prototype.LDrrAH, CPU.prototype.LDrrAL, CPU.prototype.LDrmAHL, CPU.prototype.LDrrAA,
 
-        _this._ins.ADDrrAB, _this._ins.ADDrrAC, _this._ins.ADDrrAD, _this._ins.ADDrrAE,
-        _this._ins.ADDrrAH, _this._ins.ADDrrAL, _this._ins.ADDrmAHL, _this._ins.ADDrrAA,
-        _this._ins.ADCrrAB, _this._ins.ADCrrAC, _this._ins.ADCrrAD, _this._ins.ADCrrAE,
-        _this._ins.ADCrrAH, _this._ins.ADCrrAL, _this._ins.ADCrmAHL, _this._ins.ADCrrAA,
+        CPU.prototype.ADDrrAB, CPU.prototype.ADDrrAC, CPU.prototype.ADDrrAD, CPU.prototype.ADDrrAE,
+        CPU.prototype.ADDrrAH, CPU.prototype.ADDrrAL, CPU.prototype.ADDrmAHL, CPU.prototype.ADDrrAA,
+        CPU.prototype.ADCrrAB, CPU.prototype.ADCrrAC, CPU.prototype.ADCrrAD, CPU.prototype.ADCrrAE,
+        CPU.prototype.ADCrrAH, CPU.prototype.ADCrrAL, CPU.prototype.ADCrmAHL, CPU.prototype.ADCrrAA,
 
-        _this._ins.SUBrrB, _this._ins.SUBrrC, _this._ins.SUBrrD, _this._ins.SUBrrE,
-        _this._ins.SUBrrH, _this._ins.SUBrrL, _this._ins.SUBrmHL, _this._ins.SUBrrA,
-        _this._ins.SBCrrB, _this._ins.SBCrrC, _this._ins.SBCrrD, _this._ins.SBCrrE,
-        _this._ins.SBCrrH, _this._ins.SBCrrL, _this._ins.SBCrmHL, _this._ins.SBCrrA,
+        CPU.prototype.SUBrrB, CPU.prototype.SUBrrC, CPU.prototype.SUBrrD, CPU.prototype.SUBrrE,
+        CPU.prototype.SUBrrH, CPU.prototype.SUBrrL, CPU.prototype.SUBrmHL, CPU.prototype.SUBrrA,
+        CPU.prototype.SBCrrB, CPU.prototype.SBCrrC, CPU.prototype.SBCrrD, CPU.prototype.SBCrrE,
+        CPU.prototype.SBCrrH, CPU.prototype.SBCrrL, CPU.prototype.SBCrmHL, CPU.prototype.SBCrrA,
 
-        _this._ins.ANDrrB, _this._ins.ANDrrC, _this._ins.ANDrrD, _this._ins.ANDrrE,
-        _this._ins.ANDrrH, _this._ins.ANDrrL, _this.ANDrmHL, _this._ins.ANDrrA,
-        _this._ins.XORrrB, _this._ins.XORrrC, _this._ins.XORrrD, _this._ins.XORrrE,
-        _this._ins.XORrrH, _this._ins.XORrrL, _this._ins.XORrmHL, _this._ins.XORrrA,
+        CPU.prototype.ANDrrB, CPU.prototype.ANDrrC, CPU.prototype.ANDrrD, CPU.prototype.ANDrrE,
+        CPU.prototype.ANDrrH, CPU.prototype.ANDrrL, CPU.prototype.ANDrmHL, CPU.prototype.ANDrrA,
+        CPU.prototype.XORrrB, CPU.prototype.XORrrC, CPU.prototype.XORrrD, CPU.prototype.XORrrE,
+        CPU.prototype.XORrrH, CPU.prototype.XORrrL, CPU.prototype.XORrmHL, CPU.prototype.XORrrA,
 
-        _this._ins.ORrrB, _this._ins.ORrrC, _this._ins.ORrrD, _this._ins.ORrrE,
-        _this._ins.ORrrH, _this._ins.ORrrL, _this._ins.ORrmHL, _this._ins.ORrrA,
-        _this._ins.CPrrB, _this._ins.CPrrC, _this._ins.CPrrD, _this._ins.CPrrE,
-        _this._ins.CPrrH, _this._ins.CPrrL, _this._ins.CPrmHL, _this._ins.CPrrA,
+        CPU.prototype.ORrrB, CPU.prototype.ORrrC, CPU.prototype.ORrrD, CPU.prototype.ORrrE,
+        CPU.prototype.ORrrH, CPU.prototype.ORrrL, CPU.prototype.ORrmHL, CPU.prototype.ORrrA,
+        CPU.prototype.CPrrB, CPU.prototype.CPrrC, CPU.prototype.CPrrD, CPU.prototype.CPrrE,
+        CPU.prototype.CPrrH, CPU.prototype.CPrrL, CPU.prototype.CPrmHL, CPU.prototype.CPrrA,
 
-        _this.NI, _this._ins.POPBC, _this.NI, _this.NI,
-        _this.NI, _this._ins.PUSHBC, _this.NI, _this.NI,
-        _this.NI, _this.NI, _this.NI, _this.NI,
-        _this.NI, _this.NI, _this.NI, _this.NI,
+        CPU.prototype._NI, CPU.prototype.POPBC, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype.PUSHBC, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
 
-        _this.NI, _this._ins.POPDE, _this.NI, _this.EMPTY,
-        _this.NI, _this._ins.PUSHDE, _this.NI, _this.NI,
-        _this.NI, _this.NI, _this.NI, _this.EMPTY,
-        _this.NI, _this.EMPTY, _this.NI, _this.NI,
+        CPU.prototype._NI, CPU.prototype.POPDE, CPU.prototype._NI, CPU.prototype._EMPTY,
+        CPU.prototype._NI, CPU.prototype.PUSHDE, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._EMPTY,
+        CPU.prototype._NI, CPU.prototype._EMPTY, CPU.prototype._NI, CPU.prototype._NI,
 
-        _this._ins.LDarA, _this._ins.POPHL, _this._ins.LDmrCA, _this.EMPTY,
-        _this.EMPTY, _this._ins.PUSHHL, _this.NI, _this.NI,
-        _this.NI, _this.NI, _this._ins.LDaarA, _this.EMPTY,
-        _this.EMPTY, _this.EMPTY, _this.NI, _this.NI,
+        CPU.prototype.LDarA, CPU.prototype.POPHL, CPU.prototype.LDmrCA, CPU.prototype._EMPTY,
+        CPU.prototype._EMPTY, CPU.prototype.PUSHHL, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.LDaarA, CPU.prototype._EMPTY,
+        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype._NI, CPU.prototype._NI,
 
-        _this._ins.LDraA, _this._ins.POPAF, _this._ins.LDrmAC, _this.NI,
-        _this.EMPTY, _this._ins.PUSHAF, _this.NI, _this.NI,
-        _this._ins.LDHLSPn, _this._ins.LDSPHL, _this._ins.LDraaA, _this.NI,
-        _this.EMPTY, _this.EMPTY, _this.NI, _this.NI
+        CPU.prototype.LDraA, CPU.prototype.POPAF, CPU.prototype.LDrmAC, CPU.prototype._NI,
+        CPU.prototype._EMPTY, CPU.prototype.PUSHAF, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype.LDHLSPn, CPU.prototype.LDSPHL, CPU.prototype.LDraaA, CPU.prototype._NI,
+        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype._NI, CPU.prototype._NI
     ];
 
     return new CPU();
