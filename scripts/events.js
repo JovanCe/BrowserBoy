@@ -8,6 +8,7 @@ define(function(require) {
         this.callbacks = [];
 
         this.ROMLoaded = "ROMloaded";
+        this.BIOSLoaded = "BIOSloaded";
     }
     Event.prototype.registerCallback = function(callback){
         this.callbacks.push(callback);

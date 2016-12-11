@@ -99,10 +99,17 @@ define(["lodash", "events"], function(_, events) {
 
     MemoryManager.prototype.loadBIOS = function (file) {
         var reader = new FileReader();
-        var bios = new Uint8Array(reader.readAsArrayBuffer(file));
-        // copy BIOS data to memory
-        this._memory.set(bios);
-        this._biosLoaded = true;
+        var rom;
+        reader.onload = function(e) {
+            rom = new Uint8Array(reader.result);
+            var bios = new Uint8Array(reader.readAsArrayBuffer(file));
+            // copy BIOS data to memory
+            this._memory.set(bios);
+            this._biosLoaded = true;
+            events.dispatch(events.BIOSLoaded);
+
+        }.bind(this);
+        reader.readAsArrayBuffer(file);
     };
 
     MemoryManager.prototype.readByte = function(address) {
