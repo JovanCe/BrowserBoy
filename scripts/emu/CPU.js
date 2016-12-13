@@ -98,7 +98,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
           this._reg.PC &= 65535;
 
           if(instruction > 0) {
-              this._insMap[instruction].call(this, instruction);
+              this._instructions[instruction].call(this, instruction);
           }
       }
     };
@@ -680,7 +680,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         console.log("Unmapped instruction called: " + position.toString(16));
     };
 
-    CPU.prototype._insMap = [
+    CPU.prototype._instructions = [
         // position of the instructions corresponds to its memory address
         CPU.prototype.NOP, CPU.prototype.LDnnBC, CPU.prototype.LDmrBCA, CPU.prototype.INCrrBC,
         CPU.prototype.INCrB, CPU.prototype.DECrB, CPU.prototype.LDnB, CPU.prototype._NI,
