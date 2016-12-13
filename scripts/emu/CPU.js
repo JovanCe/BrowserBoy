@@ -281,6 +281,22 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(2);
     };
 
+    CPU.prototype._ADDr16n = function(reg) {
+        var offset = MM.readByte(this._reg.PC++);
+        // the offset is signed, need to convert it from 2-complement representation
+        if (offset > 127) {
+            offset = -((~offset + 1) & 255);
+        }
+        var value = this._reg[reg] + offset;
+
+        // set flags
+        this._reg.F = 0;
+        this._setFlag(this._FLAG_CARRY, value > 0xFFFF);
+        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg] & 0xF)  + (offset & 0xF) > 0xF);
+        this._reg[reg] = value;
+        this._step(2, 16);
+    };
+
     CPU.prototype._performSUB = function(val1, val2, useCarry) {
         var result = val1 - val2;
         var halfCarryTest = (val1 & 0xF) - (val2 & 0xF);
@@ -589,6 +605,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.ADDrrHLDE =  CPU.prototype._ADDrrrr.curry(H, L, D, E);
     CPU.prototype.ADDrrHLHL =  CPU.prototype._ADDrrrr.curry(H, L, H, L);
     CPU.prototype.ADDrrHLSP =  CPU.prototype._ADDrrrr.curry(H, L, SP);
+
+    CPU.prototype.ADDSPn = CPU.prototype._ADDr16n.curry(SP);
 
     CPU.prototype.SUBrrA =  CPU.prototype._SUBrr.curry(A);
     CPU.prototype.SUBrrB =  CPU.prototype._SUBrr.curry(B);

@@ -331,7 +331,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
             describe("when there's a low nibble overflow", function() {
                 it("should set the half-carry flag", function() {
-                    execute(1000, -2);
+                    execute(1000, 254);
                     expect(CPU._reg.H).to.equal(3);
                     expect(CPU._reg.L).to.equal(230);
                     expect((CPU._reg.F & 0x20) >> 5).to.equal(1);
@@ -446,6 +446,40 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
             });
+        });
+        describe("ADDr16n", function() {
+            function execute(regVal, offsetVal) {
+                CPU._reg.SP=regVal;
+                CPU._reg.PC=5;
+                MM.writeByte(CPU._reg.PC, offsetVal);
+                CPU._ADDr16n("SP");
+            }
+            it("should add the immediate signed byte value to the 16-bit register , " +
+                "and advance the clocks by 2 machine cycle and 16 cpu cycles respectively", function() {
+                execute(1000, 2);
+                expect(CPU._reg.SP).to.equal(1002);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(16);
+            });
+            describe("when the offset is negative", function() {
+                it("should convert the offset from 2-complement representation", function() {
+                    execute(1000, 254);
+                    expect(CPU._reg.SP).to.equal(998);
+                });
+            });
+            describe("when there's a low nibble overflow", function() {
+                it("should set the half-carry flag", function() {
+                    execute(1000, -2);
+                    expect((CPU._reg.F & 0x20) >> 5).to.equal(1);
+                });
+            });
+            describe("when there's an overflow", function() {
+                it("should set the carry flag", function() {
+                    execute(65535, 2);
+                    expect((CPU._reg.F & 0x10) >> 4).to.equal(1);
+                });
+            });
+
         });
         describe("ADCrr", function() {
             it("should behave exactly like ADDrr but take into account the carry flag", function() {
