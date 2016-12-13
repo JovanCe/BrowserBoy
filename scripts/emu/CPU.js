@@ -275,6 +275,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 8);
     };
 
+    CPU.prototype._ADDrn = function(reg, useCarry) {
+        var toAdd = MM.readByte(this._reg.PC++);
+        this._reg.A = this._performADD(this._reg.A, toAdd, useCarry);
+        this._step(2);
+    };
+
     CPU.prototype._performSUB = function(val1, val2, useCarry) {
         var result = val1 - val2;
         var halfCarryTest = (val1 & 0xF) - (val2 & 0xF);
@@ -301,6 +307,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         var toSubtract = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._reg.A = this._performSUB(this._reg.A, toSubtract, useCarry);
         this._step(1, 8);
+    };
+
+    CPU.prototype._SUBrn = function(useCarry) {
+        var toSubtract = MM.readByte(this._reg.PC++);
+        this._reg.A = this._performSUB(this._reg.A, toSubtract, useCarry);
+        this._step(2);
     };
 
     CPU.prototype._ANDrr = function(reg) {
@@ -561,11 +573,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.ADDrrAH =  CPU.prototype._ADDrr.curry(A, H);
     CPU.prototype.ADDrrAL =  CPU.prototype._ADDrr.curry(A, L);
     CPU.prototype.ADDrmAHL =  CPU.prototype._ADDrmm.curry(H, L, A);
-    CPU.prototype.ADDrnA = function() {
-        var toAdd = MM.readByte(this._reg.PC++);
-        this._reg.A = this._performADD(this._reg.A, toAdd);
-        this._step(2);
-    };
+    CPU.prototype.ADDrnA = CPU.prototype._ADDrn.curry(A);
 
     CPU.prototype.ADCrrAA =  CPU.prototype._ADDrr.curry(A, A, true);
     CPU.prototype.ADCrrAB =  CPU.prototype._ADDrr.curry(A, B, true);
@@ -575,6 +583,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.ADCrrAH =  CPU.prototype._ADDrr.curry(A, H, true);
     CPU.prototype.ADCrrAL =  CPU.prototype._ADDrr.curry(A, L, true);
     CPU.prototype.ADCrmAHL =  CPU.prototype._ADDrmm.curry(H, L, A, true);
+    CPU.prototype.ADCrnA = CPU.prototype._ADDrn.curry(A, true);
 
     CPU.prototype.ADDrrHLBC =  CPU.prototype._ADDrrrr.curry(H, L, B, C);
     CPU.prototype.ADDrrHLDE =  CPU.prototype._ADDrrrr.curry(H, L, D, E);
@@ -589,6 +598,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.SUBrrH =  CPU.prototype._SUBrr.curry(H);
     CPU.prototype.SUBrrL =  CPU.prototype._SUBrr.curry(L);
     CPU.prototype.SUBrmHL =  CPU.prototype._SUBrmm.curry(H, L);
+    CPU.prototype.SUBrnA = CPU.prototype._SUBrn;
 
     CPU.prototype.SBCrrA =  CPU.prototype._SUBrr.curry(A, true);
     CPU.prototype.SBCrrB =  CPU.prototype._SUBrr.curry(B, true);
@@ -598,6 +608,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.SBCrrH =  CPU.prototype._SUBrr.curry(H, true);
     CPU.prototype.SBCrrL =  CPU.prototype._SUBrr.curry(L, true);
     CPU.prototype.SBCrmHL =  CPU.prototype._SUBrmm.curry(H, L, true);
+    CPU.prototype.SUBrnA = CPU.prototype._SUBrn.curry(true);
+
 
     CPU.prototype.ANDrrA =  CPU.prototype._ANDrr.curry(A);
     CPU.prototype.ANDrrB =  CPU.prototype._ANDrr.curry(B);

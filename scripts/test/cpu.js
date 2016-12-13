@@ -492,6 +492,18 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(8);
             });
         });
+        describe("ADDrn", function() {
+            it("should behave exactly like ADDrr but take the second operand as immediate value" +
+                "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
+                CPU._reg.A = 5;
+                MM.writeByte(5, 5);
+                CPU._reg.PC = 5;
+                CPU._ADDrn("A");
+                expect(CPU._reg.A).to.equal(10);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
         describe("ADDrrrr", function() {
             it("should behave exactly like ADDrr but treats the  operands as single, 16-bit registers," +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
@@ -562,6 +574,18 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(8);
             });
         });
+        describe("SUBrn", function() {
+            it("should behave exactly like SUBrr but take the second operand as immediate value" +
+                "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
+                CPU._reg.A = 20;
+                MM.writeByte(5, 10);
+                CPU._reg.PC = 5;
+                CPU._SUBrn();
+                expect(CPU._reg.A).to.equal(10);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
         describe("SBCrr", function() {
             it("should behave exactly like SUBrr but take into account the carry flag", function() {
                 CPU._reg.A=20;
@@ -607,6 +631,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(8);
             });
         });
+
         describe("ANDrr", function() {
             it("should perform a bitwise and between the A register and the given register " +
                 "and store the result in A. It should also advance " +
