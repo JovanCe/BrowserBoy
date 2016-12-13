@@ -626,8 +626,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.SBCrrH =  CPU.prototype._SUBrr.curry(H, true);
     CPU.prototype.SBCrrL =  CPU.prototype._SUBrr.curry(L, true);
     CPU.prototype.SBCrmHL =  CPU.prototype._SUBrmm.curry(H, L, true);
-    CPU.prototype.SUBrnA = CPU.prototype._SUBrn.curry(true);
-
+    CPU.prototype.SBCrnA = CPU.prototype._SUBrn.curry(true);
 
     CPU.prototype.ANDrrA =  CPU.prototype._ANDrr.curry(A);
     CPU.prototype.ANDrrB =  CPU.prototype._ANDrr.curry(B);
