@@ -451,7 +451,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             it("should behave exactly like ADDrr but take into account the carry flag", function() {
                 CPU._reg.A=5;
                 CPU._reg.B=10;
-                CPU._ADCrr("A", "B");
+                CPU._ADDrr("A", "B", true);
                 expect(CPU._reg.A).to.equal(15);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
@@ -461,7 +461,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     CPU._setFlag(CPU._FLAG_CARRY, true);
                     CPU._reg.A = 10;
                     CPU._reg.B = 11;
-                    CPU._ADCrr("A", "B");
+                    CPU._ADDrr("A", "B", true);
                     expect(CPU._reg.A).to.equal(22);
                     expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(0);
                 });
@@ -471,7 +471,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     CPU._setFlag(CPU._FLAG_CARRY, true);
                     CPU._reg.A = 200;
                     CPU._reg.B = 55;
-                    CPU._ADCrr("A", "B");
+                    CPU._ADDrr("A", "B", true);
                     expect(CPU._reg.A).to.equal(0);
                     expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
                 });
@@ -486,7 +486,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B = 5;
                 CPU.LDmrHLB();
                 CPU._setFlag(CPU._FLAG_CARRY, true);
-                CPU._ADCrmm("H", "L", "A");
+                CPU._ADDrmm("H", "L", "A", true);
                 expect(CPU._reg.A).to.equal(16);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -566,7 +566,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             it("should behave exactly like SUBrr but take into account the carry flag", function() {
                 CPU._reg.A=20;
                 CPU._reg.B=10;
-                CPU._SBCrr("B");
+                CPU._SUBrr("B", true);
                 expect(CPU._reg.A).to.equal(10);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
@@ -576,7 +576,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     CPU._setFlag(CPU._FLAG_CARRY, true);
                     CPU._reg.A = 15;
                     CPU._reg.B = 11;
-                    CPU._SBCrr("B");
+                    CPU._SUBrr("B", true);
                     expect(CPU._reg.A).to.equal(3);
                     expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(0);
                 });
@@ -586,7 +586,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     CPU._setFlag(CPU._FLAG_CARRY, true);
                     CPU._reg.A = 15;
                     CPU._reg.B = 15;
-                    CPU._SBCrr("B");
+                    CPU._SUBrr("B", true);
                     expect(CPU._reg.A).to.equal(255);
                     expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
                 });
@@ -601,7 +601,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B = 10;
                 CPU.LDmrHLB();
                 CPU._setFlag(CPU._FLAG_CARRY, true);
-                CPU._SBCrmm("H", "L");
+                CPU._SUBrmm("H", "L", true);
                 expect(CPU._reg.A).to.equal(9);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);

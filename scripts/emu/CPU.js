@@ -229,12 +229,18 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(2, 12);
     };
 
-    CPU.prototype._performADD = function(val1, val2, word) {
+    CPU.prototype._performADD = function(val1, val2, useCarry, word) {
         var result = val1 + val2;
+        var halfCarryTest = (val1 & 0xF) + (val2 & 0xF);
+        if(useCarry) {
+            var carry = this._getFlag(this._FLAG_CARRY);
+            result += carry;
+            halfCarryTest += carry & 0xF;
+        }
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, result == 0);
         this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, (val1 & 0xF)  + (val2 & 0xF) > 0xF);
+        this._setFlag(this._FLAG_HALF_CARRY, halfCarryTest > 0xF);
         this._setFlag(this._FLAG_CARRY, result > 0xFF);
         if(!word) {
             result &= 0xFF;
@@ -242,28 +248,17 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         return result;
     };
 
-    CPU.prototype._ADDrr = function(reg1, reg2) {
-        this._reg[reg1] = this._performADD(this._reg[reg1], this._reg[reg2]);
+    CPU.prototype._ADDrr = function(reg1, reg2, useCarry) {
+        this._reg[reg1] = this._performADD(this._reg[reg1], this._reg[reg2], useCarry);
         this._step(1);
     };
 
-    CPU.prototype._ADDrmm = function(src1, src2, dest) {
+    CPU.prototype._ADDrmm = function(src1, src2, dest, useCarry) {
         var toAdd = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
-        this._reg[dest] = this._performADD(this._reg[dest], toAdd);
+        this._reg[dest] = this._performADD(this._reg[dest], toAdd, useCarry);
         this._step(1, 8);
     };
 
-    CPU.prototype._ADCrr = function(reg1, reg2) {
-        var toAdd = this._reg[reg2] + this._getFlag(this._FLAG_CARRY);
-        this._reg[reg1] = this._performADD(this._reg[reg1], toAdd);
-        this._step(1);
-    };
-
-    CPU.prototype._ADCrmm = function(src1, src2, dest) {
-        var toAdd = MM.readByte((this._reg[src1] << 8) + this._reg[src2]) + this._getFlag(this._FLAG_CARRY);
-        this._reg[dest] = this._performADD(this._reg[dest], toAdd);
-        this._step(1, 8);
-    };
     CPU.prototype._ADDrrrr = function(dest1, dest2, src1, src2) {
         var toAdd;
         if(src2) {
@@ -273,46 +268,38 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             toAdd = this._reg[src1];
         }
         var zero = this._getFlag(this._FLAG_ZERO);
-        var result = this._performADD((this._reg[dest1] << 8) + this._reg[dest2], toAdd, true);
+        var result = this._performADD((this._reg[dest1] << 8) + this._reg[dest2], toAdd, false, true);
         this._setFlag(this._FLAG_ZERO, zero == 0);
         this._reg[dest1] = (result >> 8) & 0xFF;
         this._reg[dest2] = result & 0xFF;
         this._step(1, 8);
     };
 
-    CPU.prototype._performSUB = function(val1, val2) {
+    CPU.prototype._performSUB = function(val1, val2, useCarry) {
         var result = val1 - val2;
+        var halfCarryTest = (val1 & 0xF) - (val2 & 0xF);
+        if(useCarry) {
+            var carry = this._getFlag(this._FLAG_CARRY);
+            result -= carry;
+            halfCarryTest -= carry & 0xF;
+        }
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, result == 0);
         this._setFlag(this._FLAG_SUBTRACT, true);
-        this._setFlag(this._FLAG_HALF_CARRY, (val1 & 0xF) - (val2 & 0xF) < 0);
+        this._setFlag(this._FLAG_HALF_CARRY, halfCarryTest < 0);
         this._setFlag(this._FLAG_CARRY, result < 0);
 
         return result & 0xFF;
     };
 
-    CPU.prototype._SUBrr = function(reg) {
-        this._reg.A = this._performSUB(this._reg.A, this._reg[reg]);
+    CPU.prototype._SUBrr = function(reg, useCarry) {
+        this._reg.A = this._performSUB(this._reg.A, this._reg[reg], useCarry);
         this._step(1);
     };
 
-    CPU.prototype._SUBrmm = function(src1, src2) {
+    CPU.prototype._SUBrmm = function(src1, src2, useCarry) {
         var toSubtract = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
-        this._reg.A = this._performSUB(this._reg.A, toSubtract);
-        this._step(1, 8);
-    };
-
-    CPU.prototype._SBCrr = function(reg) {
-        var toSubstract = this._reg[reg] + this._getFlag(this._FLAG_CARRY);
-        this._reg.A = this._performSUB(this._reg.A, toSubstract);
-
-        this._step(1);
-    };
-
-    CPU.prototype._SBCrmm = function(src1, src2) {
-        var toSubstract = MM.readByte((this._reg[src1] << 8) + this._reg[src2]) + this._getFlag(this._FLAG_CARRY);
-        this._reg.A = this._performSUB(this._reg.A, toSubstract);
-
+        this._reg.A = this._performSUB(this._reg.A, toSubtract, useCarry);
         this._step(1, 8);
     };
 
@@ -574,15 +561,20 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.ADDrrAH =  CPU.prototype._ADDrr.curry(A, H);
     CPU.prototype.ADDrrAL =  CPU.prototype._ADDrr.curry(A, L);
     CPU.prototype.ADDrmAHL =  CPU.prototype._ADDrmm.curry(H, L, A);
+    CPU.prototype.ADDrnA = function() {
+        var toAdd = MM.readByte(this._reg.PC++);
+        this._reg.A = this._performADD(this._reg.A, toAdd);
+        this._step(2);
+    };
 
-    CPU.prototype.ADCrrAA =  CPU.prototype._ADCrr.curry(A, A);
-    CPU.prototype.ADCrrAB =  CPU.prototype._ADCrr.curry(A, B);
-    CPU.prototype.ADCrrAC =  CPU.prototype._ADCrr.curry(A, C);
-    CPU.prototype.ADCrrAD =  CPU.prototype._ADCrr.curry(A, D);
-    CPU.prototype.ADCrrAE =  CPU.prototype._ADCrr.curry(A, E);
-    CPU.prototype.ADCrrAH =  CPU.prototype._ADCrr.curry(A, H);
-    CPU.prototype.ADCrrAL =  CPU.prototype._ADCrr.curry(A, L);
-    CPU.prototype.ADCrmAHL =  CPU.prototype._ADCrmm.curry(H, L, A);
+    CPU.prototype.ADCrrAA =  CPU.prototype._ADDrr.curry(A, A, true);
+    CPU.prototype.ADCrrAB =  CPU.prototype._ADDrr.curry(A, B, true);
+    CPU.prototype.ADCrrAC =  CPU.prototype._ADDrr.curry(A, C, true);
+    CPU.prototype.ADCrrAD =  CPU.prototype._ADDrr.curry(A, D, true);
+    CPU.prototype.ADCrrAE =  CPU.prototype._ADDrr.curry(A, E, true);
+    CPU.prototype.ADCrrAH =  CPU.prototype._ADDrr.curry(A, H, true);
+    CPU.prototype.ADCrrAL =  CPU.prototype._ADDrr.curry(A, L, true);
+    CPU.prototype.ADCrmAHL =  CPU.prototype._ADDrmm.curry(H, L, A, true);
 
     CPU.prototype.ADDrrHLBC =  CPU.prototype._ADDrrrr.curry(H, L, B, C);
     CPU.prototype.ADDrrHLDE =  CPU.prototype._ADDrrrr.curry(H, L, D, E);
@@ -598,14 +590,14 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.SUBrrL =  CPU.prototype._SUBrr.curry(L);
     CPU.prototype.SUBrmHL =  CPU.prototype._SUBrmm.curry(H, L);
 
-    CPU.prototype.SBCrrA =  CPU.prototype._SBCrr.curry(A);
-    CPU.prototype.SBCrrB =  CPU.prototype._SBCrr.curry(B);
-    CPU.prototype.SBCrrC =  CPU.prototype._SBCrr.curry(C);
-    CPU.prototype.SBCrrD =  CPU.prototype._SBCrr.curry(D);
-    CPU.prototype.SBCrrE =  CPU.prototype._SBCrr.curry(E);
-    CPU.prototype.SBCrrH =  CPU.prototype._SBCrr.curry(H);
-    CPU.prototype.SBCrrL =  CPU.prototype._SBCrr.curry(L);
-    CPU.prototype.SBCrmHL =  CPU.prototype._SBCrmm.curry(H, L);
+    CPU.prototype.SBCrrA =  CPU.prototype._SUBrr.curry(A, true);
+    CPU.prototype.SBCrrB =  CPU.prototype._SUBrr.curry(B, true);
+    CPU.prototype.SBCrrC =  CPU.prototype._SUBrr.curry(C, true);
+    CPU.prototype.SBCrrD =  CPU.prototype._SUBrr.curry(D, true);
+    CPU.prototype.SBCrrE =  CPU.prototype._SUBrr.curry(E, true);
+    CPU.prototype.SBCrrH =  CPU.prototype._SUBrr.curry(H, true);
+    CPU.prototype.SBCrrL =  CPU.prototype._SUBrr.curry(L, true);
+    CPU.prototype.SBCrmHL =  CPU.prototype._SUBrmm.curry(H, L, true);
 
     CPU.prototype.ANDrrA =  CPU.prototype._ANDrr.curry(A);
     CPU.prototype.ANDrrB =  CPU.prototype._ANDrr.curry(B);
