@@ -763,15 +763,15 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype.CPrrB, CPU.prototype.CPrrC, CPU.prototype.CPrrD, CPU.prototype.CPrrE,
         CPU.prototype.CPrrH, CPU.prototype.CPrrL, CPU.prototype.CPrmHL, CPU.prototype.CPrrA,
 
-        CPU.prototype._NI, CPU.prototype.POPBC, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype.POPBC, CPU.prototype.ADDrnA, CPU.prototype._NI,
         CPU.prototype._NI, CPU.prototype.PUSHBC, CPU.prototype._NI, CPU.prototype._NI,
         CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
-        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.ADCrnA, CPU.prototype._NI,
 
-        CPU.prototype._NI, CPU.prototype.POPDE, CPU.prototype._NI, CPU.prototype._EMPTY,
+        CPU.prototype._NI, CPU.prototype.POPDE, CPU.prototype.SUBrnA, CPU.prototype._EMPTY,
         CPU.prototype._NI, CPU.prototype.PUSHDE, CPU.prototype._NI, CPU.prototype._NI,
         CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._EMPTY,
-        CPU.prototype._NI, CPU.prototype._EMPTY, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._EMPTY, CPU.prototype.SBCrnA, CPU.prototype._NI,
 
         CPU.prototype.LDarA, CPU.prototype.POPHL, CPU.prototype.LDmrCA, CPU.prototype._EMPTY,
         CPU.prototype._EMPTY, CPU.prototype.PUSHHL, CPU.prototype._NI, CPU.prototype._NI,
@@ -779,7 +779,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype._NI, CPU.prototype._NI,
 
         CPU.prototype.LDraA, CPU.prototype.POPAF, CPU.prototype.LDrmAC, CPU.prototype._NI,
-        CPU.prototype._EMPTY, CPU.prototype.PUSHAF, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype.ADDSPn, CPU.prototype.PUSHAF, CPU.prototype._NI, CPU.prototype._NI,
         CPU.prototype.LDHLSPn, CPU.prototype.LDSPHL, CPU.prototype.LDraaA, CPU.prototype._NI,
         CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype._NI, CPU.prototype._NI
     ];
