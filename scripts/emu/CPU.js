@@ -351,6 +351,11 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 8);
     };
 
+    CPU.prototype._ANDrn = function() {
+        this._reg.A = this._performAND(this._reg.A, MM.readByte(this._reg.PC++));
+        this._step(2);
+    };
+
     CPU.prototype._performXOR = function(val1, val2) {
         var result = val1 ^ val2;
         this._reg.F = 0;
@@ -369,6 +374,11 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._XORrmm = function(src1, src2) {
         this._reg.A = this._performXOR(this._reg.A, MM.readByte((this._reg[src1] << 8) + this._reg[src2]));
         this._step(1, 8);
+    };
+
+    CPU.prototype._XORrn = function() {
+        this._reg.A = this._performXOR(this._reg.A, MM.readByte(this._reg.PC++));
+        this._step(2);
     };
 
     CPU.prototype._performOR = function(val1, val2) {
@@ -391,6 +401,11 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 8);
     };
 
+    CPU.prototype._ORrn = function() {
+        this._reg.A = this._performOR(this._reg.A, MM.readByte(this._reg.PC++));
+        this._step(2);
+    };
+
     CPU.prototype._CPrr = function(reg) {
         this._performSUB(this._reg.A, this._reg[reg]);
         this._step(1);
@@ -400,6 +415,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         var toCompare = MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
         this._performSUB(this._reg.A, toCompare);
         this._step(1, 8);
+    };
+
+    CPU.prototype._CPrn = function() {
+        var toCompare = MM.readByte(this._reg.PC++);
+        this._performSUB(this._reg.A, toCompare);
+        this._step(2);
     };
 
     CPU.prototype._INCr = function(reg) {
@@ -630,6 +651,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.ANDrrH =  CPU.prototype._ANDrr.curry(H);
     CPU.prototype.ANDrrL =  CPU.prototype._ANDrr.curry(L);
     CPU.prototype.ANDrmHL =  CPU.prototype._ANDrmm.curry(H, L);
+    CPU.prototype.ANDrnA = CPU.prototype._ANDrn;
 
     CPU.prototype.ORrrA =  CPU.prototype._ORrr.curry(A);
     CPU.prototype.ORrrB =  CPU.prototype._ORrr.curry(B);
@@ -639,6 +661,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.ORrrH =  CPU.prototype._ORrr.curry(H);
     CPU.prototype.ORrrL =  CPU.prototype._ORrr.curry(L);
     CPU.prototype.ORrmHL =  CPU.prototype._ORrmm.curry(H, L);
+    CPU.prototype.ORrnA = CPU.prototype._ORrn;
 
     CPU.prototype.CPrrA =  CPU.prototype._CPrr.curry(A);
     CPU.prototype.CPrrB =  CPU.prototype._CPrr.curry(B);
@@ -648,6 +671,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.CPrrH =  CPU.prototype._CPrr.curry(H);
     CPU.prototype.CPrrL =  CPU.prototype._CPrr.curry(L);
     CPU.prototype.CPrmHL =  CPU.prototype._CPrmm.curry(H, L);
+    CPU.prototype.CPrnA = CPU.prototype._CPrn;
 
     CPU.prototype.XORrrA =  CPU.prototype._XORrr.curry(A);
     CPU.prototype.XORrrB =  CPU.prototype._XORrr.curry(B);
@@ -657,6 +681,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.XORrrH =  CPU.prototype._XORrr.curry(H);
     CPU.prototype.XORrrL =  CPU.prototype._XORrr.curry(L);
     CPU.prototype.XORrmHL =  CPU.prototype._XORrmm.curry(H, L);
+    CPU.prototype.XORrnA = CPU.prototype._XORrn;
 
     CPU.prototype.INCrrBC =  CPU.prototype._INCrr.curry(C, B);
     CPU.prototype.INCrrDE =  CPU.prototype._INCrr.curry(E, D);
@@ -768,14 +793,14 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype._NI, CPU.prototype._EMPTY, CPU.prototype.SBCrnA, CPU.prototype._NI,
 
         CPU.prototype.LDarA, CPU.prototype.POPHL, CPU.prototype.LDmrCA, CPU.prototype._EMPTY,
-        CPU.prototype._EMPTY, CPU.prototype.PUSHHL, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._EMPTY, CPU.prototype.PUSHHL, CPU.prototype.ANDrnA, CPU.prototype._NI,
         CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.LDaarA, CPU.prototype._EMPTY,
-        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.XORrnA, CPU.prototype._NI,
 
         CPU.prototype.LDraA, CPU.prototype.POPAF, CPU.prototype.LDrmAC, CPU.prototype._NI,
-        CPU.prototype.ADDSPn, CPU.prototype.PUSHAF, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype.ADDSPn, CPU.prototype.PUSHAF, CPU.prototype.ORrnA, CPU.prototype._NI,
         CPU.prototype.LDHLSPn, CPU.prototype.LDSPHL, CPU.prototype.LDraaA, CPU.prototype._NI,
-        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype._NI, CPU.prototype._NI
+        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.CPrnA, CPU.prototype._NI
     ];
 
     return new CPU();
