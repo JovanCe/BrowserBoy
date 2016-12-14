@@ -331,69 +331,63 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(2);
     };
 
-    CPU.prototype._ANDrr = function(reg) {
-        this._reg.A &= this._reg[reg];
+    CPU.prototype._performAND = function(val1, val2) {
+        var result = val1 & val2;
         this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
+        this._setFlag(this._FLAG_ZERO, result == 0);
         this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, true);
         this._setFlag(this._FLAG_CARRY, false);
+        return result;
+    };
 
+    CPU.prototype._ANDrr = function(reg) {
+        this._reg.A = this._performAND(this._reg.A, this._reg[reg]);
         this._step(1);
     };
 
     CPU.prototype._ANDrmm = function(src1, src2) {
-        this._reg.A &= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
-        this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, true);
-        this._setFlag(this._FLAG_CARRY, false);
-
+        this._reg.A = this._performAND(this._reg.A, MM.readByte((this._reg[src1] << 8) + this._reg[src2]));
         this._step(1, 8);
     };
 
-    CPU.prototype._XORrr = function(reg) {
-        this._reg.A ^= this._reg[reg];
+    CPU.prototype._performXOR = function(val1, val2) {
+        var result = val1 ^ val2;
         this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
+        this._setFlag(this._FLAG_ZERO, result == 0);
         this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, false);
         this._setFlag(this._FLAG_CARRY, false);
+        return result;
+    };
 
+    CPU.prototype._XORrr = function(reg) {
+        this._reg.A = this._performXOR(this._reg.A, this._reg[reg]);
         this._step(1);
     };
 
     CPU.prototype._XORrmm = function(src1, src2) {
-        this._reg.A ^= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
-        this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, false);
-        this._setFlag(this._FLAG_CARRY, false);
-
+        this._reg.A = this._performXOR(this._reg.A, MM.readByte((this._reg[src1] << 8) + this._reg[src2]));
         this._step(1, 8);
     };
 
-    CPU.prototype._ORrr = function(reg) {
-        this._reg.A |= this._reg[reg];
+    CPU.prototype._performOR = function(val1, val2) {
+        var result = val1 | val2;
         this._reg.F = 0;
         this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
         this._setFlag(this._FLAG_SUBTRACT, false);
         this._setFlag(this._FLAG_HALF_CARRY, false);
         this._setFlag(this._FLAG_CARRY, false);
+        return result;
+    };
 
+    CPU.prototype._ORrr = function(reg) {
+        this._reg.A = this._performOR(this._reg.A, this._reg[reg]);
         this._step(1);
     };
 
     CPU.prototype._ORrmm = function(src1, src2) {
-        this._reg.A |= MM.readByte((this._reg[src1] << 8) + this._reg[src2]);
-        this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, false);
-        this._setFlag(this._FLAG_CARRY, false);
-
+        this._reg.A = this._performOR(this._reg.A, MM.readByte((this._reg[src1] << 8) + this._reg[src2]));
         this._step(1, 8);
     };
 
