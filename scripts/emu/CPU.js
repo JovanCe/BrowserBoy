@@ -552,9 +552,10 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
             this._step(3);
             return
         }
+        var old_PC = this._reg.PC;
         this._reg.PC += 2;
         this._PUSHr16(PC);
-        this._reg.PC = MM.readWord(this._reg.PC);
+        this._reg.PC = MM.readWord(old_PC);
         this._step(3, 24);
     };
 
