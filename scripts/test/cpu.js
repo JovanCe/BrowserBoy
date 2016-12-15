@@ -1030,6 +1030,14 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     expect(CPU._reg.T).to.equal(12);
                 });
             });
+            describe("when no condition is provided", function() {
+                it("should also work as expected", function() {
+                    CPU._reg.PC = 0xFFBA;
+                    MM.writeWord(CPU._reg.PC, 0xABC);
+                    CPU._JPnn();
+                    expect(CPU._reg.PC).to.equal(0xABC);
+                });
+            });
         });
         describe("JPmm", function() {
             it("should load the value from the address stored in provided registers into the PC register and " +
@@ -1042,7 +1050,54 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.PC).to.equal(0xABC);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
-
+            });
+        });
+        describe("JRn", function() {
+            it("should add the immediate signed offset to the PC register if the flag condition holds. " +
+                "If the condition holds it should also advance the clock by 2 machine cycle and 12 cpu cycles respectively", function() {
+                CPU._setFlag(ZERO, true);
+                CPU._reg.PC = 0xFFBA;
+                MM.writeWord(CPU._reg.PC, 0x13);
+                CPU._JRn(ZERO);
+                expect(CPU._reg.PC).to.equal(0xFFCD);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(12);
+            });
+            it("should work for inverse conditions also", function() {
+                CPU._setFlag(ZERO, false);
+                CPU._reg.PC = 0xFFBA;
+                MM.writeWord(CPU._reg.PC, 0x02);
+                CPU._JRn(ZERO, true);
+                expect(CPU._reg.PC).to.equal(0xFFBC);
+            });
+            describe("when the condition does not hold", function() {
+                it("should advance the PC by 1 and " +
+                    "advance the clock by 2 machine cycle and 8 cpu cycles respectively", function() {
+                    CPU._setFlag(ZERO, false);
+                    CPU._reg.PC = 0xFFBA;
+                    MM.writeWord(CPU._reg.PC, 0x02);
+                    CPU._JRn(ZERO);
+                    expect(CPU._reg.PC).to.equal(0xFFBB);
+                    expect(CPU._reg.M).to.equal(2);
+                    expect(CPU._reg.T).to.equal(8);
+                });
+            });
+            describe("when the offset is negative", function() {
+                it("should decrement the PC by the offset value", function() {
+                    CPU._setFlag(ZERO, false);
+                    CPU._reg.PC = 0xFFBA;
+                    MM.writeWord(CPU._reg.PC, 0xFE);
+                    CPU._JRn(ZERO, true);
+                    expect(CPU._reg.PC).to.equal(0xFFB8);
+                });
+            });
+            describe("when no condition is provided", function() {
+                it("should also work as expected", function() {
+                    CPU._reg.PC = 0xFFBA;
+                    MM.writeWord(CPU._reg.PC, 0x02);
+                    CPU._JRn();
+                    expect(CPU._reg.PC).to.equal(0xFFBC);
+                });
             });
         });
         describe("CALLnn", function() {
@@ -1073,6 +1128,14 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     expect(CPU._reg.PC).to.equal(0xFFBC);
                     expect(CPU._reg.M).to.equal(3);
                     expect(CPU._reg.T).to.equal(12);
+                });
+            });
+            describe("when no condition is provided", function() {
+                it("should also work as expected", function() {
+                    CPU._reg.PC = 0xFFBA;
+                    MM.writeWord(CPU._reg.PC, 0xABC);
+                    CPU._CALLnn();
+                    expect(CPU._reg.PC).to.equal(0xABC);
                 });
             });
         });
