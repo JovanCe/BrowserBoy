@@ -69,6 +69,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         _.map(_.keys(this._reg), function(key){
             this._reg[key] = 0;
         }.bind(this));
+        this._reg.SP = 0xFFFE;
         this._clock.M = 0;
         this._clock.T = 0;
         this._halt = false;
