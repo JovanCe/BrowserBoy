@@ -507,12 +507,10 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
     CPU.prototype._JPnn = function(flag, inverse) {
         var test = inverse ? 0 : 1;
-        if(flag !== undefined) {
-            if(!(this._getFlag(flag) == test)) {
-                this._reg.PC += 2;
-                this._step(3);
-                return
-            }
+        if(flag !== undefined && !(this._getFlag(flag) == test)) {
+            this._reg.PC += 2;
+            this._step(3);
+            return
         }
         this._reg.PC = MM.readWord(this._reg.PC);
         this._step(3, 16);
@@ -525,12 +523,10 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
     CPU.prototype._CALLnn = function(flag, inverse) {
         var test = inverse ? 0 : 1;
-        if(flag !== undefined) {
-            if(!(this._getFlag(flag) == test)) {
-                this._reg.PC += 2;
-                this._step(3);
-                return
-            }
+        if(flag !== undefined && !(this._getFlag(flag) == test)) {
+            this._reg.PC += 2;
+            this._step(3);
+            return
         }
         this._reg.PC += 2;
         this._PUSHr16(PC);
