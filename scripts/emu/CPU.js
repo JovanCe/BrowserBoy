@@ -135,7 +135,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype._POPr16 = function(reg) {
-        this._reg[reg] = (MM.readByte(this._reg.SP++) << 8) + MM.readByte(this._reg.SP++);
+        this._reg[reg] = MM.readByte(this._reg.SP++) + (MM.readByte(this._reg.SP++) << 8);
 
         // there's no step intentionally. This is a helper function used in jump instructions and the like.
     };
