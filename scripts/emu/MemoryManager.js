@@ -50,8 +50,6 @@ define(["lodash", "events"], function(_, events) {
         // this._io = [];
         // this._eram = [];
         // this._zram = [];
-        // interrupt enable register
-        this._ie = 0;
     }
 
     MemoryManager.prototype.reset = function() {
@@ -120,8 +118,7 @@ define(["lodash", "events"], function(_, events) {
         this._memory[address] = value;
 
         // temp code; check for output when running blargg's test roms
-        var data = this.readByte(0xFF02);
-        if (address == 0xFF02 && data == 0x81) {
+        if (address == 0xFF02 && this.readByte(0xFF02) == 0x81) {
             console.log(this.readByte(0xFF01));
         }
     };
