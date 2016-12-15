@@ -52,10 +52,13 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         // show instruction names in debug
         if(config.debug) {
-            _.map(_.keys(this._ins), function (key) {
-                this._ins[key].toString = function () {
-                    return key
-                };
+            _.map(_.keys(this.__proto__), function (key) {
+                var prop = this[key];
+                if(typeof prop == "function") {
+                    prop.toString = function () {
+                        return key
+                    };
+                }
             }.bind(this));
         }
     }
