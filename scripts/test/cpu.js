@@ -700,6 +700,18 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(8);
             });
         });
+        describe("ANDrn", function() {
+            it("should behave exactly like ANDrr but take the second operand as immediate value" +
+                "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
+                CPU._reg.A = 2;
+                MM.writeByte(5, 3);
+                CPU._reg.PC = 5;
+                CPU._ANDrn("A");
+                expect(CPU._reg.A).to.equal(2);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
         describe("XORrr", function() {
             it("should perform a bitwise xor between the A register and the given register " +
                 "and store the result in A. It should also advance " +
@@ -734,6 +746,18 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(8);
             });
         });
+        describe("XORrn", function() {
+            it("should behave exactly like XORrr but take the second operand as immediate value" +
+                "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
+                CPU._reg.A = 7;
+                MM.writeByte(5, 3);
+                CPU._reg.PC = 5;
+                CPU._XORrn("A");
+                expect(CPU._reg.A).to.equal(4);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
         describe("ORrr", function() {
             it("should perform a bitwise or between the A register and the given register " +
                 "and store the result in A. It should also advance " +
@@ -765,6 +789,18 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._ORrmm("H", "L");
                 expect(CPU._reg.A).to.equal(7);
                 expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
+        describe("ORrn", function() {
+            it("should behave exactly like ORrr but take the second operand as immediate value" +
+                "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
+                CPU._reg.A = 4;
+                MM.writeByte(5, 3);
+                CPU._reg.PC = 5;
+                CPU._ORrn("A");
+                expect(CPU._reg.A).to.equal(7);
+                expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
             });
         });
@@ -821,6 +857,18 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._CPrmm("H", "L");
                 expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
                 expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(8);
+            });
+        });
+        describe("CPrn", function() {
+            it("should behave exactly like CPrr but take the second operand as immediate value" +
+                "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
+                CPU._reg.A = 10;
+                MM.writeByte(5, 10);
+                CPU._reg.PC = 5;
+                CPU._CPrn("A");
+                expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
             });
         });
