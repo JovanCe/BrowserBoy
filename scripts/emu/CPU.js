@@ -523,6 +523,21 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
+    CPU.prototype._CALLnn = function(flag, inverse) {
+        var test = inverse ? 0 : 1;
+        if(flag !== undefined) {
+            if(!(this._getFlag(flag) == test)) {
+                this._reg.PC += 2;
+                this._step(3);
+                return
+            }
+        }
+        this._reg.PC += 2;
+        this._PUSHr16(PC);
+        this._reg.PC = MM.readWord(this._reg.PC);
+        this._step(3, 24);
+    };
+
     // concrete instructions
     CPU.prototype.LDrrAA =  CPU.prototype._LDr.curry(A, A);
     CPU.prototype.LDrrAB =  CPU.prototype._LDr.curry(B, A);
@@ -772,6 +787,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.JPNCnn = CPU.prototype._JPnn.curry(CARRY, true);
     CPU.prototype.JPmHL = CPU.prototype._JPmm.curry(H, L);
 
+    CPU.prototype.CALLnn = CPU.prototype._CALLnn.curry();
+    CPU.prototype.CALLZnn = CPU.prototype._CALLnn.curry(ZERO, false);
+    CPU.prototype.CALLNZnn = CPU.prototype._CALLnn.curry(ZERO, true);
+    CPU.prototype.CALLCnn = CPU.prototype._CALLnn.curry(CARRY, false);
+    CPU.prototype.CALLNCnn = CPU.prototype._CALLnn.curry(CARRY, true);
+
     CPU.prototype._NI = function(position) {
         console.log("Unimplemented instruction called: " + position.toString(16));
     };
@@ -843,14 +864,14 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype.CPrrH, CPU.prototype.CPrrL, CPU.prototype.CPrmHL, CPU.prototype.CPrrA,
 
         CPU.prototype._NI, CPU.prototype.POPBC, CPU.prototype.JPNZnn, CPU.prototype.JPnn,
-        CPU.prototype._NI, CPU.prototype.PUSHBC, CPU.prototype.ADDrnA, CPU.prototype.RST00,
+        CPU.prototype.CALLNZnn, CPU.prototype.PUSHBC, CPU.prototype.ADDrnA, CPU.prototype.RST00,
         CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.JPZnn, CPU.prototype._NI,
-        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.ADCrnA, CPU.prototype.RST08,
+        CPU.prototype.CALLZnn, CPU.prototype.CALLnn, CPU.prototype.ADCrnA, CPU.prototype.RST08,
 
         CPU.prototype._NI, CPU.prototype.POPDE, CPU.prototype.JPNCnn, CPU.prototype._EMPTY,
-        CPU.prototype._NI, CPU.prototype.PUSHDE, CPU.prototype.SUBrnA, CPU.prototype.RST10,
+        CPU.prototype.CALLNCnn, CPU.prototype.PUSHDE, CPU.prototype.SUBrnA, CPU.prototype.RST10,
         CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.JPCnn, CPU.prototype._EMPTY,
-        CPU.prototype._NI, CPU.prototype._EMPTY, CPU.prototype.SBCrnA, CPU.prototype.RST18,
+        CPU.prototype.CALLCnn, CPU.prototype._EMPTY, CPU.prototype.SBCrnA, CPU.prototype.RST18,
 
         CPU.prototype.LDarA, CPU.prototype.POPHL, CPU.prototype.LDmrCA, CPU.prototype._EMPTY,
         CPU.prototype._EMPTY, CPU.prototype.PUSHHL, CPU.prototype.ANDrnA, CPU.prototype.RST20,
