@@ -35,6 +35,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         this._halt = false;
         this._stop = true;
+
+        // interrupt enable register
+        this._ie = true;
         
         // flag masks
         this._flags = {
@@ -83,6 +86,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._clock.T = 0;
         this._halt = false;
         this._stop = true;
+        this._ie = true;
     };
 
     CPU.prototype._getFlag = function(flag) {
@@ -843,6 +847,16 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.RETC = CPU.prototype._RET.curry(CARRY, false);
     CPU.prototype.RETNC = CPU.prototype._RET.curry(CARRY, true);
 
+    CPU.prototype.DI = function() {
+        this._ie = false;
+        this._step(1);
+    };
+
+    CPU.prototype.EI = function() {
+        this._ie = true;
+        this._step(1);
+    };
+
     CPU.prototype._NI = function(position) {
         console.log("Unimplemented instruction called: " + position.toString(16));
     };
@@ -928,9 +942,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype.ADDSPn, CPU.prototype.JPmHL, CPU.prototype.LDaarA, CPU.prototype._EMPTY,
         CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.XORrnA, CPU.prototype.RST28,
 
-        CPU.prototype.LDraA, CPU.prototype.POPAF, CPU.prototype.LDrmAC, CPU.prototype._NI,
+        CPU.prototype.LDraA, CPU.prototype.POPAF, CPU.prototype.LDrmAC, CPU.prototype.DI,
         CPU.prototype._EMPTY, CPU.prototype.PUSHAF, CPU.prototype.ORrnA, CPU.prototype.RST30,
-        CPU.prototype.LDHLSPn, CPU.prototype.LDSPHL, CPU.prototype.LDraaA, CPU.prototype._NI,
+        CPU.prototype.LDHLSPn, CPU.prototype.LDSPHL, CPU.prototype.LDraaA, CPU.prototype.EI,
         CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.CPrnA, CPU.prototype.RST38
     ];
 
