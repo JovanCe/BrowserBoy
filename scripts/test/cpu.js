@@ -149,6 +149,24 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.T).to.equal(4);
             })
         });
+        describe("DI", function() {
+            it("should set the master interrupt flag to false and advance the clock by 1 machine cycles and 4 CPU cycles", function() {
+                this._ie = true;
+                CPU.DI();
+                expect(CPU._ie).to.equal(false);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
+            })
+        });
+        describe("EI", function() {
+            it("should set the master interrupt flag to false and advance the clock by 1 machine cycles and 4 CPU cycles", function() {
+                this._ie = false;
+                CPU.EI();
+                expect(CPU._ie).to.equal(true);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
+            })
+        });
         describe("LDr", function() {
             it("should copy value from the register in the first argument to the register in the second " +
                 "and advance the clock by 1 machine cycle", function() {
@@ -1012,7 +1030,6 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                     expect(CPU._reg.T).to.equal(12);
                 });
             });
-
         });
         describe("JPmm", function() {
             it("should load the value from the address stored in provided registers into the PC register and " +
@@ -1026,6 +1043,82 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
 
+            });
+        });
+        describe("CALLnn", function() {
+            it("should push the PC to the stack then load the immediate value into the PC register if the flag condition holds. " +
+                "If the condition holds it should also advance the clock by 3 machine cycle and 24 cpu cycles respectively", function() {
+                CPU._setFlag(ZERO, true);
+                CPU._reg.PC = 0xFFBA;
+                MM.writeWord(CPU._reg.PC, 0xABC);
+                CPU._CALLnn(ZERO);
+                expect(CPU._reg.PC).to.equal(0xABC);
+                expect(CPU._reg.M).to.equal(3);
+                expect(CPU._reg.T).to.equal(24);
+            });
+            it("should work for inverse conditions also", function() {
+                CPU._setFlag(ZERO, false);
+                CPU._reg.PC = 0xFFBA;
+                MM.writeWord(CPU._reg.PC, 0xABC);
+                CPU._CALLnn(ZERO, true);
+                expect(CPU._reg.PC).to.equal(0xABC);
+            });
+            describe("when the condition does not hold", function() {
+                it("should advance the PC by 2 and " +
+                    "advance the clock by 3 machine cycle and 12 cpu cycles respectively", function() {
+                    CPU._setFlag(ZERO, false);
+                    CPU._reg.PC = 0xFFBA;
+                    MM.writeWord(CPU._reg.PC, 0xABC);
+                    CPU._CALLnn(ZERO);
+                    expect(CPU._reg.PC).to.equal(0xFFBC);
+                    expect(CPU._reg.M).to.equal(3);
+                    expect(CPU._reg.T).to.equal(12);
+                });
+            });
+        });
+        describe("RET", function() {
+            it("should pop the previously stored PC value from the stack if the flag condition holds. " +
+                "If the condition holds it should also advance the clock by 1 machine cycle and 20 cpu cycles respectively", function() {
+                CPU._setFlag(ZERO, true);
+                CPU._reg.PC = 0xFFBA;
+                MM.writeWord(CPU._reg.PC, 0xABC);
+                CPU._CALLnn(ZERO);
+                CPU._RET(ZERO);
+                expect(CPU._reg.PC).to.equal(0xFFBC);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(20);
+            });
+            it("should work for inverse conditions also", function() {
+                CPU._setFlag(ZERO, false);
+                CPU._reg.PC = 0xFFBA;
+                MM.writeWord(CPU._reg.PC, 0xABC);
+                CPU._CALLnn(ZERO, true);
+                CPU._RET(ZERO, true);
+                expect(CPU._reg.PC).to.equal(0xFFBC);
+            });
+            describe("when the condition does not hold", function() {
+                it("advance the clock by 1 machine cycle and 12 cpu cycles respectively", function() {
+                    CPU._setFlag(ZERO, true);
+                    CPU._reg.PC = 0xFFBA;
+                    MM.writeWord(CPU._reg.PC, 0xABC);
+                    CPU._CALLnn(ZERO);
+                    CPU._RET(ZERO, true);
+                    expect(CPU._reg.PC).to.equal(0xABC);
+                    expect(CPU._reg.M).to.equal(1);
+                    expect(CPU._reg.T).to.equal(8);
+                });
+            });
+            describe("when no condition is provided", function() {
+                it("should pop the PC immediately and " +
+                    "advance the clock by 1 machine cycle and 16 cpu cycles respectively", function() {
+                    CPU._reg.PC = 0xFFBA;
+                    MM.writeWord(CPU._reg.PC, 0xABC);
+                    CPU._CALLnn();
+                    CPU._RET();
+                    expect(CPU._reg.PC).to.equal(0xFFBC);
+                    expect(CPU._reg.M).to.equal(1);
+                    expect(CPU._reg.T).to.equal(16);
+                });
             });
         });
     });
