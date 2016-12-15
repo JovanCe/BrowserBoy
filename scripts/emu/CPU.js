@@ -127,9 +127,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype._PUSHr16 = function(reg) {
-        this._reg.SP--;
-        MM.writeByte(this._reg.SP--, (this._reg[reg] >> 8) & 0xFF);
-        MM.writeByte(this._reg.SP, this._reg[reg] & 0xFF);
+        this._reg.SP -= 2;
+        MM.writeWord(this._reg.SP, this._reg[reg]);
 
         // there's no step intentionally. This is a helper function used in jump instructions and the like.
     };
@@ -141,7 +140,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype._POPr16 = function(reg) {
-        this._reg[reg] = MM.readByte(this._reg.SP++) + (MM.readByte(this._reg.SP++) << 8);
+        this._reg[reg] = MM.readWord(this._reg.SP);
+        this._reg.SP += 2;
 
         // there's no step intentionally. This is a helper function used in jump instructions and the like.
     };

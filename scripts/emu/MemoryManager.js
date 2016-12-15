@@ -128,12 +128,12 @@ define(["lodash", "events"], function(_, events) {
 
     MemoryManager.prototype.readWord = function(address) {
         // GB is little endian
-        return (this._memory[address+1] << 8) + this._memory[address];
+        return (this._memory[address + 1] << 8) + this._memory[address];
     };
 
     MemoryManager.prototype.writeWord = function(address, value) {
-        this.writeByte(address, value & 255);
-        this.writeByte(address+1, value>>8);
+        this.writeByte(address, value & 0xFF);
+        this.writeByte(address + 1, (value>>8) & 0xFF);
     };
 
     return new MemoryManager();
