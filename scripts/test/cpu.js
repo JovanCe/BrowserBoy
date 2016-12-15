@@ -943,6 +943,19 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 });
             });
         });
+        describe("RST", function() {
+            it("should push the PC register to the stack and load the 0x00 + given address into the PC" +
+                "and advance the clocks by 1 machine cycle and 16 cpu cycles respectively", function() {
+                CPU._reg.PC = 0xFFBA;
+                CPU._RST(0x28);
+                expect(CPU._reg.PC).to.equal(0x28);
+                CPU._POPr16("PC");
+                expect(CPU._reg.PC).to.equal(0xFFBA);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(16);
+
+            });
+        });
     });
 
 
