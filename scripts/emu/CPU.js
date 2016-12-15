@@ -15,6 +15,10 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     var SP = "SP";
     var M = "M";
     var T = "T";
+    var ZERO = "ZERO";
+    var SUBTRACT = "SUBTRACT";
+    var HALF_CARRY = "HALF_CARRY";
+    var CARRY = "CARRY";
 
     function CPU() {
         // registers
@@ -33,10 +37,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._stop = true;
         
         // flag masks
-        this._FLAG_ZERO = 0x80;
-        this._FLAG_SUBTRACT = 0x40;
-        this._FLAG_HALF_CARRY = 0x20;
-        this._FLAG_CARRY = 0x10;
+        this._flags = {
+            ZERO: 0x80,
+            SUBTRACT: 0x40,
+            HALF_CARRY: 0x20,
+            CARRY: 0x10
+        };
 
         // register event handlers
         events.register(events.ROMLoaded);
@@ -77,14 +83,14 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype._getFlag = function(flag) {
-        return (this._reg.F & flag) > 0 ? 1:0;
+        return (this._reg.F & this._flags[flag]) > 0 ? 1:0;
     };
     CPU.prototype._setFlag = function(flag, value) {
         if(value) {
-            this._reg.F |= flag;
+            this._reg.F |= this._flags[flag];
         }
         else {
-            this._reg.F &= flag ^ 0xFF;
+            this._reg.F &= this._flags[flag] ^ 0xFF;
         }
     };
 
@@ -238,8 +244,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         // set flags
         this._reg.F = 0;
-        this._setFlag(this._FLAG_CARRY, value > 0xFFFF);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg.SP & 0xF)  + (offset & 0xF) > 0xF);
+        this._setFlag(CARRY, value > 0xFFFF);
+        this._setFlag(HALF_CARRY, (this._reg.SP & 0xF)  + (offset & 0xF) > 0xF);
 
         this._step(2, 12);
     };
@@ -248,15 +254,15 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         var result = val1 + val2;
         var halfCarryTest = (val1 & 0xF) + (val2 & 0xF);
         if(useCarry) {
-            var carry = this._getFlag(this._FLAG_CARRY);
+            var carry = this._getFlag(CARRY);
             result += carry;
             halfCarryTest += carry & 0xF;
         }
         this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, halfCarryTest > 0xF);
-        this._setFlag(this._FLAG_CARRY, result > 0xFF);
+        this._setFlag(ZERO, result == 0);
+        this._setFlag(SUBTRACT, false);
+        this._setFlag(HALF_CARRY, halfCarryTest > 0xF);
+        this._setFlag(CARRY, result > 0xFF);
         if(!word) {
             result &= 0xFF;
         }
@@ -282,9 +288,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         else {
             toAdd = this._reg[src1];
         }
-        var zero = this._getFlag(this._FLAG_ZERO);
+        var zero = this._getFlag(ZERO);
         var result = this._performADD((this._reg[dest1] << 8) + this._reg[dest2], toAdd, false, true);
-        this._setFlag(this._FLAG_ZERO, zero == 0);
+        this._setFlag(ZERO, zero == 0);
         this._reg[dest1] = (result >> 8) & 0xFF;
         this._reg[dest2] = result & 0xFF;
         this._step(1, 8);
@@ -306,8 +312,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         // set flags
         this._reg.F = 0;
-        this._setFlag(this._FLAG_CARRY, value > 0xFFFF);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg] & 0xF)  + (offset & 0xF) > 0xF);
+        this._setFlag(CARRY, value > 0xFFFF);
+        this._setFlag(HALF_CARRY, (this._reg[reg] & 0xF)  + (offset & 0xF) > 0xF);
         this._reg[reg] = value;
         this._step(2, 16);
     };
@@ -316,15 +322,15 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         var result = val1 - val2;
         var halfCarryTest = (val1 & 0xF) - (val2 & 0xF);
         if(useCarry) {
-            var carry = this._getFlag(this._FLAG_CARRY);
+            var carry = this._getFlag(CARRY);
             result -= carry;
             halfCarryTest -= carry & 0xF;
         }
         this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBTRACT, true);
-        this._setFlag(this._FLAG_HALF_CARRY, halfCarryTest < 0);
-        this._setFlag(this._FLAG_CARRY, result < 0);
+        this._setFlag(ZERO, result == 0);
+        this._setFlag(SUBTRACT, true);
+        this._setFlag(HALF_CARRY, halfCarryTest < 0);
+        this._setFlag(CARRY, result < 0);
 
         return result & 0xFF;
     };
@@ -349,10 +355,10 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._performAND = function(val1, val2) {
         var result = val1 & val2;
         this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, true);
-        this._setFlag(this._FLAG_CARRY, false);
+        this._setFlag(ZERO, result == 0);
+        this._setFlag(SUBTRACT, false);
+        this._setFlag(HALF_CARRY, true);
+        this._setFlag(CARRY, false);
         return result;
     };
 
@@ -374,10 +380,10 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._performXOR = function(val1, val2) {
         var result = val1 ^ val2;
         this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, result == 0);
-        this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, false);
-        this._setFlag(this._FLAG_CARRY, false);
+        this._setFlag(ZERO, result == 0);
+        this._setFlag(SUBTRACT, false);
+        this._setFlag(HALF_CARRY, false);
+        this._setFlag(CARRY, false);
         return result;
     };
 
@@ -399,10 +405,10 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._performOR = function(val1, val2) {
         var result = val1 | val2;
         this._reg.F = 0;
-        this._setFlag(this._FLAG_ZERO, this._reg.A == 0);
-        this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, false);
-        this._setFlag(this._FLAG_CARRY, false);
+        this._setFlag(ZERO, this._reg.A == 0);
+        this._setFlag(SUBTRACT, false);
+        this._setFlag(HALF_CARRY, false);
+        this._setFlag(CARRY, false);
         return result;
     };
 
@@ -441,9 +447,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._INCr = function(reg) {
         this._reg[reg]++;
         this._reg[reg] &= 0xFF;
-        this._setFlag(this._FLAG_ZERO, this._reg[reg] == 0);
-        this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg] & 0xF) + (1 & 0xF) > 0xF);
+        this._setFlag(ZERO, this._reg[reg] == 0);
+        this._setFlag(SUBTRACT, false);
+        this._setFlag(HALF_CARRY, (this._reg[reg] & 0xF) + (1 & 0xF) > 0xF);
         this._step(1);
     };
     CPU.prototype._INCmm = function(src1, src2) {
@@ -451,9 +457,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         value++;
         value &= 0xFF;
         MM.writeByte((this._reg[src1] << 8) + this._reg[src2], value);
-        this._setFlag(this._FLAG_ZERO, value == 0);
-        this._setFlag(this._FLAG_SUBTRACT, false);
-        this._setFlag(this._FLAG_HALF_CARRY, (value & 0xF) + (1 & 0xF) > 0xF);
+        this._setFlag(ZERO, value == 0);
+        this._setFlag(SUBTRACT, false);
+        this._setFlag(HALF_CARRY, (value & 0xF) + (1 & 0xF) > 0xF);
         this._step(1, 12);
     };
     CPU.prototype._INCrr = function(reg1, reg2) {
@@ -468,9 +474,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._DECr = function(reg) {
         this._reg[reg]--;
         this._reg[reg] &= 0xFF;
-        this._setFlag(this._FLAG_ZERO, this._reg[reg] == 0);
-        this._setFlag(this._FLAG_SUBTRACT, true);
-        this._setFlag(this._FLAG_HALF_CARRY, (this._reg[reg] & 0xF) - (1 & 0xF) < 0);
+        this._setFlag(ZERO, this._reg[reg] == 0);
+        this._setFlag(SUBTRACT, true);
+        this._setFlag(HALF_CARRY, (this._reg[reg] & 0xF) - (1 & 0xF) < 0);
         this._step(1);
     };
     CPU.prototype._DECmm = function(src1, src2) {
@@ -478,9 +484,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         value--;
         value &= 0xFF;
         MM.writeByte((this._reg[src1] << 8) + this._reg[src2], value);
-        this._setFlag(this._FLAG_ZERO, value == 0);
-        this._setFlag(this._FLAG_SUBTRACT, true);
-        this._setFlag(this._FLAG_HALF_CARRY, (value & 0xF) - (1 & 0xF) < 0);
+        this._setFlag(ZERO, value == 0);
+        this._setFlag(SUBTRACT, true);
+        this._setFlag(HALF_CARRY, (value & 0xF) - (1 & 0xF) < 0);
         this._step(1, 12);
     };
     CPU.prototype._DECrr = function(reg1, reg2) {

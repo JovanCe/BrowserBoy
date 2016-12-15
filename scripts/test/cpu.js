@@ -3,6 +3,23 @@
  */
 
 define(["CPU", "MemoryManager"], function(CPU, MM) {
+    var A = "A";
+    var B = "B";
+    var C = "C";
+    var D = "D";
+    var E = "E";
+    var H = "H";
+    var L = "L";
+    var F = "F";
+    var PC = "PC";
+    var SP = "SP";
+    var M = "M";
+    var T = "T";
+    var ZERO = "ZERO";
+    var SUBTRACT = "SUBTRACT";
+    var HALF_CARRY = "HALF_CARRY";
+    var CARRY = "CARRY";
+    
     describe("CPU", function() {
         beforeEach(function() {
             CPU.reset();
@@ -37,74 +54,74 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
         describe("_getFlag()", function() {
             describe("get zero flag", function() {
                 it("should get current flag value", function() {
-                    CPU._setFlag(CPU._FLAG_ZERO, true);
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                    CPU._setFlag(ZERO, true);
+                    expect(CPU._getFlag(ZERO)).to.equal(1);
                 });
             });
             describe("get substract flag", function() {
                 it("should get current flag value", function() {
-                    CPU._setFlag(CPU._FLAG_SUBTRACT, true);
-                    expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(1);
+                    CPU._setFlag(SUBTRACT, true);
+                    expect(CPU._getFlag(SUBTRACT)).to.equal(1);
                 });
             });
             describe("get half-carry flag", function() {
                 it("should get current flag value", function() {
-                    CPU._setFlag(CPU._FLAG_HALF_CARRY, true);
-                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                    CPU._setFlag(HALF_CARRY, true);
+                    expect(CPU._getFlag(HALF_CARRY)).to.equal(1);
                 });
             });
             describe("get carry flag", function() {
                 it("should get current flag value", function() {
-                    CPU._setFlag(CPU._FLAG_CARRY, true);
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
+                    CPU._setFlag(CARRY, true);
+                    expect(CPU._getFlag(CARRY)).to.equal(1);
                 });
             });
         });
         describe("_resetZeroFlag()", function() {
             it("should should set the zero flag to 0", function() {
-                CPU._setFlag(CPU._FLAG_ZERO, false);
+                CPU._setFlag(ZERO, false);
                 expect(CPU._reg.F & 0x80).to.equal(0);
             });
         });
         describe("_setZeroFlag()", function() {
             it("should set the zero flag to 1", function() {
-                CPU._setFlag(CPU._FLAG_ZERO, true);
+                CPU._setFlag(ZERO, true);
                 expect((CPU._reg.F & 0x80) >> 7).to.equal(1);
             });
         });
         describe("_resetSubstractFlag()", function() {
             it("should set the substract flag to 0", function() {
-                CPU._setFlag(CPU._FLAG_SUBTRACT, false);
+                CPU._setFlag(SUBTRACT, false);
                 expect(CPU._reg.F & 0x40).to.equal(0);
             });
         });
         describe("_setSubstractFlag()", function() {
             it("should set the substract flag to 1", function() {
-                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
+                CPU._setFlag(SUBTRACT, true);
                 expect((CPU._reg.F & 0x40) >> 6).to.equal(1);
             });
         });
         describe("_resetHalfCarryFlag()", function() {
             it("should set the half-carry flag to 0", function() {
-                CPU._setFlag(CPU._FLAG_HALF_CARRY, false);
+                CPU._setFlag(HALF_CARRY, false);
                 expect(CPU._reg.F & 0x20).to.equal(0);
             });
         });
         describe("_setHalfCarryFlag()", function() {
             it("should set the half-carry flag to 1", function() {
-                CPU._setFlag(CPU._FLAG_HALF_CARRY, true);
+                CPU._setFlag(HALF_CARRY, true);
                 expect((CPU._reg.F & 0x20) >> 5).to.equal(1);
             });
         });
         describe("_resetCarryFlag()", function() {
             it("should set the carry flag to 0", function() {
-                CPU._setFlag(CPU._FLAG_CARRY, false);
+                CPU._setFlag(CARRY, false);
                 expect(CPU._reg.F & 0x10).to.equal(0);
             });
         });
         describe("_setCarryFlag()", function() {
             it("should set the carry flag to 1", function() {
-                CPU._setFlag(CPU._FLAG_CARRY, true);
+                CPU._setFlag(CARRY, true);
                 expect((CPU._reg.F & 0x10) >> 4).to.equal(1);
             });
         });
@@ -127,7 +144,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             it("should copy value from the register in the first argument to the register in the second" +
                 "and advance the clock by 1 machine cycle", function() {
                 CPU._reg.A=5;
-                CPU._LDr("A", "B");
+                CPU._LDr(A, B);
                 expect(CPU._reg.B).to.equal(5);
                 expect(CPU._reg.M).to.equal(1);
             });
@@ -137,7 +154,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "and advance the clock by 2 machine cycles", function() {
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, 1);
-                CPU._LDrn("A");
+                CPU._LDrn(A);
                 expect(CPU._reg.A).to.equal(1);
                 expect(CPU._reg.M).to.equal(2);
             });
@@ -148,7 +165,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, 1);
                 MM.writeByte(CPU._reg.PC+1, 2);
-                CPU._LDrn16("A", "B");
+                CPU._LDrn16(A, B);
                 expect(CPU._reg.A).to.equal(1);
                 expect(CPU._reg.B).to.equal(2);
                 expect(CPU._reg.PC).to.equal(7);
@@ -161,7 +178,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, 1);
                 MM.writeByte(CPU._reg.PC+1, 2);
-                CPU._LDr16n16("SP");
+                CPU._LDr16n16(SP);
                 // CPU is little endian and memory works with binaries, not BCDs, that's why the expected result is
                 // not 21
                 expect(CPU._reg.SP).to.equal(513);
@@ -187,7 +204,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.A = 5;
                 CPU._reg.H=1;
                 CPU._reg.L=2;
-                CPU._LDmmr("A", "H", "L");
+                CPU._LDmmr(A, H, L);
                 expect(MM.readByte(258)).to.equal(5);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -200,7 +217,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 MM.writeByte(CPU._reg.PC, 81);
                 CPU._reg.H=1;
                 CPU._reg.L=2;
-                CPU._LDmn("H", "L");
+                CPU._LDmn(H, L);
                 expect(MM.readByte(258)).to.equal(81);
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(12);
@@ -213,7 +230,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 MM.writeByte(CPU._reg.PC, 2);
                 MM.writeByte(CPU._reg.PC+1, 1);
                 CPU._reg.A = 10;
-                CPU._LDa16r("A");
+                CPU._LDa16r(A);
                 expect(MM.readByte(258)).to.equal(10);
                 expect(CPU._reg.PC).to.equal(7);
                 expect(CPU._reg.M).to.equal(3);
@@ -227,7 +244,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 MM.writeByte(CPU._reg.PC, 2);
                 MM.writeByte(CPU._reg.PC+1, 1);
                 CPU._reg.SP = 512;
-                CPU._LDa16r16("SP");
+                CPU._LDa16r16(SP);
                 expect(MM.readWord(258)).to.equal(512);
                 expect(CPU._reg.PC).to.equal(7);
                 expect(CPU._reg.M).to.equal(3);
@@ -241,7 +258,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 MM.writeByte(CPU._reg.PC, 2);
                 MM.writeByte(CPU._reg.PC+1, 1);
                 MM.writeByte(MM.readWord(CPU._reg.PC), 8);
-                CPU._LDra16("A");
+                CPU._LDra16(A);
                 expect(CPU._reg.A).to.equal(8);
                 expect(CPU._reg.PC).to.equal(7);
                 expect(CPU._reg.M).to.equal(3);
@@ -254,7 +271,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.PC = 5;
                 MM.writeByte(CPU._reg.PC, 2);
                 CPU._reg.A = 1;
-                CPU._LDar("A");
+                CPU._LDar(A);
                 expect(MM.readByte(0xFF00 + 2)).to.equal(1);
                 expect(CPU._reg.PC).to.equal(6);
                 expect(CPU._reg.M).to.equal(2);
@@ -267,7 +284,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.PC = 5;
                 MM.writeByte(CPU._reg.PC, 2);
                 MM.writeByte(0xFF00 + 2, 1);
-                CPU._LDra("A");
+                CPU._LDra(A);
                 expect(CPU._reg.A).to.equal(1);
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(12);
@@ -278,7 +295,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.C = 5;
                 CPU._reg.A = 1;
-                CPU._LDmr("A", "C");
+                CPU._LDmr(A, C);
                 expect(MM.readByte(0xFF00 + 5)).to.equal(1);
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
@@ -289,7 +306,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.C = 5;
                 MM.writeByte(0xFF00 + 5, 13);
-                CPU._LDrm("C", "A");
+                CPU._LDrm(C, A);
                 expect(CPU._reg.A).to.equal(13);
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
@@ -300,7 +317,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.H = 2;
                 CPU._reg.L = 5;
-                CPU._LDr16rr("H", "L", "SP");
+                CPU._LDr16rr(H, L, SP);
                 expect(CPU._reg.SP).to.equal(517);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -311,7 +328,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.SP=regVal;
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, offsetVal);
-                CPU._LDrrr16n("SP", "H", "L");
+                CPU._LDrrr16n(SP, H, L);
             }
             it("should load the value from the first 16-bit register added with the immediate signed byte offset, " +
                 "into the second two 8-bit registers, set carry and half-carry flags accordingly" +
@@ -353,7 +370,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.SP = 9;
                 MM.writeByte(10, 5);
                 MM.writeByte(9, 6);
-                CPU._POPrr("D", "E");
+                CPU._POPrr(D, E);
                 expect(CPU._reg.D).to.equal(5);
                 expect(CPU._reg.E).to.equal(6);
                 expect(CPU._reg.SP).to.equal(11);
@@ -367,7 +384,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                CPU._reg.SP = 10;
                CPU._reg.D = 5;
                CPU._reg.E = 6;
-               CPU._PUSHrr("D", "E");
+               CPU._PUSHrr(D, E);
                var d = MM.readByte(9);
                var e = MM.readByte(8);
                expect(d).to.equal(CPU._reg.D);
@@ -382,8 +399,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.SP = 10;
                 CPU._reg.D = 5;
                 CPU._reg.E = 6;
-                CPU._PUSHrr("D", "E");
-                CPU._POPrr("D", "E")
+                CPU._PUSHrr(D, E);
+                CPU._POPrr(D, E)
                 expect(CPU._reg.D).to.equal(5);
                 expect(CPU._reg.E).to.equal(6);
                 expect(CPU._reg.SP).to.equal(10);
@@ -396,40 +413,40 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A=5;
                 CPU._reg.B=10;
-                CPU._ADDrr("A", "B");
+                CPU._ADDrr(A, B);
                 expect(CPU._reg.A).to.equal(15);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
             });
             it("should also reset the substract flag", function() {
-                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
+                CPU._setFlag(SUBTRACT, true);
                 CPU._reg.A=5;
                 CPU._reg.B=10;
-                CPU._ADDrr("A", "B");
-                expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(0);
+                CPU._ADDrr(A, B);
+                expect(CPU._getFlag(SUBTRACT)).to.equal(0);
             });
             describe("when the result is zero", function() {
                 it("should set the zero flag", function() {
                     CPU._reg.A = 5;
                     CPU._reg.B = -5;
-                    CPU._ADDrr("A", "B");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                    CPU._ADDrr(A, B);
+                    expect(CPU._getFlag(ZERO)).to.equal(1);
                 });
             });
             describe("when there's a low nibble overflow", function() {
                 it("should set the half-carry flag", function() {
                     CPU._reg.A = 0x0F;
                     CPU._reg.B = 0xAB;
-                    CPU._ADDrr("A", "B");
-                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                    CPU._ADDrr(A, B);
+                    expect(CPU._getFlag(HALF_CARRY)).to.equal(1);
                 });
             });
             describe("when there's an overflow", function() {
                 it("should set the carry flag", function() {
                     CPU._reg.A = 0xFF;
                     CPU._reg.B = 0xAB;
-                    CPU._ADDrr("A", "B");
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
+                    CPU._ADDrr(A, B);
+                    expect(CPU._getFlag(CARRY)).to.equal(1);
                 });
             });
         });
@@ -441,7 +458,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.L = 6;
                 CPU._reg.B = 5;
                 CPU.LDmrHLB();
-                CPU._ADDrmm("H", "L", "A");
+                CPU._ADDrmm(H, L, A);
                 expect(CPU._reg.A).to.equal(15);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -452,7 +469,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.SP=regVal;
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, offsetVal);
-                CPU._ADDr16n("SP");
+                CPU._ADDr16n(SP);
             }
             it("should add the immediate signed byte value to the 16-bit register , " +
                 "and advance the clocks by 2 machine cycle and 16 cpu cycles respectively", function() {
@@ -485,29 +502,29 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             it("should behave exactly like ADDrr but take into account the carry flag", function() {
                 CPU._reg.A=5;
                 CPU._reg.B=10;
-                CPU._ADDrr("A", "B", true);
+                CPU._ADDrr(A, B, true);
                 expect(CPU._reg.A).to.equal(15);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
             });
             describe("when the carry flag is set before", function() {
                 it("should add 1 to the final result and reset the carry flag", function() {
-                    CPU._setFlag(CPU._FLAG_CARRY, true);
+                    CPU._setFlag(CARRY, true);
                     CPU._reg.A = 10;
                     CPU._reg.B = 11;
-                    CPU._ADDrr("A", "B", true);
+                    CPU._ADDrr(A, B, true);
                     expect(CPU._reg.A).to.equal(22);
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(0);
+                    expect(CPU._getFlag(CARRY)).to.equal(0);
                 });
             });
             describe("when the carry flag is set before and the result is 255", function() {
             it("should set the carry flag because of overflow", function() {
-                    CPU._setFlag(CPU._FLAG_CARRY, true);
+                    CPU._setFlag(CARRY, true);
                     CPU._reg.A = 200;
                     CPU._reg.B = 55;
-                    CPU._ADDrr("A", "B", true);
+                    CPU._ADDrr(A, B, true);
                     expect(CPU._reg.A).to.equal(0);
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
+                    expect(CPU._getFlag(CARRY)).to.equal(1);
                 });
             });
         });
@@ -519,8 +536,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.L = 6;
                 CPU._reg.B = 5;
                 CPU.LDmrHLB();
-                CPU._setFlag(CPU._FLAG_CARRY, true);
-                CPU._ADDrmm("H", "L", "A", true);
+                CPU._setFlag(CARRY, true);
+                CPU._ADDrmm(H, L, A, true);
                 expect(CPU._reg.A).to.equal(16);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -532,7 +549,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.A = 5;
                 MM.writeByte(5, 5);
                 CPU._reg.PC = 5;
-                CPU._ADDrn("A");
+                CPU._ADDrn(A);
                 expect(CPU._reg.A).to.equal(10);
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
@@ -545,7 +562,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.L = 6;
                 CPU._reg.B = 1;
                 CPU._reg.C = 5;
-                CPU._ADDrrrr("H", "L", "B", "C");
+                CPU._ADDrrrr(H, L, B, C);
                 expect(CPU._reg.H).to.equal(6);
                 expect(CPU._reg.L).to.equal(11);
                 expect(CPU._reg.M).to.equal(1);
@@ -557,40 +574,40 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A=20;
                 CPU._reg.B=10;
-                CPU._SUBrr("B");
+                CPU._SUBrr(B);
                 expect(CPU._reg.A).to.equal(10);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
             });
             it("should also set the substract flag", function() {
-                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
+                CPU._setFlag(SUBTRACT, true);
                 CPU._reg.A=15;
                 CPU._reg.B=10;
-                CPU._SUBrr("B");
-                expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(1);
+                CPU._SUBrr(B);
+                expect(CPU._getFlag(SUBTRACT)).to.equal(1);
             });
             describe("when the result is zero", function() {
                 it("should set the zero flag", function() {
                     CPU._reg.A = 5;
                     CPU._reg.B = 5;
-                    CPU._SUBrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                    CPU._SUBrr(B);
+                    expect(CPU._getFlag(ZERO)).to.equal(1);
                 });
             });
             describe("when there's a low nibble underflow", function() {
                 it("should set the half-carry flag", function() {
                     CPU._reg.A = 0xFA;
                     CPU._reg.B = 0xAB;
-                    CPU._SUBrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                    CPU._SUBrr(B);
+                    expect(CPU._getFlag(HALF_CARRY)).to.equal(1);
                 });
             });
             describe("when there's an underflow", function() {
                 it("should set the carry flag", function() {
                     CPU._reg.A = 0xAB;
                     CPU._reg.B = 0xFF;
-                    CPU._SUBrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
+                    CPU._SUBrr(B);
+                    expect(CPU._getFlag(CARRY)).to.equal(1);
                 });
             });
         });
@@ -602,7 +619,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.L = 6;
                 CPU._reg.B = 10;
                 CPU.LDmrHLB();
-                CPU._SUBrmm("H", "L");
+                CPU._SUBrmm(H, L);
                 expect(CPU._reg.A).to.equal(10);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -624,29 +641,29 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             it("should behave exactly like SUBrr but take into account the carry flag", function() {
                 CPU._reg.A=20;
                 CPU._reg.B=10;
-                CPU._SUBrr("B", true);
+                CPU._SUBrr(B, true);
                 expect(CPU._reg.A).to.equal(10);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
             });
             describe("when the carry flag is set before", function() {
                 it("should substract 1 from the final result and reset the carry flag", function() {
-                    CPU._setFlag(CPU._FLAG_CARRY, true);
+                    CPU._setFlag(CARRY, true);
                     CPU._reg.A = 15;
                     CPU._reg.B = 11;
-                    CPU._SUBrr("B", true);
+                    CPU._SUBrr(B, true);
                     expect(CPU._reg.A).to.equal(3);
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(0);
+                    expect(CPU._getFlag(CARRY)).to.equal(0);
                 });
             });
             describe("when the carry flag is set before and the result is zero", function() {
                 it("should set the carry flag because of underflow", function() {
-                    CPU._setFlag(CPU._FLAG_CARRY, true);
+                    CPU._setFlag(CARRY, true);
                     CPU._reg.A = 15;
                     CPU._reg.B = 15;
-                    CPU._SUBrr("B", true);
+                    CPU._SUBrr(B, true);
                     expect(CPU._reg.A).to.equal(255);
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
+                    expect(CPU._getFlag(CARRY)).to.equal(1);
                 });
             });
         });
@@ -658,8 +675,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.L = 6;
                 CPU._reg.B = 10;
                 CPU.LDmrHLB();
-                CPU._setFlag(CPU._FLAG_CARRY, true);
-                CPU._SUBrmm("H", "L", true);
+                CPU._setFlag(CARRY, true);
+                CPU._SUBrmm(H, L, true);
                 expect(CPU._reg.A).to.equal(9);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -672,7 +689,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A = 2;
                 CPU._reg.B = 3;
-                CPU._ANDrr("B");
+                CPU._ANDrr(B);
                 expect(CPU._reg.A).to.equal(2);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
@@ -681,8 +698,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 it("should set the zero flag", function() {
                     CPU._reg.A = 4;
                     CPU._reg.B = 3;
-                    CPU._ANDrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                    CPU._ANDrr(B);
+                    expect(CPU._getFlag(ZERO)).to.equal(1);
                 });
             });
         });
@@ -694,7 +711,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B = 3;
                 CPU.LDmrHLB();
                 CPU._reg.A = 2;
-                CPU._ANDrmm("H", "L");
+                CPU._ANDrmm(H, L);
                 expect(CPU._reg.A).to.equal(2);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -706,7 +723,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.A = 2;
                 MM.writeByte(5, 3);
                 CPU._reg.PC = 5;
-                CPU._ANDrn("A");
+                CPU._ANDrn(A);
                 expect(CPU._reg.A).to.equal(2);
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
@@ -718,7 +735,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A = 7;
                 CPU._reg.B = 3;
-                CPU._XORrr("B");
+                CPU._XORrr(B);
                 expect(CPU._reg.A).to.equal(4);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
@@ -727,8 +744,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 it("should set the zero flag", function() {
                     CPU._reg.A = 7;
                     CPU._reg.B = 7;
-                    CPU._XORrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                    CPU._XORrr(B);
+                    expect(CPU._getFlag(ZERO)).to.equal(1);
                 });
             });
         });
@@ -740,7 +757,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B = 4;
                 CPU.LDmrHLB();
                 CPU._reg.A = 7;
-                CPU._XORrmm("H", "L");
+                CPU._XORrmm(H, L);
                 expect(CPU._reg.A).to.equal(3);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -752,7 +769,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.A = 7;
                 MM.writeByte(5, 3);
                 CPU._reg.PC = 5;
-                CPU._XORrn("A");
+                CPU._XORrn(A);
                 expect(CPU._reg.A).to.equal(4);
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
@@ -764,7 +781,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A = 4;
                 CPU._reg.B = 3;
-                CPU._ORrr("B");
+                CPU._ORrr(B);
                 expect(CPU._reg.A).to.equal(7);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
@@ -773,8 +790,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 it("should set the zero flag", function() {
                     CPU._reg.A = 0;
                     CPU._reg.B = 0;
-                    CPU._ORrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                    CPU._ORrr(B);
+                    expect(CPU._getFlag(ZERO)).to.equal(1);
                 });
             });
         });
@@ -786,7 +803,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B = 3;
                 CPU.LDmrHLB();
                 CPU._reg.A = 4;
-                CPU._ORrmm("H", "L");
+                CPU._ORrmm(H, L);
                 expect(CPU._reg.A).to.equal(7);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
@@ -798,7 +815,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.A = 4;
                 MM.writeByte(5, 3);
                 CPU._reg.PC = 5;
-                CPU._ORrn("A");
+                CPU._ORrn(A);
                 expect(CPU._reg.A).to.equal(7);
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
@@ -809,40 +826,40 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A=10;
                 CPU._reg.B=10;
-                CPU._CPrr("B");
-                expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                CPU._CPrr(B);
+                expect(CPU._getFlag(ZERO)).to.equal(1);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
             });
             it("should also set the substract flag", function() {
-                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
+                CPU._setFlag(SUBTRACT, true);
                 CPU._reg.A=15;
                 CPU._reg.B=10;
-                CPU._CPrr("B");
-                expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(1);
+                CPU._CPrr(B);
+                expect(CPU._getFlag(SUBTRACT)).to.equal(1);
             });
             describe("when the result is not zero", function() {
                 it("should reset the zero flag", function() {
                     CPU._reg.A = 12;
                     CPU._reg.B = 5;
-                    CPU._CPrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(0);
+                    CPU._CPrr(B);
+                    expect(CPU._getFlag(ZERO)).to.equal(0);
                 });
             });
             describe("when there's a low nibble underflow", function() {
                 it("should set the half-carry flag", function() {
                     CPU._reg.A = 0xFA;
                     CPU._reg.B = 0xAB;
-                    CPU._CPrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                    CPU._CPrr(B);
+                    expect(CPU._getFlag(HALF_CARRY)).to.equal(1);
                 });
             });
             describe("when there's an underflow", function() {
                 it("should set the carry flag", function() {
                     CPU._reg.A = 0xAB;
                     CPU._reg.B = 0xFF;
-                    CPU._CPrr("B");
-                    expect(CPU._getFlag(CPU._FLAG_CARRY)).to.equal(1);
+                    CPU._CPrr(B);
+                    expect(CPU._getFlag(CARRY)).to.equal(1);
                 });
             });
         });
@@ -854,8 +871,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.B = 10;
                 CPU.LDmrHLB();
                 CPU._reg.A = 10;
-                CPU._CPrmm("H", "L");
-                expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                CPU._CPrmm(H, L);
+                expect(CPU._getFlag(ZERO)).to.equal(1);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(8);
             });
@@ -866,8 +883,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.A = 10;
                 MM.writeByte(5, 10);
                 CPU._reg.PC = 5;
-                CPU._CPrn("A");
-                expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                CPU._CPrn(A);
+                expect(CPU._getFlag(ZERO)).to.equal(1);
                 expect(CPU._reg.M).to.equal(2);
                 expect(CPU._reg.T).to.equal(8);
             });
@@ -876,29 +893,29 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             it("should increment the given register" +
                 "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A = 10;
-                CPU._INCr("A");
+                CPU._INCr(A);
                 expect(CPU._reg.A).to.equal(11);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
             });
             it("should reset the subtract flag", function() {
-                CPU._setFlag(CPU._FLAG_SUBTRACT, true);
+                CPU._setFlag(SUBTRACT, true);
                 CPU._reg.A = 10;
-                CPU._INCr("A");
-                expect(CPU._getFlag(CPU._FLAG_SUBTRACT)).to.equal(0);
+                CPU._INCr(A);
+                expect(CPU._getFlag(SUBTRACT)).to.equal(0);
             });
             describe("when the result is zero", function() {
                 it("should set the zero flag", function() {
                     CPU._reg.A = 255;
-                    CPU._INCr("A");
-                    expect(CPU._getFlag(CPU._FLAG_ZERO)).to.equal(1);
+                    CPU._INCr(A);
+                    expect(CPU._getFlag(ZERO)).to.equal(1);
                 });
             });
             describe("when there's a low nibble overflow", function() {
                 it("should set the half-carry flag", function() {
                     CPU._reg.A = 0xAE;
-                    CPU._INCr("A");
-                    expect(CPU._getFlag(CPU._FLAG_HALF_CARRY)).to.equal(1);
+                    CPU._INCr(A);
+                    expect(CPU._getFlag(HALF_CARRY)).to.equal(1);
                 });
             });
         });
@@ -909,7 +926,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.H = 5;
                 CPU._reg.L = 6;
                 CPU.LDmrHLA();
-                CPU._INCmm("H", "L");
+                CPU._INCmm(H, L);
                 expect(MM.readByte((CPU._reg.H << 8) + CPU._reg.L)).to.equal(11);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(12);
@@ -920,7 +937,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.B = 10;
                 CPU._reg.C = 5;
-                CPU._INCrr("C", "B");
+                CPU._INCrr(C, B);
                 expect(CPU._reg.C).to.equal(6);
                 expect(CPU._reg.B).to.equal(10);
                 expect(CPU._reg.M).to.equal(1);
@@ -930,7 +947,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 it("should increment the second register also (high byte)", function() {
                     CPU._reg.B = 10;
                     CPU._reg.C = 0xFF;
-                    CPU._INCrr("C", "B");
+                    CPU._INCrr(C, B);
                     expect(CPU._reg.C).to.equal(0);
                     expect(CPU._reg.B).to.equal(11);
                 });
@@ -938,7 +955,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             describe("when only one argument is provided (16-bit register inc)", function() {
                 it("should increment it", function() {
                     CPU._reg.SP = 10;
-                    CPU._INCrr("SP");
+                    CPU._INCrr(SP);
                     expect(CPU._reg.SP).to.equal(11);
                 });
             });
@@ -949,7 +966,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 CPU._reg.PC = 0xFFBA;
                 CPU._RST(0x28);
                 expect(CPU._reg.PC).to.equal(0x28);
-                CPU._POPr16("PC");
+                CPU._POPr16(PC);
                 expect(CPU._reg.PC).to.equal(0xFFBA);
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(16);
