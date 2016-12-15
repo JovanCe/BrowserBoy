@@ -94,6 +94,15 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         }
     };
 
+    CPU.prototype._getSignedOffset = function() {
+        var offset = MM.readByte(this._reg.PC++);
+        // the offset is signed, need to convert it from 2-complement representation
+        if (offset > 127) {
+            offset = -((~offset + 1) & 255);
+        }
+        return offset;
+    };
+
     CPU.prototype.dispatch = function() {
         // skip bios for now
         this._reg.PC = 0x100;
@@ -238,11 +247,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype._LDrrr16n = function(src, dest1, dest2) {
-        var offset = MM.readByte(this._reg.PC++);
-        // the offset is signed, need to convert it from 2-complement representation
-        if (offset > 127) {
-            offset = -((~offset + 1) & 255);
-        }
+        var offset = this._getSignedOffset();
         var value = this._reg[src] + offset;
         this._reg[dest1] = (value >> 8) & 255;
         this._reg[dest2] = value & 255;
@@ -308,11 +313,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype._ADDr16n = function(reg) {
-        var offset = MM.readByte(this._reg.PC++);
-        // the offset is signed, need to convert it from 2-complement representation
-        if (offset > 127) {
-            offset = -((~offset + 1) & 255);
-        }
+        var offset = this._getSignedOffset();
         var value = this._reg[reg] + offset;
 
         // set flags
