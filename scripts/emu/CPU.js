@@ -811,6 +811,13 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.RST30 = CPU.prototype._RST.curry(0x30);
     CPU.prototype.RST38 = CPU.prototype._RST.curry(0x38);
 
+    //interrupt handlers
+    CPU.prototype.RST40 = CPU.prototype._RST.curry(0x40);
+    CPU.prototype.RST48 = CPU.prototype._RST.curry(0x48);
+    CPU.prototype.RST50 = CPU.prototype._RST.curry(0x50);
+    CPU.prototype.RST58 = CPU.prototype._RST.curry(0x58);
+    CPU.prototype.RST60 = CPU.prototype._RST.curry(0x60);
+
     CPU.prototype.JPnn = CPU.prototype._JPnn.curry();
     CPU.prototype.JPZnn = CPU.prototype._JPnn.curry(ZERO, false);
     CPU.prototype.JPNZnn = CPU.prototype._JPnn.curry(ZERO, true);
