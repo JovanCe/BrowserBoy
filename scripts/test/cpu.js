@@ -141,7 +141,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
         });
 
         describe("LDr", function() {
-            it("should copy value from the register in the first argument to the register in the second" +
+            it("should copy value from the register in the first argument to the register in the second " +
                 "and advance the clock by 1 machine cycle", function() {
                 CPU._reg.A=5;
                 CPU._LDr(A, B);
@@ -150,7 +150,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDrn", function() {
-            it("should load an immediate byte value into the provided register" +
+            it("should load an immediate byte value into the provided register " +
                 "and advance the clock by 2 machine cycles", function() {
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, 1);
@@ -160,7 +160,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDrn16", function() {
-            it("should load an immediate word value into two provided 8-bit registers, advance the PC by 2" +
+            it("should load an immediate word value into two provided 8-bit registers, advance the PC by 2 " +
                 "and advance the clock by 3 machine cycles", function() {
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, 1);
@@ -173,7 +173,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDr16n16", function() {
-            it("should load an immediate word value into the provided 16-bit register, advance the PC by 2" +
+            it("should load an immediate word value into the provided 16-bit register, advance the PC by 2 " +
                 "and advance the clock by 3 machine cycles", function() {
                 CPU._reg.PC=5;
                 MM.writeByte(CPU._reg.PC, 1);
@@ -187,7 +187,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDrmm", function() {
-            it("should load the value from the address provided by first two registers into the third one," +
+            it("should load the value from the address provided by first two registers into the third one, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 MM.writeByte(258, 1);
                 CPU._reg.H=1;
@@ -199,7 +199,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDmmr", function() {
-            it("should put the value from the first register to the address provided by the second two," +
+            it("should put the value from the first register to the address provided by the second two, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.A = 5;
                 CPU._reg.H=1;
@@ -211,7 +211,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDmn", function() {
-            it("should put the immediate byte value into the the address provided by two registers in params," +
+            it("should put the immediate byte value into the the address provided by two registers in params, " +
                 "and advance the clocks by 2 machine cycle and 12 cpu cycles respectively", function() {
                 CPU._reg.PC = 5;
                 MM.writeByte(CPU._reg.PC, 81);
@@ -224,7 +224,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDa16r", function() {
-            it("should put the byte value in the register to the immediate address value, advance the PC by 2" +
+            it("should put the byte value in the register to the immediate address value, advance the PC by 2 " +
                 "and advance the clocks by 3 machine cycle and 16 cpu cycles respectively", function() {
                 CPU._reg.PC = 5;
                 MM.writeByte(CPU._reg.PC, 2);
@@ -238,7 +238,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDa16r16", function() {
-            it("should put the word value in the 16-bit register to the immediate address value, advance the PC by 2" +
+            it("should put the word value in the 16-bit register to the immediate address value, advance the PC by 2 " +
                 "and advance the clocks by 3 machine cycle and 20 cpu cycles respectively", function() {
                 CPU._reg.PC = 5;
                 MM.writeByte(CPU._reg.PC, 2);
@@ -252,7 +252,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDra16", function() {
-            it("should load the value in the immediate address, put it in the provided register, advance the PC by 2" +
+            it("should load the value in the immediate address, put it in the provided register, advance the PC by 2 " +
                 "and advance the clocks by 3 machine cycle and 16 cpu cycles respectively", function() {
                 CPU._reg.PC = 5;
                 MM.writeByte(CPU._reg.PC, 2);
@@ -266,7 +266,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDar", function() {
-            it("should put the value from the register into the FF00 + immediate offset address, advance the PC by 1" +
+            it("should put the value from the register into the FF00 + immediate offset address, advance the PC by 1 " +
                 "and advance the clocks by 2 machine cycle and 12 cpu cycles respectively", function() {
                 CPU._reg.PC = 5;
                 MM.writeByte(CPU._reg.PC, 2);
@@ -279,7 +279,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDra", function() {
-            it("should load the value from the FF00 + immediate offset address into the provided register," +
+            it("should load the value from the FF00 + immediate offset address into the provided register, " +
                 "and advance the clocks by 2 machine cycle and 12 cpu cycles respectively", function() {
                 CPU._reg.PC = 5;
                 MM.writeByte(CPU._reg.PC, 2);
@@ -291,7 +291,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDmr", function() {
-            it("should put the value from the first register into the FF00 + offset provided in the second register address," +
+            it("should put the value from the first register into the FF00 + offset provided in the second register address, " +
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.C = 5;
                 CPU._reg.A = 1;
@@ -302,7 +302,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDrm", function() {
-            it("should load the value from the FF00 + offset provided in the second register address into the first register," +
+            it("should load the value from the FF00 + offset provided in the second register address into the first register, " +
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.C = 5;
                 MM.writeByte(0xFF00 + 5, 13);
@@ -313,7 +313,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("LDr16rr", function() {
-            it("should load the value from the first two 8-bit registers to the third 16-bit register," +
+            it("should load the value from the first two 8-bit registers to the third 16-bit register, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.H = 2;
                 CPU._reg.L = 5;
@@ -330,8 +330,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 MM.writeByte(CPU._reg.PC, offsetVal);
                 CPU._LDrrr16n(SP, H, L);
             }
-            it("should load the value from the first 16-bit register added with the immediate signed byte offset, " +
-                "into the second two 8-bit registers, set carry and half-carry flags accordingly" +
+            it("should load the value from the first 16-bit register added with the immediate signed byte offset,  " +
+                "into the second two 8-bit registers, set carry and half-carry flags accordingly " +
                 "and advance the clocks by 2 machine cycle and 12 cpu cycles respectively", function() {
                 execute(1000, 2);
                 expect(CPU._reg.H).to.equal(3);
@@ -365,7 +365,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
 
         });
         describe("POPrr", function() {
-            it("should pop two byte values from the stack, put them into provided registers, increasing the SP register twice in the meantime, " +
+            it("should pop two byte values from the stack, put them into provided registers, increasing the SP register twice in the meantime,  " +
                 "and advance the clocks by 1 machine cycle and 16 cpu cycles respectively", function() {
                 CPU._reg.SP = 9;
                 MM.writeByte(10, 5);
@@ -379,7 +379,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("PUSHrr", function() {
-           it("should push provided registers to the stack, decreasing the SP register twice in the meantime, " +
+           it("should push provided registers to the stack, decreasing the SP register twice in the meantime,  " +
                "and advance the clocks by 1 machine cycle and 16 cpu cycles respectively", function() {
                CPU._reg.SP = 10;
                CPU._reg.D = 5;
@@ -409,7 +409,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ADDrr", function() {
-            it("should add the contents of the two registers and store them in the first one, " +
+            it("should add the contents of the two registers and store them in the first one,  " +
                 "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A=5;
                 CPU._reg.B=10;
@@ -451,7 +451,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ADDrmm", function() {
-            it("should behave exactly like ADDrr but take the operand from the address stored in provided registers," +
+            it("should behave exactly like ADDrr but take the operand from the address stored in provided registers, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.A=10;
                 CPU._reg.H = 5;
@@ -471,7 +471,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 MM.writeByte(CPU._reg.PC, offsetVal);
                 CPU._ADDr16n(SP);
             }
-            it("should add the immediate signed byte value to the 16-bit register , " +
+            it("should add the immediate signed byte value to the 16-bit register ,  " +
                 "and advance the clocks by 2 machine cycle and 16 cpu cycles respectively", function() {
                 execute(1000, 2);
                 expect(CPU._reg.SP).to.equal(1002);
@@ -529,7 +529,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ADCrmm", function() {
-            it("should behave exactly like ADCrr but take the operand from the address stored in provided registers," +
+            it("should behave exactly like ADCrr but take the operand from the address stored in provided registers, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.A=10;
                 CPU._reg.H = 5;
@@ -544,7 +544,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ADDrn", function() {
-            it("should behave exactly like ADDrr but take the second operand as immediate value" +
+            it("should behave exactly like ADDrr but take the second operand as immediate value " +
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
                 CPU._reg.A = 5;
                 MM.writeByte(5, 5);
@@ -556,7 +556,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ADDrrrr", function() {
-            it("should behave exactly like ADDrr but treats the  operands as single, 16-bit registers," +
+            it("should behave exactly like ADDrr but treats the  operands as single, 16-bit registers, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.H = 5;
                 CPU._reg.L = 6;
@@ -570,7 +570,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("SUBrr", function() {
-            it("should substract the contents of the register A and the given and store them in A, " +
+            it("should substract the contents of the register A and the given and store them in A,  " +
                 "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A=20;
                 CPU._reg.B=10;
@@ -612,7 +612,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("SUBrmm", function() {
-            it("should behave exactly like SUBrr but take the operand from the address stored in provided registers," +
+            it("should behave exactly like SUBrr but take the operand from the address stored in provided registers, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.A=20;
                 CPU._reg.H = 5;
@@ -626,7 +626,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("SUBrn", function() {
-            it("should behave exactly like SUBrr but take the second operand as immediate value" +
+            it("should behave exactly like SUBrr but take the second operand as immediate value " +
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
                 CPU._reg.A = 20;
                 MM.writeByte(5, 10);
@@ -668,7 +668,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("SBCrmm", function() {
-            it("should behave exactly like SBCrr but take the operand from the address stored in provided registers," +
+            it("should behave exactly like SBCrr but take the operand from the address stored in provided registers, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.A=20;
                 CPU._reg.H = 5;
@@ -684,8 +684,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
         });
 
         describe("ANDrr", function() {
-            it("should perform a bitwise and between the A register and the given register " +
-                "and store the result in A. It should also advance " +
+            it("should perform a bitwise and between the A register and the given register  " +
+                "and store the result in A. It should also advance  " +
                 "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A = 2;
                 CPU._reg.B = 3;
@@ -704,7 +704,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ANDrmm", function() {
-            it("should behave like ANDrr but take the operand from the address stored in provided registers," +
+            it("should behave like ANDrr but take the operand from the address stored in provided registers, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.H = 5;
                 CPU._reg.L = 6;
@@ -718,7 +718,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ANDrn", function() {
-            it("should behave exactly like ANDrr but take the second operand as immediate value" +
+            it("should behave exactly like ANDrr but take the second operand as immediate value " +
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
                 CPU._reg.A = 2;
                 MM.writeByte(5, 3);
@@ -730,8 +730,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("XORrr", function() {
-            it("should perform a bitwise xor between the A register and the given register " +
-                "and store the result in A. It should also advance " +
+            it("should perform a bitwise xor between the A register and the given register  " +
+                "and store the result in A. It should also advance  " +
                 "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A = 7;
                 CPU._reg.B = 3;
@@ -750,7 +750,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("XORrmm", function() {
-            it("should behave like XORrr but take the operand from the address stored in provided registers," +
+            it("should behave like XORrr but take the operand from the address stored in provided registers, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.H = 5;
                 CPU._reg.L = 6;
@@ -764,7 +764,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("XORrn", function() {
-            it("should behave exactly like XORrr but take the second operand as immediate value" +
+            it("should behave exactly like XORrr but take the second operand as immediate value " +
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
                 CPU._reg.A = 7;
                 MM.writeByte(5, 3);
@@ -776,8 +776,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ORrr", function() {
-            it("should perform a bitwise or between the A register and the given register " +
-                "and store the result in A. It should also advance " +
+            it("should perform a bitwise or between the A register and the given register  " +
+                "and store the result in A. It should also advance  " +
                 "the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A = 4;
                 CPU._reg.B = 3;
@@ -796,7 +796,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ORrmm", function() {
-            it("should behave like ORrr but take the operand from the address stored in provided registers," +
+            it("should behave like ORrr but take the operand from the address stored in provided registers, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.H = 5;
                 CPU._reg.L = 6;
@@ -810,7 +810,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("ORrn", function() {
-            it("should behave exactly like ORrr but take the second operand as immediate value" +
+            it("should behave exactly like ORrr but take the second operand as immediate value " +
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
                 CPU._reg.A = 4;
                 MM.writeByte(5, 3);
@@ -822,7 +822,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("CPrr", function() {
-            it("should compare the contents of the register A and the given and set the zero flag of they're equal, " +
+            it("should compare the contents of the register A and the given and set the zero flag of they're equal,  " +
                 "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A=10;
                 CPU._reg.B=10;
@@ -864,7 +864,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("CPrmm", function() {
-            it("should behave like CPrr but take the operand from the address stored in provided registers," +
+            it("should behave like CPrr but take the operand from the address stored in provided registers, " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.H = 5;
                 CPU._reg.L = 6;
@@ -878,7 +878,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("CPrn", function() {
-            it("should behave exactly like CPrr but take the second operand as immediate value" +
+            it("should behave exactly like CPrr but take the second operand as immediate value " +
                 "and advance the clocks by 2 machine cycle and 8 cpu cycles respectively", function () {
                 CPU._reg.A = 10;
                 MM.writeByte(5, 10);
@@ -890,7 +890,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("INCr", function() {
-            it("should increment the given register" +
+            it("should increment the given register " +
                 "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.A = 10;
                 CPU._INCr(A);
@@ -920,7 +920,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("INCmm", function() {
-            it("should behave like INCr but increment the value on address stored in two provided registers" +
+            it("should behave like INCr but increment the value on address stored in two provided registers " +
                 "and advance the clocks by 1 machine cycle and 12 cpu cycles respectively", function() {
                 CPU._reg.A = 10;
                 CPU._reg.H = 5;
@@ -933,7 +933,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("INCrr", function() {
-            it("should increment provided register pair as if they're a single 16-bit value" +
+            it("should increment provided register pair as if they're a single 16-bit value " +
                 "and advance the clocks by 1 machine cycle and 8 cpu cycles respectively", function() {
                 CPU._reg.B = 10;
                 CPU._reg.C = 5;
@@ -961,7 +961,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("RST", function() {
-            it("should push the PC register to the stack and load the 0x00 + given address into the PC" +
+            it("should push the PC register to the stack and load the 0x00 + given address into the PC " +
                 "and advance the clocks by 1 machine cycle and 16 cpu cycles respectively", function() {
                 CPU._reg.PC = 0xFFBA;
                 CPU._RST(0x28);
@@ -974,7 +974,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
             });
         });
         describe("JPnn", function() {
-            it("should load the immediate value into the PC register if the flag condition holds." +
+            it("should load the immediate value into the PC register if the flag condition holds. " +
                 "If the condition holds it should also advance the clock by 3 machine cycle and 16 cpu cycles respectively", function() {
                 CPU._setFlag(ZERO, true);
                 CPU._reg.PC = 0xFFBA;
@@ -992,7 +992,7 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
                 expect(CPU._reg.PC).to.equal(0xABC);
             });
             describe("when the condition does not hold", function() {
-                it("should advance the PC by 2 and" +
+                it("should advance the PC by 2 and " +
                     "advance the clock by 3 machine cycle and 12 cpu cycles respectively", function() {
                     CPU._setFlag(ZERO, false);
                     CPU._reg.PC = 0xFFBA;
@@ -1006,8 +1006,8 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
 
         });
         describe("JPmm", function() {
-            it("should load the value from the address stored in provided registers into the PC register" +
-                "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
+            it("should load the value from the address stored in provided registers into the PC register and " +
+                "advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
                 CPU._reg.PC = 0xFFBA;
                 CPU._reg.H = 5;
                 CPU._reg.L = 6;
