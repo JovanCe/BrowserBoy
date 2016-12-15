@@ -816,7 +816,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.RST30 = CPU.prototype._RST.curry(0x30);
     CPU.prototype.RST38 = CPU.prototype._RST.curry(0x38);
 
-    //interrupt handlers
+    // interrupt handlers
     CPU.prototype.RST40 = CPU.prototype._RST.curry(0x40);
     CPU.prototype.RST48 = CPU.prototype._RST.curry(0x48);
     CPU.prototype.RST50 = CPU.prototype._RST.curry(0x50);
@@ -856,6 +856,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.EI = function() {
         this._ie = true;
         this._step(1);
+    };
+
+    CPU.prototype.RETI = function() {
+        this._POPr16(PC);
+        this.ie = true;
+        this._step(1, 16);
     };
 
     CPU.prototype._NI = function(position) {
@@ -935,7 +941,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         CPU.prototype.RETNC, CPU.prototype.POPDE, CPU.prototype.JPNCnn, CPU.prototype._EMPTY,
         CPU.prototype.CALLNCnn, CPU.prototype.PUSHDE, CPU.prototype.SUBrnA, CPU.prototype.RST10,
-        CPU.prototype.RETC, CPU.prototype._NI, CPU.prototype.JPCnn, CPU.prototype._EMPTY,
+        CPU.prototype.RETC, CPU.prototype.RETI, CPU.prototype.JPCnn, CPU.prototype._EMPTY,
         CPU.prototype.CALLCnn, CPU.prototype._EMPTY, CPU.prototype.SBCrnA, CPU.prototype.RST18,
 
         CPU.prototype.LDarA, CPU.prototype.POPHL, CPU.prototype.LDmrCA, CPU.prototype._EMPTY,
