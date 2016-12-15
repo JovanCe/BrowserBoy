@@ -527,6 +527,17 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
+    CPU.prototype._JRn = function(flag, inverse) {
+        var test = inverse ? 0 : 1;
+        if(flag !== undefined && !(this._getFlag(flag) == test)) {
+            this._reg.PC += 1;
+            this._step(2);
+            return
+        }
+        this._reg.PC += this._getSignedOffset();
+        this._step(2, 12);
+    };
+
     CPU.prototype._CALLnn = function(flag, inverse) {
         var test = inverse ? 0 : 1;
         if(flag !== undefined && !(this._getFlag(flag) == test)) {
@@ -804,6 +815,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.JPNCnn = CPU.prototype._JPnn.curry(CARRY, true);
     CPU.prototype.JPmHL = CPU.prototype._JPmm.curry(H, L);
 
+    CPU.prototype.JRn = CPU.prototype._JRn.curry();
+    CPU.prototype.JRZn = CPU.prototype._JRn.curry(ZERO, false);
+    CPU.prototype.JRNZn = CPU.prototype._JRn.curry(ZERO, true);
+    CPU.prototype.JRCn = CPU.prototype._JRn.curry(CARRY, false);
+    CPU.prototype.JRNCn = CPU.prototype._JRn.curry(CARRY, true);
+
     CPU.prototype.CALLnn = CPU.prototype._CALLnn.curry();
     CPU.prototype.CALLZnn = CPU.prototype._CALLnn.curry(ZERO, false);
     CPU.prototype.CALLNZnn = CPU.prototype._CALLnn.curry(ZERO, true);
@@ -833,17 +850,17 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         CPU.prototype.STOP, CPU.prototype.LDnnDE, CPU.prototype.LDmrDEA, CPU.prototype.INCrrDE,
         CPU.prototype.INCrD, CPU.prototype.DECrD, CPU.prototype.LDnD, CPU.prototype._NI,
-        CPU.prototype._NI, CPU.prototype.ADDrrHLDE, CPU.prototype.LDrmADE, CPU.prototype.DECrrDE,
+        CPU.prototype.JRn, CPU.prototype.ADDrrHLDE, CPU.prototype.LDrmADE, CPU.prototype.DECrrDE,
         CPU.prototype.INCrE, CPU.prototype.DECrE, CPU.prototype.LDnE, CPU.prototype._NI,
 
-        CPU.prototype._NI, CPU.prototype.LDnnHL, CPU.prototype.LDmrHLplusA, CPU.prototype.INCrrHL,
+        CPU.prototype.JRNZn, CPU.prototype.LDnnHL, CPU.prototype.LDmrHLplusA, CPU.prototype.INCrrHL,
         CPU.prototype.INCrH, CPU.prototype.DECrH, CPU.prototype.LDnH, CPU.prototype._NI,
-        CPU.prototype._NI, CPU.prototype.ADDrrHLHL, CPU.prototype.LDrmAHLplus, CPU.prototype.DECrrHL,
+        CPU.prototype.JRZn, CPU.prototype.ADDrrHLHL, CPU.prototype.LDrmAHLplus, CPU.prototype.DECrrHL,
         CPU.prototype.INCrL, CPU.prototype.DECrL, CPU.prototype.LDnL, CPU.prototype._NI,
 
-        CPU.prototype._NI, CPU.prototype.LDnnSP, CPU.prototype.LDmrHLminusA, CPU.prototype.INCrrSP,
+        CPU.prototype.JRNCn, CPU.prototype.LDnnSP, CPU.prototype.LDmrHLminusA, CPU.prototype.INCrrSP,
         CPU.prototype.INCmHL, CPU.prototype.DECmHL, CPU.prototype.LDmnHL, CPU.prototype._NI,
-        CPU.prototype._NI, CPU.prototype.ADDrrHLSP, CPU.prototype.LDrmAHLminus, CPU.prototype.DECrrSP,
+        CPU.prototype.JRCn, CPU.prototype.ADDrrHLSP, CPU.prototype.LDrmAHLminus, CPU.prototype.DECrrSP,
         CPU.prototype.INCrA, CPU.prototype.DECrA, CPU.prototype.LDnA, CPU.prototype._NI,
 
         CPU.prototype.LDrrBB, CPU.prototype.LDrrBC, CPU.prototype.LDrrBD, CPU.prototype.LDrrBE,
