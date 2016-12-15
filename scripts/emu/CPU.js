@@ -494,7 +494,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype._RST = function(address) {
-        this._PUSHr16(this._reg.PC);
+        this._PUSHr16(PC);
         this._reg.PC = address;
         this._step(1, 16);
     };
