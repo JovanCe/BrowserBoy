@@ -505,8 +505,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 16);
     };
 
-    CPU.prototype._JPnn = function(flag, invert) {
-        var test = invert ? 0 : 1;
+    CPU.prototype._JPnn = function(flag, inverse) {
+        var test = inverse ? 0 : 1;
         if(flag !== undefined) {
             if(!(this._getFlag(flag) == test)) {
                 this._reg.PC += 2;

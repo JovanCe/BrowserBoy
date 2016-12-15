@@ -973,6 +973,52 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
 
             });
         });
+        describe("JPnn", function() {
+            it("should load the immediate value into the PC register if the flag condition holds." +
+                "If the condition holds it should also advance the clock by 3 machine cycle and 16 cpu cycles respectively", function() {
+                CPU._setFlag(ZERO, true);
+                CPU._reg.PC = 0xFFBA;
+                MM.writeWord(CPU._reg.PC, 0xABC);
+                CPU._JPnn(ZERO);
+                expect(CPU._reg.PC).to.equal(0xABC);
+                expect(CPU._reg.M).to.equal(3);
+                expect(CPU._reg.T).to.equal(16);
+            });
+            it("should work for inverse conditions also", function() {
+                CPU._setFlag(ZERO, false);
+                CPU._reg.PC = 0xFFBA;
+                MM.writeWord(CPU._reg.PC, 0xABC);
+                CPU._JPnn(ZERO, true);
+                expect(CPU._reg.PC).to.equal(0xABC);
+            });
+            describe("when the condition does not hold", function() {
+                it("should advance the PC by 2 and" +
+                    "advance the clock by 3 machine cycle and 12 cpu cycles respectively", function() {
+                    CPU._setFlag(ZERO, false);
+                    CPU._reg.PC = 0xFFBA;
+                    MM.writeWord(CPU._reg.PC, 0xABC);
+                    CPU._JPnn(ZERO);
+                    expect(CPU._reg.PC).to.equal(0xFFBC);
+                    expect(CPU._reg.M).to.equal(3);
+                    expect(CPU._reg.T).to.equal(12);
+                });
+            });
+
+        });
+        describe("JPmm", function() {
+            it("should load the value from the address stored in provided registers into the PC register" +
+                "and advance the clocks by 1 machine cycle and 4 cpu cycles respectively", function() {
+                CPU._reg.PC = 0xFFBA;
+                CPU._reg.H = 5;
+                CPU._reg.L = 6;
+                MM.writeWord((CPU._reg.H << 8) + CPU._reg.L, 0xABC);
+                CPU._JPmm(H, L);
+                expect(CPU._reg.PC).to.equal(0xABC);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
+
+            });
+        });
     });
 
 
