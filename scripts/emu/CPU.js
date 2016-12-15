@@ -852,7 +852,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype._instructions = [
-        // position of the instructions corresponds to its memory address
+        // position of the instructions corresponds to its opcode
         CPU.prototype.NOP, CPU.prototype.LDnnBC, CPU.prototype.LDmrBCA, CPU.prototype.INCrrBC,
         CPU.prototype.INCrB, CPU.prototype.DECrB, CPU.prototype.LDnB, CPU.prototype._NI,
         CPU.prototype.LDarSP, CPU.prototype.ADDrrHLBC, CPU.prototype.LDrmABC, CPU.prototype.DECrrBC,
@@ -929,7 +929,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.XORrnA, CPU.prototype.RST28,
 
         CPU.prototype.LDraA, CPU.prototype.POPAF, CPU.prototype.LDrmAC, CPU.prototype._NI,
-        CPU.prototype._NI, CPU.prototype.PUSHAF, CPU.prototype.ORrnA, CPU.prototype.RST30,
+        CPU.prototype._EMPTY, CPU.prototype.PUSHAF, CPU.prototype.ORrnA, CPU.prototype.RST30,
         CPU.prototype.LDHLSPn, CPU.prototype.LDSPHL, CPU.prototype.LDraaA, CPU.prototype._NI,
         CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.CPrnA, CPU.prototype.RST38
     ];
