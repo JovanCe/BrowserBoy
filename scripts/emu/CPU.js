@@ -505,6 +505,24 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 16);
     };
 
+    CPU.prototype._JPnn = function(flag, invert) {
+        var test = invert ? 0 : 1;
+        if(flag !== undefined) {
+            if(!(this._getFlag(flag) == test)) {
+                this._reg.PC += 2;
+                this._step(3);
+                return
+            }
+        }
+        this._reg.PC = MM.readWord(this._reg.PC);
+        this._step(3, 16);
+    };
+
+    CPU.prototype._JPmm = function(reg1, reg2) {
+        this._reg.PC = (this._reg[reg1] << 8) + this._reg[reg2];
+        this._step(1);
+    };
+
     // concrete instructions
     CPU.prototype.LDrrAA =  CPU.prototype._LDr.curry(A, A);
     CPU.prototype.LDrrAB =  CPU.prototype._LDr.curry(B, A);
@@ -746,7 +764,13 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.RST28 = CPU.prototype._RST.curry(0x28);
     CPU.prototype.RST30 = CPU.prototype._RST.curry(0x30);
     CPU.prototype.RST38 = CPU.prototype._RST.curry(0x38);
-    
+
+    CPU.prototype.JPnn = CPU.prototype._JPnn.curry();
+    CPU.prototype.JPZnn = CPU.prototype._JPnn.curry(ZERO, false);
+    CPU.prototype.JPNZnn = CPU.prototype._JPnn.curry(ZERO, true);
+    CPU.prototype.JPCnn = CPU.prototype._JPnn.curry(CARRY, false);
+    CPU.prototype.JPNCnn = CPU.prototype._JPnn.curry(CARRY, true);
+    CPU.prototype.JPmHL = CPU.prototype._JPmm.curry(H, L);
 
     CPU.prototype._NI = function(position) {
         console.log("Unimplemented instruction called: " + position.toString(16));
@@ -818,23 +842,23 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype.CPrrB, CPU.prototype.CPrrC, CPU.prototype.CPrrD, CPU.prototype.CPrrE,
         CPU.prototype.CPrrH, CPU.prototype.CPrrL, CPU.prototype.CPrmHL, CPU.prototype.CPrrA,
 
-        CPU.prototype._NI, CPU.prototype.POPBC, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype.POPBC, CPU.prototype.JPNZnn, CPU.prototype.JPnn,
         CPU.prototype._NI, CPU.prototype.PUSHBC, CPU.prototype.ADDrnA, CPU.prototype.RST00,
-        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.JPZnn, CPU.prototype._NI,
         CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.ADCrnA, CPU.prototype.RST08,
 
-        CPU.prototype._NI, CPU.prototype.POPDE, CPU.prototype._NI, CPU.prototype._EMPTY,
+        CPU.prototype._NI, CPU.prototype.POPDE, CPU.prototype.JPNCnn, CPU.prototype._EMPTY,
         CPU.prototype._NI, CPU.prototype.PUSHDE, CPU.prototype.SUBrnA, CPU.prototype.RST10,
-        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._EMPTY,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.JPCnn, CPU.prototype._EMPTY,
         CPU.prototype._NI, CPU.prototype._EMPTY, CPU.prototype.SBCrnA, CPU.prototype.RST18,
 
         CPU.prototype.LDarA, CPU.prototype.POPHL, CPU.prototype.LDmrCA, CPU.prototype._EMPTY,
         CPU.prototype._EMPTY, CPU.prototype.PUSHHL, CPU.prototype.ANDrnA, CPU.prototype.RST20,
-        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.LDaarA, CPU.prototype._EMPTY,
+        CPU.prototype.ADDSPn, CPU.prototype.JPmHL, CPU.prototype.LDaarA, CPU.prototype._EMPTY,
         CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.XORrnA, CPU.prototype.RST28,
 
         CPU.prototype.LDraA, CPU.prototype.POPAF, CPU.prototype.LDrmAC, CPU.prototype._NI,
-        CPU.prototype.ADDSPn, CPU.prototype.PUSHAF, CPU.prototype.ORrnA, CPU.prototype.RST30,
+        CPU.prototype._NI, CPU.prototype.PUSHAF, CPU.prototype.ORrnA, CPU.prototype.RST30,
         CPU.prototype.LDHLSPn, CPU.prototype.LDSPHL, CPU.prototype.LDraaA, CPU.prototype._NI,
         CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.CPrnA, CPU.prototype.RST38
     ];
