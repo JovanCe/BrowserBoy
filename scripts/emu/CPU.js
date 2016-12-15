@@ -519,7 +519,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype._JPmm = function(reg1, reg2) {
-        this._reg.PC = (this._reg[reg1] << 8) + this._reg[reg2];
+        this._reg.PC = MM.readWord((this._reg[reg1] << 8) + this._reg[reg2]);
         this._step(1);
     };
 
