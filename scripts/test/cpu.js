@@ -127,19 +127,28 @@ define(["CPU", "MemoryManager"], function(CPU, MM) {
         });
 
         describe("NOP", function() {
-            it("should do nothing but advance the clock by 1 machine cycle", function() {
+            it("should do nothing but advance the clock by 1 machine cycle and 4 CPU cycles", function() {
                 CPU.NOP();
                 expect(CPU._reg.M).to.equal(1);
                 expect(CPU._reg.T).to.equal(4);
             })
         });
         describe("HALT", function() {
-            it("should put the CPU in HALT state (pause)", function() {
+            it("should put the CPU in HALT state (pause) and advance the clock by 2 machine cycles and 4 CPU cycles", function() {
                 CPU.HALT();
                 expect(CPU._halt).to.equal(true);
+                expect(CPU._reg.M).to.equal(1);
+                expect(CPU._reg.T).to.equal(4);
             })
         });
-
+        describe("STOP", function() {
+            it("should put the CPU in STOP state and advance the clock by 2 machine cycles and 4 CPU cycles", function() {
+                CPU.STOP();
+                expect(CPU._stop).to.equal(true);
+                expect(CPU._reg.M).to.equal(2);
+                expect(CPU._reg.T).to.equal(4);
+            })
+        });
         describe("LDr", function() {
             it("should copy value from the register in the first argument to the register in the second " +
                 "and advance the clock by 1 machine cycle", function() {

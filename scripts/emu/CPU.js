@@ -119,6 +119,11 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
+    CPU.prototype.STOP = function() {
+        this._stop = true;
+        this._step(2, 4);
+    };
+
     CPU.prototype._PUSHrr = function(reg1, reg2) {
         this._reg.SP--;
         MM.writeByte(this._reg.SP--, this._reg[reg1]);
@@ -825,7 +830,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype.LDarSP, CPU.prototype.ADDrrHLBC, CPU.prototype.LDrmABC, CPU.prototype.DECrrBC,
         CPU.prototype.INCrC, CPU.prototype.DECrC, CPU.prototype.LDnC, CPU.prototype._NI,
 
-        CPU.prototype._NI, CPU.prototype.LDnnDE, CPU.prototype.LDmrDEA, CPU.prototype.INCrrDE,
+        CPU.prototype.STOP, CPU.prototype.LDnnDE, CPU.prototype.LDmrDEA, CPU.prototype.INCrrDE,
         CPU.prototype.INCrD, CPU.prototype.DECrD, CPU.prototype.LDnD, CPU.prototype._NI,
         CPU.prototype._NI, CPU.prototype.ADDrrHLDE, CPU.prototype.LDrmADE, CPU.prototype.DECrrDE,
         CPU.prototype.INCrE, CPU.prototype.DECrE, CPU.prototype.LDnE, CPU.prototype._NI,
