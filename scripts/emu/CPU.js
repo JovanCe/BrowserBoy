@@ -119,10 +119,24 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 16);
     };
 
+    CPU.prototype._PUSHr16 = function(reg) {
+        this._reg.SP--;
+        MM.writeByte(this._reg.SP--, (this._reg[reg] >> 8) & 0xFF);
+        MM.writeByte(this._reg.SP, this._reg[reg] & 0xFF);
+
+        // there's no step intentionally. This is a helper function used in jump instructions and the like.
+    };
+
     CPU.prototype._POPrr = function(reg1, reg2) {
         this._reg[reg2] = MM.readByte(this._reg.SP++);
         this._reg[reg1] = MM.readByte(this._reg.SP++);
         this._step(1, 12);
+    };
+
+    CPU.prototype._POPr16 = function(reg) {
+        this._reg[reg] = (MM.readByte(this._reg.SP++) << 8) + MM.readByte(this._reg.SP++);
+
+        // there's no step intentionally. This is a helper function used in jump instructions and the like.
     };
 
     CPU.prototype._LDr = function(src, dest) {
@@ -478,6 +492,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 8);
     };
 
+    CPU.prototype._RST = function(address) {
+        this._PUSHr16(this._reg.PC);
+        this._reg.PC = address;
+        this._step(1, 16);
+    };
+
     // concrete instructions
     CPU.prototype.LDrrAA =  CPU.prototype._LDr.curry(A, A);
     CPU.prototype.LDrrAB =  CPU.prototype._LDr.curry(B, A);
@@ -710,6 +730,15 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.DECrH =  CPU.prototype._DECr.curry(H);
     CPU.prototype.DECrL =  CPU.prototype._DECr.curry(L);
     CPU.prototype.DECmHL =  CPU.prototype._DECmm.curry(H, L);
+
+    CPU.prototype.RST00 = CPU.prototype._RST.curry(0);
+    CPU.prototype.RST08 = CPU.prototype._RST.curry(0x8);
+    CPU.prototype.RST10 = CPU.prototype._RST.curry(0x10);
+    CPU.prototype.RST18 = CPU.prototype._RST.curry(0x18);
+    CPU.prototype.RST20 = CPU.prototype._RST.curry(0x20);
+    CPU.prototype.RST28 = CPU.prototype._RST.curry(0x28);
+    CPU.prototype.RST30 = CPU.prototype._RST.curry(0x30);
+    CPU.prototype.RST38 = CPU.prototype._RST.curry(0x38);
     
 
     CPU.prototype._NI = function(position) {
@@ -782,25 +811,25 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype.CPrrB, CPU.prototype.CPrrC, CPU.prototype.CPrrD, CPU.prototype.CPrrE,
         CPU.prototype.CPrrH, CPU.prototype.CPrrL, CPU.prototype.CPrmHL, CPU.prototype.CPrrA,
 
-        CPU.prototype._NI, CPU.prototype.POPBC, CPU.prototype.ADDrnA, CPU.prototype._NI,
-        CPU.prototype._NI, CPU.prototype.PUSHBC, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype.POPBC, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype.PUSHBC, CPU.prototype.ADDrnA, CPU.prototype.RST00,
         CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
-        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.ADCrnA, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.ADCrnA, CPU.prototype.RST08,
 
-        CPU.prototype._NI, CPU.prototype.POPDE, CPU.prototype.SUBrnA, CPU.prototype._EMPTY,
-        CPU.prototype._NI, CPU.prototype.PUSHDE, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype.POPDE, CPU.prototype._NI, CPU.prototype._EMPTY,
+        CPU.prototype._NI, CPU.prototype.PUSHDE, CPU.prototype.SUBrnA, CPU.prototype.RST10,
         CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._EMPTY,
-        CPU.prototype._NI, CPU.prototype._EMPTY, CPU.prototype.SBCrnA, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._EMPTY, CPU.prototype.SBCrnA, CPU.prototype.RST18,
 
         CPU.prototype.LDarA, CPU.prototype.POPHL, CPU.prototype.LDmrCA, CPU.prototype._EMPTY,
-        CPU.prototype._EMPTY, CPU.prototype.PUSHHL, CPU.prototype.ANDrnA, CPU.prototype._NI,
+        CPU.prototype._EMPTY, CPU.prototype.PUSHHL, CPU.prototype.ANDrnA, CPU.prototype.RST20,
         CPU.prototype._NI, CPU.prototype._NI, CPU.prototype.LDaarA, CPU.prototype._EMPTY,
-        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.XORrnA, CPU.prototype._NI,
+        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.XORrnA, CPU.prototype.RST28,
 
         CPU.prototype.LDraA, CPU.prototype.POPAF, CPU.prototype.LDrmAC, CPU.prototype._NI,
-        CPU.prototype.ADDSPn, CPU.prototype.PUSHAF, CPU.prototype.ORrnA, CPU.prototype._NI,
+        CPU.prototype.ADDSPn, CPU.prototype.PUSHAF, CPU.prototype.ORrnA, CPU.prototype.RST30,
         CPU.prototype.LDHLSPn, CPU.prototype.LDSPHL, CPU.prototype.LDraaA, CPU.prototype._NI,
-        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.CPrnA, CPU.prototype._NI
+        CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.CPrnA, CPU.prototype.RST38
     ];
 
     return new CPU();
