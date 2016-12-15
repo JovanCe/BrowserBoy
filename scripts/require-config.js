@@ -12,7 +12,6 @@ requirejs.config({
         config: "config",
         events: "events",
 
-        lodash: "lib/lodash",
-        jquery: "lib/jquery-3.1.1.min"
+        lodash: "lib/lodash"
     }
 });

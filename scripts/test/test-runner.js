@@ -3,9 +3,10 @@
  */
 
 requirejs.config({
-    urlArgs: "now="+Date.now(),
+    //urlArgs: "now="+Date.now(),
     paths: {
-        tests: "test"
+        tests: "test",
+        jquery: "lib/jquery-3.1.1.min"
     }
 });
 tests = [
