@@ -67,6 +67,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     }
 
     CPU.prototype._step = function(m, t) {
+        this._reg.PC = (this._reg.PC + 1) & 65535;
         if(!t) {
             t=m*4;
         }
@@ -136,9 +137,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._stop = false;
 
       while(!(this._halt || this._stop)) {
-          var instruction = MM.readByte(this._reg.PC++);
-          this._reg.PC &= 65535;
-
+          var instruction = MM.readByte(this._reg.PC);
           this._instructions[instruction].call(this, instruction);
       }
     };
