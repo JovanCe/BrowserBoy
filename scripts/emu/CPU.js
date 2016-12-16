@@ -89,6 +89,25 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._ie = true;
     };
 
+    CPU.prototype.resetNoBIOS = function() {
+        this._reg.A = 0x01;
+        this._reg.F = 0xB0;
+        this._reg.B = 0x00;
+        this._reg.C = 0x13;
+        this._reg.D = 0x00;
+        this._reg.E = 0xD8;
+        this._reg.H = 0x01;
+        this._reg.L = 0x4D;
+        this._reg.PC = 0x100;
+        this._reg.SP = 0xFFFE;
+
+        MM.writeByte(0xFF40, 0x91);
+        MM.writeByte(0xFF47, 0xFC);
+        MM.writeByte(0xFF48, 0xFF);
+        MM.writeByte(0xFF49, 0xFF);
+    };
+
+
     CPU.prototype._getFlag = function(flag) {
         return (this._reg.F & this._flags[flag]) > 0 ? 1:0;
     };

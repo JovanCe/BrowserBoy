@@ -12,7 +12,7 @@ require(["require-config"], function(){
     require(["dom", "CPU", "MemoryManager", "GPU"],
         function(dom, CPU, MM, GPU) {
             dom.setupDOM();
-            CPU.reset();
+            CPU.resetNoBIOS();
             MM.reset();
             GPU.reset();
         });
