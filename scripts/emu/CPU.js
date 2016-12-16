@@ -881,6 +881,79 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1, 16);
     };
 
+    CPU.prototype._RLr = function(reg, useCarry, setZero) {
+        var r = this._reg[reg] << 1;
+        this._reg[reg] = (r | r >> 8) & 0xFF;
+        if(useCarry) {
+            this._reg[reg] = (this._reg[reg] & 0xFE) | this._getFlag(CARRY);
+        }
+        this._reg.F = 0;
+        this._setFlag(CARRY, r >> 8 > 0);
+        if(setZero) {
+            this._setFlag(ZERO, this._reg[reg] == 0);
+            this._step(2);
+        }
+        else {
+            this._step(1);
+        }
+    };
+
+    CPU.prototype._RRr = function(reg, useCarry, setZero) {
+        var r = this._reg[reg] << 8 | this._reg[reg];
+        this._reg[reg] = (r >> 1) & 0xFF;
+        if(useCarry) {
+            this._reg[reg] = (this._reg[reg] & 0x7F) | this._getFlag(CARRY) << 7;
+        }
+        this._reg.F = 0;
+        this._setFlag(CARRY, r & 1 > 0);
+        if(setZero) {
+            this._setFlag(ZERO, this._reg[reg] == 0);
+            this._step(2);
+        }
+        else {
+            this._step(1);
+        }
+    };
+
+    CPU.prototype.RLCA = CPU.prototype._RLr.curry(A);
+    CPU.prototype.RLA = CPU.prototype._RLr.curry(A, true);
+    CPU.prototype.RRCA = CPU.prototype._RRr.curry(A);
+    CPU.prototype.RRA = CPU.prototype._RRr.curry(A, true);
+
+    CPU.prototype.RLCrA = CPU.prototype._RLr.curry(A, false, true);
+    CPU.prototype.RLCrB = CPU.prototype._RLr.curry(B, false, true);
+    CPU.prototype.RLCrC = CPU.prototype._RLr.curry(C, false, true);
+    CPU.prototype.RLCrD = CPU.prototype._RLr.curry(D, false, true);
+    CPU.prototype.RLCrE = CPU.prototype._RLr.curry(E, false, true);
+    CPU.prototype.RLCrH = CPU.prototype._RLr.curry(H, false, true);
+    CPU.prototype.RLCrL = CPU.prototype._RLr.curry(L, false, true);
+
+    CPU.prototype.RLrA = CPU.prototype._RLr.curry(A, true, true);
+    CPU.prototype.RLrB = CPU.prototype._RLr.curry(B, true, true);
+    CPU.prototype.RLrC = CPU.prototype._RLr.curry(C, true, true);
+    CPU.prototype.RLrD = CPU.prototype._RLr.curry(D, true, true);
+    CPU.prototype.RLrE = CPU.prototype._RLr.curry(E, true, true);
+    CPU.prototype.RLrH = CPU.prototype._RLr.curry(H, true, true);
+    CPU.prototype.RLrL = CPU.prototype._RLr.curry(L, true, true);
+
+    CPU.prototype.RRCrA = CPU.prototype._RRr.curry(A, false, true);
+    CPU.prototype.RRCrB = CPU.prototype._RRr.curry(B, false, true);
+    CPU.prototype.RRCrC = CPU.prototype._RRr.curry(C, false, true);
+    CPU.prototype.RRCrD = CPU.prototype._RRr.curry(D, false, true);
+    CPU.prototype.RRCrE = CPU.prototype._RRr.curry(E, false, true);
+    CPU.prototype.RRCrH = CPU.prototype._RRr.curry(H, false, true);
+    CPU.prototype.RRCrL = CPU.prototype._RRr.curry(L, false, true);
+
+    CPU.prototype.RRrA = CPU.prototype._RRr.curry(A, true, true);
+    CPU.prototype.RRrB = CPU.prototype._RRr.curry(B, true, true);
+    CPU.prototype.RRrC = CPU.prototype._RRr.curry(C, true, true);
+    CPU.prototype.RRrD = CPU.prototype._RRr.curry(D, true, true);
+    CPU.prototype.RRrE = CPU.prototype._RRr.curry(E, true, true);
+    CPU.prototype.RRrH = CPU.prototype._RRr.curry(H, true, true);
+    CPU.prototype.RRrL = CPU.prototype._RRr.curry(L, true, true);
+
+
+
     CPU.prototype._NI = function(position) {
         console.log("Unimplemented instruction called: " + position.toString(16));
     };
@@ -892,14 +965,14 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._instructions = [
         // position of the instructions corresponds to its opcode
         CPU.prototype.NOP, CPU.prototype.LDnnBC, CPU.prototype.LDmrBCA, CPU.prototype.INCrrBC,
-        CPU.prototype.INCrB, CPU.prototype.DECrB, CPU.prototype.LDnB, CPU.prototype._NI,
+        CPU.prototype.INCrB, CPU.prototype.DECrB, CPU.prototype.LDnB, CPU.prototype.RLCA,
         CPU.prototype.LDarSP, CPU.prototype.ADDrrHLBC, CPU.prototype.LDrmABC, CPU.prototype.DECrrBC,
-        CPU.prototype.INCrC, CPU.prototype.DECrC, CPU.prototype.LDnC, CPU.prototype._NI,
+        CPU.prototype.INCrC, CPU.prototype.DECrC, CPU.prototype.LDnC, CPU.prototype.RRCA,
 
         CPU.prototype.STOP, CPU.prototype.LDnnDE, CPU.prototype.LDmrDEA, CPU.prototype.INCrrDE,
-        CPU.prototype.INCrD, CPU.prototype.DECrD, CPU.prototype.LDnD, CPU.prototype._NI,
+        CPU.prototype.INCrD, CPU.prototype.DECrD, CPU.prototype.LDnD, CPU.prototype.RLA,
         CPU.prototype.JRn, CPU.prototype.ADDrrHLDE, CPU.prototype.LDrmADE, CPU.prototype.DECrrDE,
-        CPU.prototype.INCrE, CPU.prototype.DECrE, CPU.prototype.LDnE, CPU.prototype._NI,
+        CPU.prototype.INCrE, CPU.prototype.DECrE, CPU.prototype.LDnE, CPU.prototype.RRA,
 
         CPU.prototype.JRNZn, CPU.prototype.LDnnHL, CPU.prototype.LDmrHLplusA, CPU.prototype.INCrrHL,
         CPU.prototype.INCrH, CPU.prototype.DECrH, CPU.prototype.LDnH, CPU.prototype._NI,
