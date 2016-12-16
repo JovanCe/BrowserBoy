@@ -1045,5 +1045,87 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype._EMPTY, CPU.prototype._EMPTY, CPU.prototype.CPrnA, CPU.prototype.RST38
     ];
 
+    CPU.prototype._cbinstructions = [
+        CPU.prototype.RLCrB, CPU.prototype.RLCrC, CPU.prototype.RLCrD, CPU.prototype.RLCrE,
+        CPU.prototype.RLCrH, CPU.prototype.RLCrL, CPU.prototype._NI, CPU.prototype.RLCrA,
+        CPU.prototype.RRCrB, CPU.prototype.RRCrC, CPU.prototype.RRCrD, CPU.prototype.RRCrE,
+        CPU.prototype.RRCrH, CPU.prototype.RRCrL, CPU.prototype._NI, CPU.prototype.RRCrA,
+
+        CPU.prototype.RLrB, CPU.prototype.RLrC, CPU.prototype.RLrD, CPU.prototype.RLrE,
+        CPU.prototype.RLrH, CPU.prototype.RLrL, CPU.prototype._NI, CPU.prototype.RLrA,
+        CPU.prototype.RRrB, CPU.prototype.RRrC, CPU.prototype.RRrD, CPU.prototype.RRrE,
+        CPU.prototype.RRrH, CPU.prototype.RRrL, CPU.prototype._NI, CPU.prototype.RRrA,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI,
+        CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI, CPU.prototype._NI
+    ];
+
     return new CPU();
 });
