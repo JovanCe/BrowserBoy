@@ -139,9 +139,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
           var instruction = MM.readByte(this._reg.PC++);
           this._reg.PC &= 65535;
 
-          if(instruction > 0) {
-              this._instructions[instruction].call(this, instruction);
-          }
+          this._instructions[instruction].call(this, instruction);
       }
     };
 
