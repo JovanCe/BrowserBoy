@@ -965,6 +965,12 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         this._step(1);
     };
 
+    CPU.prototype.PREFIX = function() {
+        var cbins = MM.readByte(this._reg.PC);
+        this._cbinstructions[cbins].call(this, cbins);
+        this._step(1);
+    };
+
     CPU.prototype._NI = function(position) {
         console.log("Unimplemented instruction called: " + position.toString(16));
     };
@@ -1037,7 +1043,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
         CPU.prototype.RETNZ, CPU.prototype.POPBC, CPU.prototype.JPNZnn, CPU.prototype.JPnn,
         CPU.prototype.CALLNZnn, CPU.prototype.PUSHBC, CPU.prototype.ADDrnA, CPU.prototype.RST00,
-        CPU.prototype.RETZ, CPU.prototype.RET, CPU.prototype.JPZnn, CPU.prototype._NI,
+        CPU.prototype.RETZ, CPU.prototype.RET, CPU.prototype.JPZnn, CPU.prototype.PREFIX,
         CPU.prototype.CALLZnn, CPU.prototype.CALLnn, CPU.prototype.ADCrnA, CPU.prototype.RST08,
 
         CPU.prototype.RETNC, CPU.prototype.POPDE, CPU.prototype.JPNCnn, CPU.prototype._EMPTY,
