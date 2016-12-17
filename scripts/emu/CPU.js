@@ -951,7 +951,19 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype.RRrH = CPU.prototype._RRr.curry(H, true, true);
     CPU.prototype.RRrL = CPU.prototype._RRr.curry(L, true, true);
 
+    CPU.prototype.SCF = function() {
+        this._setFlag(CARRY, true);
+        this._setFlag(HALF_CARRY, false);
+        this._setFlag(SUBTRACT, false);
+        this._step(1);
+    };
 
+    CPU.prototype.CCF = function() {
+        this._setFlag(CARRY, !this._getFlag(CARRY));
+        this._setFlag(HALF_CARRY, false);
+        this._setFlag(SUBTRACT, false);
+        this._step(1);
+    };
 
     CPU.prototype._NI = function(position) {
         console.log("Unimplemented instruction called: " + position.toString(16));
@@ -979,9 +991,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         CPU.prototype.INCrL, CPU.prototype.DECrL, CPU.prototype.LDnL, CPU.prototype._NI,
 
         CPU.prototype.JRNCn, CPU.prototype.LDnnSP, CPU.prototype.LDmrHLminusA, CPU.prototype.INCrrSP,
-        CPU.prototype.INCmHL, CPU.prototype.DECmHL, CPU.prototype.LDmnHL, CPU.prototype._NI,
+        CPU.prototype.INCmHL, CPU.prototype.DECmHL, CPU.prototype.LDmnHL, CPU.prototype.SCF,
         CPU.prototype.JRCn, CPU.prototype.ADDrrHLSP, CPU.prototype.LDrmAHLminus, CPU.prototype.DECrrSP,
-        CPU.prototype.INCrA, CPU.prototype.DECrA, CPU.prototype.LDnA, CPU.prototype._NI,
+        CPU.prototype.INCrA, CPU.prototype.DECrA, CPU.prototype.LDnA, CPU.prototype.CCF,
 
         CPU.prototype.LDrrBB, CPU.prototype.LDrrBC, CPU.prototype.LDrrBD, CPU.prototype.LDrrBE,
         CPU.prototype.LDrrBH, CPU.prototype.LDrrBL, CPU.prototype.LDrmBHL, CPU.prototype.LDrrBA,
