@@ -281,11 +281,13 @@ define(["lodash", "config", "events", "MemoryManager", "GPU", "interrupts"], fun
 
     CPU.prototype._LDmr = function(src, destAddr) {
         MM.writeByte(0xFF00 + this._reg[destAddr], this._reg[src]);
+        this._reg.PC++;
         this._step(2, 8);
     };
 
     CPU.prototype._LDrm = function(srcAddr, dest) {
         this._reg[dest] = MM.readByte(0xFF00 + this._reg[srcAddr]);
+        this._reg.PC++;
         this._step(2, 8);
     };
 
@@ -582,7 +584,8 @@ define(["lodash", "config", "events", "MemoryManager", "GPU", "interrupts"], fun
             this._step(2);
             return
         }
-        this._reg.PC += this._getSignedOffset();
+        var offset = this._getSignedOffset();
+        this._reg.PC += offset;
         this._step(2, 12);
     };
 
