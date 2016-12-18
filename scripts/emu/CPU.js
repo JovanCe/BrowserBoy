@@ -177,6 +177,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU", "interrupts"], fun
 
     CPU.prototype.STOP = function() {
         this._stop = true;
+        this._reg.PC = (this._reg.PC + 1) & 0xFFFF;
         this._step(2, 4);
     };
 
