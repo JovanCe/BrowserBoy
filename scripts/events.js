@@ -16,8 +16,19 @@ define(function(require) {
 
         this.ROM_LOADED = "ROMloaded";
         this.BIOS_LOADED = "BIOSloaded";
+        this.INTERRUPT_0 = "InterruptVBLANK";
+        this.INTERRUPT_1 = "InterruptLCDSTAT";
+        this.INTERRUPT_2 = "InterruptTIMER";
+        this.INTERRUPT_3 = "InterruptSERIAL";
+        this.INTERRUPT_4 = "InterruptJOYPAD";
+
         this.register(this.ROM_LOADED);
         this.register(this.BIOS_LOADED);
+        this.register(this.INTERRUPT_0);
+        this.register(this.INTERRUPT_1);
+        this.register(this.INTERRUPT_2);
+        this.register(this.INTERRUPT_3);
+        this.register(this.INTERRUPT_4);
     }
 
     Events.prototype.register = function(eventName){

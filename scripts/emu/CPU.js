@@ -2,7 +2,7 @@
  * Created by JovanCe on 11/8/15.
  */
 
-define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, config, events, MM, GPU) {
+define(["lodash", "config", "events", "MemoryManager", "GPU", "interrupts"], function(_, config, events, MM, GPU, interrupts) {
     var A = "A";
     var B = "B";
     var C = "C";
@@ -50,6 +50,26 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         // register event handlers
         events.addEventListener(events.ROM_LOADED, function() {
             this.dispatch();
+        }.bind(this));
+        events.addEventListener(events.INTERRUPT_0, function() {
+            this._ie = false;
+            this.RST40();
+        }.bind(this));
+        events.addEventListener(events.INTERRUPT_1, function() {
+            this._ie = false;
+            this.RST48();
+        }.bind(this));
+        events.addEventListener(events.INTERRUPT_2, function() {
+            this._ie = false;
+            this.RST50();
+        }.bind(this));
+        events.addEventListener(events.INTERRUPT_3, function() {
+            this._ie = false;
+            this.RST58();
+        }.bind(this));
+        events.addEventListener(events.INTERRUPT_4, function() {
+            this._ie = false;
+            this.RST60();
         }.bind(this));
 
         // show instruction names in debug
@@ -140,6 +160,9 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
           var ins = this._instructions[instruction];
           console.log(ins.toString());
           ins.call(this, instruction);
+          if(this._ie) {
+              interrupts.handleInterrupts();
+          }
       }
     };
 
@@ -877,7 +900,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
     CPU.prototype.RETI = function() {
         this._POPr16(PC);
-        this.ie = true;
+        this._ie = true;
         this._step(1, 16);
     };
 

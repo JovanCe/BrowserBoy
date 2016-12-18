@@ -11,7 +11,8 @@ define(["lodash", "events"], function(_, events) {
         // the entire GB memory
         this._memory = new Uint8Array(65536);
         // Memory region delimiters
-        this._ie = 0xFFFF; // Interrupt Enable Flag
+        this.ie = 0xFFFF; // Interrupt Enable Flag
+        this.if = 0xFF0F; //
         this._zram = 0xFF80; // Zero Page - 127 bytes
         this._zram_end = 0xFFFE;
         this._io = 0xFF00; // Hardware I/O Registers

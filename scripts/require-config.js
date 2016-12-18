@@ -8,6 +8,7 @@ requirejs.config({
         CPU: "emu/CPU",
         GPU: "emu/GPU",
         MemoryManager: "emu/MemoryManager",
+        interrupts: "emu/interrupts",
 
         config: "config",
         events: "events",
