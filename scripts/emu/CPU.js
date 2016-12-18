@@ -203,7 +203,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
 
     CPU.prototype._LDr16n16 = function(reg) {
         this._reg[reg] = MM.readWord(this._reg.PC);
-        this._reg.PC+=2;
+        this._reg.PC += 2;
         this._step(3);
     };
 
@@ -555,6 +555,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._JRn = function(flag, inverse) {
         var test = inverse ? 0 : 1;
         if(flag !== undefined && !(this._getFlag(flag) == test)) {
+            this._reg.PC++;
             this._step(2);
             return
         }
@@ -565,6 +566,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     CPU.prototype._CALLnn = function(flag, inverse) {
         var test = inverse ? 0 : 1;
         if(flag !== undefined && !(this._getFlag(flag) == test)) {
+            this._reg.PC += 2;
             this._step(3);
             return
         }
@@ -966,7 +968,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
     };
 
     CPU.prototype.PREFIX = function() {
-        var cbins = MM.readByte(this._reg.PC);
+        var cbins = MM.readByte(this._reg.PC++);
         var ins = this._cbinstructions[cbins];
         console.log("CB" + ins);
         ins.call(this, cbins);
