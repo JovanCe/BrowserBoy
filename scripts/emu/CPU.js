@@ -154,7 +154,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU", "interrupts"], fun
         this._reg.SP = 0xFFFE;
         this._stop = false;
 
-      while(!(this._halt || this._stop)) {
+      while(!(this._halt)) {
           var instruction = MM.readByte(this._reg.PC++);
           this._reg.PC &= 0xFFFF;
           var ins = this._instructions[instruction];
