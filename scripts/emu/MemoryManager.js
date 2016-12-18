@@ -63,9 +63,9 @@ define(["lodash", "events"], function(_, events) {
         reader.onload = function(e) {
             rom = new Uint8Array(reader.result);
             // reset previous ROM memory
-            this._memory.fill(0, this._rom, this._rom_end + 1);
+            this._memory.fill(0);
             // copy ROM data to memory
-            this._memory.set(rom, this._rom);
+            this._memory.set(rom);
             // TODO: ROM size checks from cartridge header
 
             events.dispatch(events.ROM_LOADED);
