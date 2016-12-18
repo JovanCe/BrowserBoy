@@ -43,7 +43,6 @@ define(["lodash", "events"], function(_, events) {
         // Note: $FEA0-$FEFF is unusable Memory
 
 
-
         // this._bios = [];
         // this._rom = [];
         // this._wram = [];
@@ -68,7 +67,7 @@ define(["lodash", "events"], function(_, events) {
             this._memory.set(rom, this._rom);
             // TODO: ROM size checks from cartridge header
 
-            events.dispatch(events.ROMLoaded);
+            events.dispatch(events.ROM_LOADED);
 
         }.bind(this);
         reader.readAsArrayBuffer(file);
@@ -104,7 +103,7 @@ define(["lodash", "events"], function(_, events) {
             // copy BIOS data to memory
             this._memory.set(bios);
             this._biosLoaded = true;
-            events.dispatch(events.BIOSLoaded);
+            events.dispatch(events.BIOS_LOADED);
 
         }.bind(this);
         reader.readAsArrayBuffer(file);

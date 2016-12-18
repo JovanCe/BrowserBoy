@@ -48,8 +48,7 @@ define(["lodash", "config", "events", "MemoryManager", "GPU"], function(_, confi
         };
 
         // register event handlers
-        events.register(events.ROMLoaded);
-        events.addEventListener(events.ROMLoaded, function() {
+        events.addEventListener(events.ROM_LOADED, function() {
             this.dispatch();
         }.bind(this));
 

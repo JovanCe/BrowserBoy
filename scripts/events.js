@@ -6,9 +6,6 @@ define(function(require) {
     function Event(name){
         this.name = name;
         this.callbacks = [];
-
-        this.ROMLoaded = "ROMloaded";
-        this.BIOSLoaded = "BIOSloaded";
     }
     Event.prototype.registerCallback = function(callback){
         this.callbacks.push(callback);
@@ -16,6 +13,11 @@ define(function(require) {
 
     function Events(){
         this.events = {};
+
+        this.ROM_LOADED = "ROMloaded";
+        this.BIOS_LOADED = "BIOSloaded";
+        this.register(this.ROM_LOADED);
+        this.register(this.BIOS_LOADED);
     }
 
     Events.prototype.register = function(eventName){
