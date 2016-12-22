@@ -118,8 +118,8 @@ define(["lodash", "events"], function(_, events) {
         this._memory[address] = value;
 
         // temp code; check for output when running blargg's test roms
-        if (address == 0xFF02 && value == 0x81) {
-            console.log(this.readByte(0xFF01));
+        if (address == 0xFF01) {
+            console.log(value);
         }
     };
 
