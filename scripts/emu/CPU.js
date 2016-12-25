@@ -260,19 +260,19 @@ define(["lodash", "config", "events", "MemoryManager", "GPU", "interrupts"], fun
     };
 
     CPU.prototype._LDa16r = function(reg) {
-        MM.writeByte(MM.readWord(this._reg[PC]), this._reg[reg]);
+        MM.writeByte(MM.readWord(this._reg.PC), this._reg[reg]);
         this._reg.PC += 2;
         this._step(3, 16);
     };
 
     CPU.prototype._LDa16r16 = function(reg) {
-        MM.writeWord(MM.readWord(this._reg[PC]), this._reg[reg]);
+        MM.writeWord(MM.readWord(this._reg.PC), this._reg[reg]);
         this._reg.PC += 2;
         this._step(3, 20);
     };
 
     CPU.prototype._LDra16 = function(reg) {
-        this._reg[reg] = MM.readByte(MM.readWord(this._reg[PC]));
+        this._reg[reg] = MM.readByte(MM.readWord(this._reg.PC));
         this._reg.PC += 2;
         this._step(3, 16);
     };
