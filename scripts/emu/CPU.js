@@ -234,7 +234,11 @@ define(["lodash", "config", "events", "MemoryManager", "GPU", "interrupts"], fun
         if(!offset) {
             offset = 0;
         }
-        this._reg[dest] = MM.readByte((this._reg[src1] << 8) + this._reg[src2] + offset);
+        var hl = (this._reg[src1] << 8) + this._reg[src2];
+        this._reg[dest] = MM.readByte(hl);
+        hl += offset;
+        this._reg[src1] = (hl >> 8) & 0xFF;
+        this._reg[src2] = hl & 0xFF;
         this._step(1,8);
     };
 
@@ -242,7 +246,11 @@ define(["lodash", "config", "events", "MemoryManager", "GPU", "interrupts"], fun
         if(!offset) {
             offset = 0;
         }
-        MM.writeByte((this._reg[dest1] << 8) + this._reg[dest2] + offset, this._reg[src]);
+        var hl = (this._reg[dest1] << 8) + this._reg[dest2];
+        MM.writeByte(hl, this._reg[src]);
+        hl += offset;
+        this._reg[dest1] = (hl >> 8) & 0xFF;
+        this._reg[dest2] = hl & 0xFF;
         this._step(1,8);
     };
 
