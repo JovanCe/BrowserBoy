@@ -1,0 +1,28 @@
+{
+  "name": "browserboy",
+  "version": "0.0.1",
+  "description": "Pure JS GameBoy Color emulator",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --require @babel/register",
+    "dev": "webpack-dev-server",
+    "build": "webpack --production"
+  },
+  "author": "Jovan Cejovic",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/register": "^7.9.0",
+    "babel-loader": "^8.1.0",
+    "chai": "^4.2.0",
+    "mocha": "^7.1.1",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.9.2",
+    "core-js": "^3.6.4"
+  }
+}
