@@ -3,4 +3,5 @@
 *.orig
 
 node_modules/
+dist/
 gb_bin/
